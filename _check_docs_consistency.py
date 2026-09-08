@@ -155,6 +155,75 @@ def walk_docx():
             yield p, lines
 
 
+# ══ C11：GitHub Actions 的 workflow 文件能不能解析 ═════════════════════
+# 2026-09-09 加的，起因是一次实打实的失败：publish-site.yml 里有一段
+# 跨行的 git commit -m "…"，续行顶格写在第 0 列。`run: |` 是 YAML 块标量，
+# 比块缩进浅的行会直接结束这个块，于是整个文件语法就废了。
+# GitHub 的反应是连 job 都不建，直接判「workflow file issue」——
+# **推一次红一次，而且红得毫无信息量**，从建立起一次都没跑起来过。
+# 更糟的是我据此对外说「它只是差个 Secret」，那是错的：先差的是文件本身能不能解析。
+#
+# 所以这条检查只回答一个问题：**这个文件 GitHub 拿去能读吗**。
+# 不装 pyyaml 也要能查出这一类，所以自己写了缩进检查：
+# 块标量里任何非空行都不许比块首行还浅。装了 pyyaml 就再整体解析一遍。
+def check_workflows():
+    wdir = os.path.join(os.path.dirname(DOCS), ".github", "workflows")
+    if not os.path.isdir(wdir):
+        return
+    for fn in sorted(os.listdir(wdir)):
+        if not fn.endswith((".yml", ".yaml")):
+            continue
+        path = os.path.join(wdir, fn)
+        lines = read(path).split("\n")
+
+        # ① 无依赖：块标量（run: | / script: | 等）里的浅缩进行
+        i = 0
+        while i < len(lines):
+            m = re.match(r"^(\s*)[\w.-]+:\s*[|>][-+]?\s*$", lines[i])
+            if not m:
+                i += 1
+                continue
+            key_indent = len(m.group(1))
+            body, j = None, i + 1
+            while j < len(lines):
+                ln = lines[j]
+                if not ln.strip():
+                    j += 1
+                    continue
+                ind = len(ln) - len(ln.lstrip())
+                if body is None:
+                    if ind <= key_indent:
+                        break                       # 空块，正常
+                    body = ind
+                elif ind < body:
+                    if ind <= key_indent:
+                        break                       # 正常收尾，回到上一层
+                    fails.append(
+                        "C11 %s 第 %d 行缩进比所属块浅（块缩进 %d，本行 %d）——"
+                        "YAML 会在这里提前结束块标量，整个文件解析就废了。"
+                        "GitHub 会直接判 workflow file issue，连 job 都不建。"
+                        % (fn, j + 1, body, ind))
+                    break
+                j += 1
+            i = j if j > i else i + 1
+
+        # ② 装了 pyyaml 就整体解析；没装就明说跳过，不算通过
+        try:
+            import yaml
+        except ImportError:
+            notes.append("C11 %s 只做了缩进检查——本机没装 pyyaml，"
+                         "整体解析没跑（pip install pyyaml 可补上）" % fn)
+            continue
+        try:
+            d = yaml.safe_load(read(path))
+        except Exception as e:
+            fails.append("C11 %s 解析失败：%s"
+                         % (fn, str(e).replace("\n", " ")[:200]))
+            continue
+        if not isinstance(d, dict) or not d.get("jobs"):
+            fails.append("C11 %s 解析出来没有 jobs——GitHub 拿到这个文件不会跑任何东西" % fn)
+
+
 # ══ C1：flow_embeds.js 是否过期 ════════════════════════════════════════
 # 这是 2026-09-08 引入 srcdoc 方案时"我自己新挖的坑"：改了 *_flow.html 但
 # 忘了重跑生成器，架构图里嵌的就是旧副本，症状正是用户最怕的那句
@@ -620,7 +689,8 @@ def main():
     for fn in (check_flow_embeds, check_retired_names, check_links,
                check_module_names, check_gate_ids, check_feature_ids,
                check_handoff_packages, check_generated_docs,
-               check_page_matches_state, check_workpackages_buildable):
+               check_page_matches_state, check_workpackages_buildable,
+               check_workflows):
         fn()
 
     print("=" * 72)
