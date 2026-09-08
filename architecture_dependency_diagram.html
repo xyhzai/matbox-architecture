@@ -1,0 +1,1610 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width,initial-scale=1" />
+<title>Matbox 架构依赖图</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600&family=Space+Grotesk:wght@400;500;600;700&display=swap" media="print" onload="this.media='all'">
+<noscript><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600&family=Space+Grotesk:wght@400;500;600;700&display=swap"></noscript>
+<style>
+  :root{
+    --bg:        #000000;
+    --bg-2:      #000000;
+    --panel:     #121821;
+    --panel-2:   #182030;
+    --border:    #1f2937;
+    --border-2:  #2a3650;
+    --text:      #e6edf7;
+    --muted:     #8492a8;
+    --dim:       #5a6679;
+
+    --c-dq:       #6aa9ff;   /* sky — 质检系统发出的依赖 */
+    --c-viz:      #b388ff;   /* violet — 人工修复台发出的依赖 */
+    --c-internal: #46f9b8;   /* mint — 基础模块之间的相互依赖 */
+    --c-optional: #ffc14d;   /* amber — 可选依赖 */
+    --c-future:   #5a6679;   /* dim — 尚未设计 */
+
+    --brand-mint:  #46f9b8;
+    --brand-violet:#a201ff;
+
+    --radius: 14px;
+    --shadow-soft: 0 10px 30px rgba(0,0,0,.45);
+    --mono: "JetBrains Mono", ui-monospace, SFMono-Regular, Menlo, monospace;
+    --sans: "Space Grotesk", system-ui, -apple-system, "Segoe UI", sans-serif;
+  }
+  *{ box-sizing:border-box; }
+  html,body{ margin:0; padding:0; }
+  body{
+    background: #000000; color: var(--text); font-family: var(--sans);
+    min-height:100vh; overflow-x:hidden;
+  }
+  header{ max-width:1480px; margin:0 auto; padding:36px 32px 8px; }
+  .eyebrow{
+    display:inline-flex; align-items:center; gap:8px;
+    font-family: var(--mono); font-size:11px; letter-spacing:.18em;
+    color: var(--muted); text-transform: uppercase;
+    padding:6px 10px; border:1px solid var(--border); border-radius:999px;
+    background: rgba(255,255,255,.015);
+  }
+  .eyebrow .dot{ width:6px; height:6px; border-radius:50%; background:var(--brand-mint); box-shadow:0 0 12px var(--brand-mint); }
+  h1{ margin:16px 0 8px; font-size:clamp(26px,3.4vw,40px); font-weight:600; letter-spacing:-.02em; }
+  h1 .accent{
+    background: linear-gradient(90deg, var(--c-dq), var(--c-viz));
+    -webkit-background-clip:text; background-clip:text; color:transparent;
+  }
+  .sub{ color:var(--muted); font-size:14.5px; max-width:78ch; line-height:1.6; margin:0 0 4px; }
+  .sub strong{ color:var(--text); font-weight:600; }
+
+  .legend{
+    max-width:1480px; margin:22px auto 0; padding:0 32px;
+    display:flex; flex-wrap:wrap; gap:16px;
+    font-family: var(--mono); font-size:11.5px; color:var(--muted);
+  }
+  .legend .item{ display:inline-flex; align-items:center; gap:7px; }
+  .legend .swatch{ width:22px; height:2.5px; border-radius:2px; }
+  .legend .swatch.dashed{ background: none; border-top:2.5px dashed; height:0; }
+
+  /* 画布不再有边框/圆角/内边距——用户2026-09-03明确指出："你把内容框在
+     一个框里了"，这跟"无限画布"这个概念本身矛盾，无限的东西不该有一
+     圈看得见的边界。画布现在贴边到视口，高度直接撑满剩余屏幕，不是
+     跟着SVG内容的宽高比走。 */
+  main{ margin:0; padding:0; }
+  .canvas{
+    position:relative;
+    background: #000000;
+    overflow:hidden;
+    height: calc(100vh - 62px);
+  }
+  .canvas svg{ display:block; width:100%; height:100%; }
+
+  .box{ cursor:pointer; }
+  .box rect{ fill: var(--panel-2); stroke: var(--border-2); stroke-width:1.4; rx:12; transition:stroke .15s ease, fill .15s ease; }
+  .box.consumer rect{ stroke-width:1.8; }
+  .box .name{ font-family: var(--sans); font-weight:600; fill:var(--text); }
+  .box .id{ font-family: var(--mono); fill:var(--muted); }
+  .box .note{ font-family: var(--mono); fill:var(--dim); }
+  .box .click-hint{ font-family: var(--mono); fill: var(--dim); opacity:0; transition:opacity .15s ease; }
+
+  /* ═══ 分组总览（Level 1）：每个方框代表一整组模块，点开才展开看内部 ═══ */
+  .group-box rect{
+    fill: var(--panel); stroke: var(--border-2); stroke-width:1.6; rx:16;
+    transition: stroke .15s ease, fill .15s ease, filter .15s ease;
+    filter: drop-shadow(0 2px 10px rgba(0,0,0,.18));
+  }
+  body.light .group-box rect{ filter: drop-shadow(0 2px 10px rgba(15,20,25,.06)); }
+  .group-box:hover rect, .group-box:focus-visible rect{ stroke: var(--brand-mint); fill: var(--panel-2); }
+  .group-box .g-name{ font-family: var(--sans); font-weight:700; fill:var(--text); }
+  .group-box .g-count{
+    font-family: var(--mono); font-size:11px; fill: var(--brand-mint); font-weight:600;
+  }
+  .group-box .g-desc{ font-family: var(--sans); fill: var(--muted); }
+  .group-box .g-members{ font-family: var(--mono); font-size:10.5px; fill: var(--dim); }
+  .group-box .g-enter{
+    font-family: var(--mono); fill: var(--dim); opacity:0; transition:opacity .15s ease;
+  }
+  .group-box:hover .g-enter, .group-box:focus-visible .g-enter{ opacity:1; }
+
+  .breadcrumb-bar{
+    max-width:1480px; margin:0 auto; padding:20px 32px 0; display:flex; align-items:center; gap:10px;
+    font-family: var(--mono); font-size:12.5px; color:var(--muted); min-height:34px;
+  }
+  .breadcrumb-bar button{
+    appearance:none; border:1px solid var(--border); background:var(--panel); color:var(--muted);
+    font-family:var(--mono); font-size:12px; padding:5px 12px; border-radius:8px; cursor:pointer;
+    display:inline-flex; align-items:center; gap:6px; transition:all .15s ease;
+  }
+  .breadcrumb-bar button:hover{ color:var(--text); border-color:var(--brand-mint); }
+  .breadcrumb-bar .crumb-current{ color:var(--text); font-weight:600; }
+  .breadcrumb-bar[hidden]{ display:none; }
+
+  /* ═══ 外部依赖引用框（stub）：点进某组内部时，组外的具体依赖目标不隐藏，
+     直接画一个简化框摆在画布上，点了跳到目标所在组并自动打开它的详情——
+     参照C4模型/Structurizr官方画法里"Container图上引用外部System"的样式。 ═══ */
+  .stub-box rect{
+    fill: none; stroke: var(--dim); stroke-width:1.3; stroke-dasharray:5 4; rx:10;
+    transition: stroke .15s ease, fill .15s ease;
+  }
+  .stub-box:hover rect, .stub-box:focus-visible rect{ stroke: var(--brand-mint); fill: rgba(0,145,95,.06); }
+  .stub-box .s-group{ font-family: var(--mono); font-size:9px; fill: var(--dim); letter-spacing:.04em; }
+  .stub-box .s-name{ font-family: var(--sans); font-weight:600; font-size:11.5px; fill: var(--muted); }
+  .stub-box:hover .s-name, .stub-box:focus-visible .s-name{ fill: var(--text); }
+  .stub-box .s-jump{ font-family: var(--mono); font-size:8.5px; fill: var(--dim); opacity:0; transition:opacity .15s ease; }
+  .stub-box:hover .s-jump, .stub-box:focus-visible .s-jump{ opacity:1; }
+  .box:hover rect, .box:focus-visible rect{ stroke: var(--brand-mint); fill: var(--panel); }
+  .box:hover .click-hint, .box:focus-visible .click-hint{ opacity:1; }
+  .box:focus-visible{ outline:none; }
+  .box.future{ cursor:pointer; }
+  .box.future rect{ stroke-dasharray:5 5; fill: rgba(90,102,121,.06); }
+  .box.future .name{ fill: var(--muted); }
+  .box.future .id{ fill: var(--dim); }
+  .box.future:hover rect, .box.future:focus-visible rect{ stroke: var(--c-future); fill: rgba(90,102,121,.1); }
+
+  /* ───────── detail modal ───────── */
+  /* ═══════════════════════════════════════════════════════════════
+     详情弹窗 — 结构和视觉照抄 quality_gate_flow.html 的右侧面板
+     （panel-head/panel-title/panel-route/panel-desc/panel-payload/
+     panel-meta），只是固定用白色底，不跟随本页深浅色主题切换。
+     颜色全部写死（不用 --panel/--text 这些会变的变量），因为用户
+     明确要求：不管页面是深是浅，弹窗永远白色，不用做第二套配色。
+     ═══════════════════════════════════════════════════════════════ */
+  .modal-overlay{
+    position:fixed; inset:0; z-index:50;
+    background: rgba(5,7,10,.6);
+    display:flex; align-items:center; justify-content:center;
+    padding: 24px;
+    opacity:0; pointer-events:none;
+    transition: opacity .18s ease;
+  }
+  .modal-overlay.open{ opacity:1; pointer-events:auto; }
+  .modal-card{
+    --pw-text:   #0f1419;
+    --pw-muted:  #55607a;
+    --pw-dim:    #8492a8;
+    --pw-border: #e2e6ee;
+    --pw-panel2: #f1f3f8;
+    --pw-mint:   #00915f;
+    width:100%; max-width: 620px; max-height: 82vh; overflow-y:auto;
+    background: #ffffff; color: var(--pw-text);
+    border: 1px solid var(--pw-border); border-radius:18px;
+    box-shadow: 0 24px 64px rgba(15,20,25,.28);
+    padding: 22px 24px 20px;
+    font-family: var(--sans);
+    transform: translateY(8px) scale(.98); transition: transform .18s ease;
+  }
+  .modal-overlay.open .modal-card{ transform: translateY(0) scale(1); }
+
+  .modal-card .panel-head{
+    display:flex; justify-content:space-between; align-items:flex-start; gap:12px;
+    padding-bottom: 14px; border-bottom: 1px dashed var(--pw-border);
+  }
+  .modal-card .panel-step{
+    font-family: var(--mono); font-size: 11px; letter-spacing:.14em;
+    color: var(--pw-muted); text-transform:uppercase;
+  }
+  .modal-card .panel-mode{
+    font-family: var(--mono); font-size: 10px; padding: 4px 8px; border-radius: 6px;
+    background: #f1f3f8; color: var(--pw-muted); border:1px solid var(--pw-border);
+    white-space:nowrap;
+  }
+  .modal-card .panel-mode.ok{ color:#00915f; border-color:rgba(0,145,95,.3); background:rgba(0,145,95,.07); }
+  .modal-card .panel-mode.draft{ color:#a16800; border-color:rgba(161,104,0,.3); background:rgba(161,104,0,.07); }
+  .modal-card .panel-mode.notstarted{ color: var(--pw-dim); }
+  .modal-card .modal-close{
+    appearance:none; border:1px solid var(--pw-border); background:#f7f8fb;
+    color:var(--pw-muted); cursor:pointer; width:30px; height:30px; border-radius:8px;
+    display:inline-flex; align-items:center; justify-content:center; flex-shrink:0;
+  }
+  .modal-card .modal-close:hover{ color:var(--pw-text); border-color:#c8d0dd; }
+
+  .modal-card .panel-title{ font-size: 19px; font-weight:600; margin: 14px 0 4px; letter-spacing:-.01em; color:var(--pw-text); }
+  .modal-card .panel-route{
+    font-family: var(--mono); font-size: 12px; color: var(--pw-muted);
+    margin: 0 0 12px; display:flex; flex-wrap:wrap; gap: 6px 10px;
+  }
+  .modal-card .panel-route .k{ color: var(--pw-dim); }
+  .modal-card .panel-route .v{ color: var(--pw-text); }
+  .modal-card .panel-desc{ color: var(--pw-muted); font-size: 13.5px; line-height:1.6; margin: 0 0 14px; }
+
+  .modal-card .panel-payload{
+    font-family: var(--mono); font-size: 11.5px;
+    background: #f4f6fa; border: 1px solid var(--pw-border); border-radius: 10px;
+    padding: 12px 14px; color: #1e2838;
+    overflow:auto; max-height: 220px; line-height:1.65; margin: 0 0 14px; white-space:pre-wrap;
+  }
+  .modal-card .panel-payload .lbl{ color:#a16800; }
+
+  .modal-card .panel-meta{
+    display:flex; flex-wrap:wrap; gap: 7px;
+    padding-top: 12px; border-top: 1px dashed var(--pw-border);
+  }
+  .modal-card .chip{
+    font-family: var(--mono); font-size: 11px;
+    padding: 5px 9px; border-radius: 999px;
+    background: var(--pw-panel2); border:1px solid var(--pw-border);
+    color: var(--pw-text);
+  }
+  .modal-card .chip .fid{ color: var(--pw-mint); margin-right:4px; }
+
+  .modal-card .modal-p0{
+    margin-top:14px;
+    background: rgba(214,58,95,.06); border:1px solid rgba(214,58,95,.22); border-radius:10px; padding:10px 12px;
+  }
+  .modal-card .modal-p0 h4{ font-family:var(--mono); font-size:10px; letter-spacing:.12em; text-transform:uppercase; color:#b0244a; margin:0 0 6px; }
+  .modal-card .modal-p0 ul{ margin:0; padding-left:16px; font-size:12.5px; line-height:1.6; color:#5a1a2c; }
+
+  .modal-card .modal-link{
+    display:inline-flex; align-items:center; gap:6px; margin-top:16px;
+    font-family:var(--mono); font-size:12px; color: var(--pw-mint);
+    text-decoration:none; border:1px solid var(--pw-border); border-radius:8px;
+    padding:8px 12px;
+  }
+  .modal-card .modal-link:hover{ border-color: var(--pw-mint); background:rgba(0,145,95,.06); }
+  .modal-card .modal-empty{ color:var(--pw-muted); font-size:13.5px; line-height:1.6; }
+
+  /* ═══════════════════════════════════════════════════════════════
+     全页弹出 — 用于"这个模块本身已经有一张完整页面"的情况（目前是
+     质检系统的流程演示图）。不是链接/iframe去借旁边的文件，是把那
+     整个页面的HTML/CSS/JS原样复制进这一个文件里（放进Shadow DOM，
+     避免两边样式/变量互相打架），发布成独立链接也能看到完整内容。
+     ═══════════════════════════════════════════════════════════════ */
+  .iframe-overlay{
+    position:fixed; inset:0; z-index:60;
+    background: rgba(5,7,10,.65);
+    display:flex; align-items:center; justify-content:center;
+    padding: 22px;
+    opacity:0; pointer-events:none;
+    transition: opacity .18s ease;
+  }
+  .iframe-overlay.open{ opacity:1; pointer-events:auto; }
+  .iframe-frame-wrap{
+    display:flex; flex-direction:column;
+    width:100%; height:100%; max-width:1520px;
+    background:#fff; border-radius:16px; overflow:hidden;
+    box-shadow: 0 24px 64px rgba(15,20,25,.35);
+    transform: scale(.98); transition: transform .18s ease;
+  }
+  .iframe-overlay.open .iframe-frame-wrap{ transform: scale(1); }
+  /* 关闭按钮单独放在一条不滚动的窄条里，跟下面 #dqEmbedHost 的可滚动
+     内容完全分开——之前按钮用 position:absolute 悬浮在滚动区域上方，
+     恰好和滚动条同一个位置，滚动条把点击事件"抢走"了，按钮变成
+     摆设点不到（2026-08-29 用户实测发现）。分层之后物理上不可能
+     再撞在一起，不是挪个像素躲一下这种治标不治本的修法。 */
+  .iframe-close-bar{
+    flex:0 0 auto; display:flex; justify-content:flex-end; align-items:center;
+    padding:10px 12px; background:#fff; border-bottom:1px solid #e2e6ee;
+  }
+  .full-page-host{ flex:1 1 auto; min-height:0; width:100%; overflow:hidden; display:block; }
+  /* 流程图整篇原文塞进 iframe 的 srcdoc（见 ensureEmbedBuilt 的注释），
+     所以滚动条归 iframe 内部自己管，外面这层不再滚——两层都能滚会打架。 */
+  .full-page-frame{ width:100%; height:100%; border:0; display:block; }
+  .iframe-close{
+    appearance:none; border:1px solid #e2e6ee; background:#ffffff;
+    color:#555f70; cursor:pointer; width:34px; height:34px; border-radius:9px;
+    display:inline-flex; align-items:center; justify-content:center;
+  }
+  .iframe-close:hover{ color:#0f1419; border-color:#c8d0dd; }
+
+  /* ═══ 依赖关系图（ego-graph）：点开任意模块都能看"这一个模块真实连着
+     谁"，位置现场算出来摆，不是手工摆坐标——参照Neo4j Bloom"选中节点
+     看邻居"的真实验证过的做法（G2 4.5分，149条真实评价），不管以后
+     模块涨到多少个，这张图每次只画"当前这一个模块的邻居"，规模不会
+     失控。点邻居能以它为中心重新生成，也能直接跳去看它自己的详情。 ═══ */
+  .ego-overlay{
+    position:fixed; inset:0; z-index:65;
+    background: rgba(5,7,10,.7);
+    display:flex; align-items:center; justify-content:center;
+    padding: 22px; opacity:0; pointer-events:none; transition: opacity .18s ease;
+  }
+  .ego-overlay.open{ opacity:1; pointer-events:auto; }
+  .ego-card{
+    width:100%; max-width:920px; height:min(680px, 92vh);
+    background:var(--panel); border:1px solid var(--border); border-radius:16px;
+    display:flex; flex-direction:column; overflow:hidden;
+    box-shadow: 0 24px 64px rgba(15,20,25,.35);
+    transform: scale(.98); transition: transform .18s ease;
+  }
+  .ego-overlay.open .ego-card{ transform: scale(1); }
+  .ego-head{
+    flex:0 0 auto; display:flex; align-items:center; justify-content:space-between;
+    padding:14px 18px; border-bottom:1px solid var(--border);
+  }
+  .ego-head .ego-title{ font-family: var(--sans); font-weight:700; font-size:15px; color:var(--text); }
+  .ego-head .ego-sub{ font-family: var(--mono); font-size:11px; color:var(--dim); margin-top:2px; }
+  .ego-head-btns{ display:flex; align-items:center; gap:8px; }
+  .ego-head-btns button{
+    appearance:none; border:1px solid var(--border); background:var(--panel-2); color:var(--muted);
+    cursor:pointer; border-radius:9px; display:inline-flex; align-items:center; justify-content:center;
+    font-family:var(--mono); font-size:12px; padding:0 12px; height:32px; gap:6px;
+  }
+  .ego-head-btns button:hover{ color:var(--text); border-color:var(--brand-mint); }
+  .ego-body{ flex:1 1 auto; min-height:0; overflow:auto; }
+  .ego-body svg{ display:block; width:100%; height:100%; }
+  .ego-node rect{ fill: var(--panel-2); stroke: var(--border-2); stroke-width:1.4; rx:12; }
+  .ego-node.focus rect{ fill: var(--panel-2); stroke: var(--brand-mint); stroke-width:2.2; }
+  .ego-node.neighbor{ cursor:pointer; }
+  .ego-node.neighbor rect{ transition: stroke .15s ease, fill .15s ease; }
+  .ego-node.neighbor:hover rect, .ego-node.neighbor:focus-visible rect{ stroke: var(--brand-mint); fill: rgba(0,145,95,.08); }
+  .ego-node .en-group{ font-family: var(--mono); font-size:9px; fill: var(--dim); }
+  .ego-node .en-name{ font-family: var(--sans); font-weight:600; font-size:12px; fill: var(--text); }
+  .ego-node.focus .en-name{ font-size:14px; }
+  .ego-node .en-jump{ font-family: var(--mono); font-size:8.5px; fill: var(--dim); opacity:0; transition:opacity .15s ease; }
+  .ego-node.neighbor:hover .en-jump, .ego-node.neighbor:focus-visible .en-jump{ opacity:1; }
+  .ego-empty{ padding:40px; text-align:center; color:var(--dim); font-family:var(--sans); font-size:13px; }
+
+  /* ═══ 架构地图节点卡片 — 照抄 .claude/skills/architecture-diagram 这个
+     项目内已有技能的 .node 卡片真实样式（方形/左侧色条/角标），不是
+     另外自己设计一套。用户2026-09-02明确要求：抄已经验证过、9张流程
+     演示图都在用的样式；同时因为架构地图最终要放到200个节点规模，
+     比参考样式（默认150px宽）更紧凑。用<foreignObject>把这张HTML卡片
+     嵌进SVG坐标空间——这样拖拽/缩放/关系线高亮这些已经跑通的机制
+     完全不用动，只换"每个节点长什么样"这一层。 ═══ */
+  .canvas{ cursor: grab; touch-action: none; }
+  .canvas.panning{ cursor: grabbing; }
+  .canvas svg{ min-width: 0; }
+
+  /* 卡片颜色定死，不跟页面主题变——用户2026-09-03明确要求："只要黑底
+     白卡，边条一种颜色，一种形式"，不要深浅两套切换（已把切换按钮
+     整个删掉）。卡片背景写死白色，文字用写死的深色，不用会跟着主题
+     变的--text/--panel-2这些变量。 */
+  .node-fo{ overflow: visible; }
+  .node{
+    position:relative; width:100%; height:100%; box-sizing:border-box;
+    padding: 6px 10px 6px 12px;
+    background: #ffffff; border: 1px solid #dde1ea;
+    border-radius: 10px;
+    box-shadow: 0 2px 10px rgba(0,0,0,.28);
+    cursor: pointer; user-select:none;
+    transition: border-color .18s ease, box-shadow .18s ease, transform .18s ease;
+    display:flex; flex-direction:column; justify-content:center; gap:2px;
+  }
+  .node::before{
+    content:""; position:absolute; left:0; top:8px; bottom:8px; width:3px;
+    background: var(--c); border-radius:3px; opacity:.9;
+  }
+  .node:hover, .node:focus-visible{
+    border-color: color-mix(in srgb, var(--c) 55%, #dde1ea);
+    transform: translateY(-1px);
+    box-shadow: 0 2px 10px rgba(0,0,0,.28), 0 0 0 1px color-mix(in srgb, var(--c) 30%, transparent);
+    outline: none;
+  }
+  /* 名字允许换到2行，不再硬截断成"独立站/移...."这种看不清是啥的省略号
+     （用户2026-09-02明确指出名字看不清）——sizing按内容留够高度。 */
+  .node-name{
+    font-family: var(--sans); font-weight:700; font-size:11.5px; color: #0f1419; line-height:1.28;
+    display:-webkit-box; -webkit-line-clamp:3; -webkit-box-orient:vertical; overflow:hidden;
+  }
+  /* 子卡片编号现在是"组编号+原编号"拼在一起，可能比单独一个编号长，
+     允许换到2行，不再硬截断（同名字截断的教训一样，2026-09-03再犯一次
+     同类问题，这次直接给够空间）。 */
+  .node-id{
+    font-family: var(--mono); font-size:8.5px; color: #6b7688; line-height:1.35;
+    display:-webkit-box; -webkit-line-clamp:2; -webkit-box-orient:vertical; overflow:hidden;
+  }
+  /* 状态文字用专门加深过的--c-text，不直接用--c——原来的浅灰/浅黄在
+     白卡上对比度不够，看不清（用户2026-09-02明确指出跟字体颜色有关，
+     不是感觉问题，是真实对比度不够）。 */
+  .node-status{ font-family: var(--mono); font-size:8.5px; color: var(--c-text, var(--c)); font-weight:700; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+  /* 子卡片角标——保留颜色圆点(用户2026-09-03明确要求保留)，去掉外面
+     那圈黑色描边(box-shadow之前有0 0 0 2px var(--bg)，在纯黑背景上会
+     显出一圈黑边)，圆点做大一些，装下2位数字不再显挤。 */
+  .node-badge{
+    position:absolute; top:-9px; right:-9px;
+    min-width:21px; height:21px; padding:0 4px; border-radius:50%;
+    background: var(--c); color:#0a0d12;
+    font-family: var(--mono); font-weight:700; font-size:10px;
+    display:flex; align-items:center; justify-content:center;
+    box-shadow: 0 2px 8px rgba(0,0,0,.5);
+  }
+  /* 组卡片的关联数——跟子卡片一样用圆点+数字，视觉统一、一目了然（用户
+     2026-09-03确认）。但组卡片的颜色不能用--c（那是健康状态色，组是
+     混合的，没有单一健康状态），改用固定的蓝色，专门挑了一个跟"维护中"
+     状态色(#3373dc)明显不同的蓝，避免被误认成状态色。 */
+  .node-badge-hub{ background:#4f8ef7; }
+  .status-idle  { --c:#8492a8; --c-text:#555f70; } .status-dev { --c:#e08a2b; --c-text:#96560a; } .status-warn { --c:#c9a227; --c-text:#7a5e08; }
+  .status-ok    { --c:#1f9d55; --c-text:#0f6b39; } .status-error{ --c:#d6393f; --c-text:#9a2029; } .status-maint{ --c:#3373dc; --c-text:#1f4d99; }
+
+  .node.hub-node{ cursor:default; background: #f5f6fa; border-style:dashed; box-shadow:none; align-items:center; }
+  .node.hub-node:hover{ transform:none; box-shadow:none; border-color:#dde1ea; }
+  .node.hub-node::before{ display:none; }
+  .node.hub-node .node-name{ font-size:12.5px; font-weight:800; color:#0f1419; text-align:center; -webkit-line-clamp:2; }
+  .node.hub-node .node-id{ text-align:center; color:#6b7688; }
+  .node-stats{ margin-top:3px; text-align:center; font-family:var(--mono); font-size:9.5px; color:#3a4150; font-weight:600; line-height:1.6; white-space:normal; }
+  .stat-dot{ display:inline-block; width:7px; height:7px; border-radius:50%; margin-right:3px; vertical-align:middle; }
+
+  /* 关系线：默认几乎隐形（只作为背景纹理暗示"这里有关系"），碰到相关
+     节点才亮起来、变粗、露出标签——参照Neo4j Bloom/ReGraph真实的
+     hover/select高亮做法，不是死摆在那的装饰线。聚簇内部"谁属于哪个
+     组"已经靠位置远近表达清楚，不再另外画一条线，减少视觉噪音。 */
+  .rel-edge-wrap{ cursor: default; }
+  .rel-edge-hit{ fill:none; stroke: transparent; stroke-width:16; pointer-events: stroke; }
+  .rel-edge{ fill:none; stroke: var(--muted); stroke-width:1.1; opacity:.16; pointer-events:none; transition: opacity .18s ease, stroke-width .18s ease, stroke .18s ease; }
+  .rel-edge.optional{ stroke-dasharray: 4 4; }
+  .canvas.hovering .rel-edge{ opacity:.05; }
+  .rel-edge.rel-active{ opacity:.95 !important; stroke-width:2.2; stroke: var(--brand-mint); }
+  /* 关系数据包动画 — 照抄 quality_gate_flow.html 里"animateMotion沿wire
+     飞的packet"这个真实做法（用户2026-09-02明确要求），不是另外发明。
+     区别：那边是"一步一次"，这里是悬停时持续循环飞，因为悬停是一个
+     连续状态，不是一次性的步骤事件。 */
+  .rel-packet{ r:3.6; fill: var(--brand-mint); filter: drop-shadow(0 0 6px var(--brand-mint)); opacity:0; }
+  .rel-packet.run{ opacity:1; }
+  @media (prefers-reduced-motion: reduce){ .rel-packet{ display:none !important; } }
+
+  /* 底层容器边界框——C4模型"容器边界"标准画法，把5个聚簇整体框起来，
+     一眼看出这一整片是一个东西（用户2026-09-02明确要求，之前只有一行
+     小字，看不出来）。 */
+  .top-to-bottom-link{ fill:none; stroke: var(--border-2); stroke-width:1.6; stroke-dasharray: 5 5; opacity:.5; }
+  .top-to-bottom-arrow{ fill: var(--border-2); opacity:.7; }
+  /* "0 底层"卡片到5个组圆心的连线——这条线是有真实意义的（"0底层由
+     这5个组构成"），不是纯装饰，所以画出来，比一般关系线更明显一点。 */
+  .cluster-spoke-root{ fill:none; stroke: var(--border-2); stroke-width:1.4; opacity:.55; }
+  .row-bound-box{ fill: rgba(255,255,255,.015); stroke: #3a4356; stroke-width:1.4; stroke-dasharray: 7 6; }
+  .canvas.hovering .node{ transition: opacity .15s ease; }
+  .canvas.hovering .node:not(.rel-dim){ opacity:1; }
+  .canvas.hovering .node.rel-dim{ opacity:.32; }
+  .edge-tip{ font-family: var(--mono); font-size:11px; fill: var(--text); paint-order: stroke; stroke: var(--bg-2); stroke-width:4; text-anchor:middle; pointer-events:none; }
+  .edge-tip-bg{ fill: var(--panel); stroke: var(--border-2); stroke-width:1; rx:5; pointer-events:none; }
+
+  .edge-label{
+    font-family: var(--mono); font-size:11px;
+    paint-order: stroke; stroke: var(--bg-2); stroke-width:5;
+  }
+  .section-label{
+    font-family: var(--mono); font-size:11px; letter-spacing:.14em;
+    fill: var(--dim); text-transform:uppercase;
+  }
+
+  .foot-list{
+    max-width:1480px; margin:22px auto 0; padding:0 32px;
+  }
+  .foot-list h2{ font-size:14px; color:var(--text); margin:0 0 10px; font-weight:600; }
+  .foot-list ol{ margin:0; padding-left:20px; color:var(--muted); font-size:13px; line-height:1.9; }
+  .foot-list code{ font-family:var(--mono); font-size:12px; color:var(--text); background:rgba(255,255,255,.05); padding:1px 5px; border-radius:4px; }
+
+  @media (max-width:720px){
+    header,.legend,main,.foot-list{ padding-left:18px; padding-right:18px; }
+  }
+</style>
+</head>
+<body>
+
+<div class="breadcrumb-bar" id="breadcrumbBar">
+  <button id="btnResetView" aria-label="回到整体视图">
+    <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4"><path d="M3 3v6h6M21 21v-6h-6"/><path d="M3 9a9 9 0 0 1 15-4.7M21 15a9 9 0 0 1-15 4.7"/></svg>
+    回到整体视图
+  </button>
+  <span class="crumb-current" id="crumbCurrent">拖拽平移 · 滚轮缩放 · 一张连续的图，不会因为点击而消失任何内容</span>
+</div>
+
+<main>
+  <div class="canvas" id="canvasWrap">
+    <svg id="mainSvg" viewBox="0 0 1560 1500" role="img" aria-label="Matbox架构地图：可拖拽缩放的完整画布，上方是前端功能入口，下方是技术架构聚簇，全部内容始终可见，点击任意节点查看它自己的详情。">
+      <defs>
+        <marker id="ah-dq" markerWidth="8" markerHeight="8" refX="6" refY="3" orient="auto" markerUnits="strokeWidth">
+          <path d="M0,0 L6,3 L0,6 Z" fill="var(--c-dq)"/>
+        </marker>
+        <marker id="ah-viz" markerWidth="8" markerHeight="8" refX="6" refY="3" orient="auto" markerUnits="strokeWidth">
+          <path d="M0,0 L6,3 L0,6 Z" fill="var(--c-viz)"/>
+        </marker>
+        <marker id="ah-internal" markerWidth="8" markerHeight="8" refX="6" refY="3" orient="auto" markerUnits="strokeWidth">
+          <path d="M0,0 L6,3 L0,6 Z" fill="var(--c-internal)"/>
+        </marker>
+        <marker id="ah-optional" markerWidth="8" markerHeight="8" refX="6" refY="3" orient="auto" markerUnits="strokeWidth">
+          <path d="M0,0 L6,3 L0,6 Z" fill="var(--c-optional)"/>
+        </marker>
+      </defs>
+
+      <!-- ═══════════════════════════════════════════════════════════
+           架构地图：一个连续坐标空间(<g id="viewport">)，拖拽平移+滚轮
+           缩放，内容永远不会因为导航/点击而消失(见memory
+           feedback_never_hide_content) —— 上方scene-top是N个真实前端
+           功能入口(架构原则47/49，不写死)，下方scene-clusters是5个真实
+           聚簇(应用层/平台核心共享层/AI员工执行体系/多端渲染/架构底层)，
+           每个聚簇一个圆心+一圈真实成员，圆心和成员统一用同一种"圆形
+           节点"渲染(用户2026-09-02明确要求：方形太占地方，200个节点
+           规模下必须用圆形；且顶层6个功能本身也是各自聚簇的圆心，跟
+           底层用同一套规则，不是两套东西)。内容全部由JS的renderAll()
+           按TOP_FUNCTIONS/NODE_GROUP/EDGES这些已有真实数据现场算坐标
+           生成，不是手摆的固定形状。
+           ═══════════════════════════════════════════════════════════ -->
+      <g id="viewport">
+        <g id="scene-top"></g>
+        <g id="scene-clusters"></g>
+      </g>
+    </svg>
+  </div>
+
+  <div class="foot-list">
+    <h2>图里每条线具体对应文档里的哪句话</h2>
+    <ol>
+      <li>质检系统 → <code>F-CRED-001</code>：SonarQube/Betterleaks等扫描器需要凭据时，走密钥模块的代理注入，不直接拿明文。</li>
+      <li>质检系统 → <code>F-OBS-001</code>：GateDecision、SourceReviewRecord等证据写入，字段名统一是 <code>evidenceBundleRef</code>。</li>
+      <li>质检系统 → <code>F-RELEASE-001</code>：SBOM复用Trivy产出，构建产物加SLSA Provenance签名。</li>
+      <li>质检系统 -·-&gt; <code>F-COST-001</code>（可选）：仅当启用F-DQ-012（AI Code Review）时，成本归因才用得上。</li>
+      <li>人工修复台 → <code>F-OBS-001</code>：只读查询证据链，不新建第二套证据存储。</li>
+      <li>人工修复台 → <code>F-TENANT-001</code>：查询权限做脱敏，操作留痕走审计。</li>
+      <li>人工修复台 → <code>F-QUEUE-001</code>：实时事件复用已有队列订阅，不新建第二套队列（F-VIZ-006）。</li>
+      <li>人工修复台 → 质检系统：只读投影质检产生的Finding/GateDecision，两个文档故意不合并成一份（CQRS模式）。</li>
+      <li><code>F-TENANT-001</code> → <code>F-CRED-001</code>：AI员工鉴权时按grantId查<code>AgentCredentialGrant</code>的scope，本次数据Contract审查删除了TENANT里重复的授权表，改成查这条依赖。</li>
+      <li><code>F-QUEUE-001</code> → <code>F-OBS-001</code>：任务派发、执行、重试全过程留痕。</li>
+    </ol>
+  </div>
+</main>
+
+<div class="modal-overlay" id="modalOverlay" role="dialog" aria-modal="true" aria-labelledby="modalTitle">
+  <div class="modal-card" id="modalCard">
+    <div class="panel-head">
+      <div class="panel-step" id="modalStep">MODULE</div>
+      <div style="display:flex; align-items:center; gap:8px;">
+        <div class="panel-mode" id="modalStatus">—</div>
+        <button class="modal-close" id="modalEgoBtn" aria-label="查看依赖关系图" title="查看依赖关系图" style="width:auto; padding:0 10px; gap:5px; font-family:var(--mono); font-size:11px;">
+          <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="5" r="2.5"/><circle cx="5" cy="19" r="2.5"/><circle cx="19" cy="19" r="2.5"/><path d="M12 7.5 L6.3 17 M12 7.5 L17.7 17"/></svg>
+          关系图
+        </button>
+        <button class="modal-close" id="modalClose" aria-label="关闭">
+          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+        </button>
+      </div>
+    </div>
+    <h3 class="panel-title" id="modalTitle">—</h3>
+    <div class="panel-route" id="modalRoute"></div>
+    <p class="panel-desc" id="modalDesc"></p>
+    <pre class="panel-payload" id="modalPayload"></pre>
+    <div class="panel-meta" id="modalMeta"></div>
+    <div id="modalP0Wrap"></div>
+    <div id="modalLinkWrap"></div>
+  </div>
+</div>
+
+<div class="iframe-overlay" id="iframeOverlay" role="dialog" aria-modal="true" aria-label="完整页面详情">
+  <div class="iframe-frame-wrap">
+    <div class="iframe-close-bar">
+      <button class="iframe-close" id="iframeEgoBtn" aria-label="查看依赖关系图" title="查看依赖关系图" style="margin-right:8px; width:auto; padding:0 12px; gap:6px; font-family:var(--mono,ui-monospace); font-size:12px;">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="5" r="2.5"/><circle cx="5" cy="19" r="2.5"/><circle cx="19" cy="19" r="2.5"/><path d="M12 7.5 L6.3 17 M12 7.5 L17.7 17"/></svg>
+        依赖关系图
+      </button>
+      <button class="iframe-close" id="iframeClose" aria-label="关闭">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+      </button>
+    </div>
+    <div class="full-page-host" id="dqEmbedHost"></div>
+    <div class="full-page-host" id="vizEmbedHost" style="display:none;"></div>
+    <div class="full-page-host" id="releaseEmbedHost" style="display:none;"></div>
+    <div class="full-page-host" id="costEmbedHost" style="display:none;"></div>
+    <div class="full-page-host" id="credTenantEmbedHost" style="display:none;"></div>
+    <div class="full-page-host" id="queueEmbedHost" style="display:none;"></div>
+    <div class="full-page-host" id="actionEmbedHost" style="display:none;"></div>
+    <div class="full-page-host" id="approvalEmbedHost" style="display:none;"></div>
+    <div class="full-page-host" id="handoffEmbedHost" style="display:none;"></div>
+    <div class="full-page-host" id="taskEmbedHost" style="display:none;"></div>
+    <div class="full-page-host" id="storageEmbedHost" style="display:none;"></div>
+    <div class="full-page-host" id="providerRouterEmbedHost" style="display:none;"></div>
+    <div class="full-page-host" id="aiempEmbedHost" style="display:none;"></div>
+  </div>
+</div>
+
+<div class="ego-overlay" id="egoOverlay" role="dialog" aria-modal="true" aria-label="依赖关系图">
+  <div class="ego-card">
+    <div class="ego-head">
+      <div>
+        <div class="ego-title" id="egoTitle">—</div>
+        <div class="ego-sub" id="egoSub">—</div>
+      </div>
+      <div class="ego-head-btns">
+        <button id="egoOpenDetail">打开详情 ›</button>
+        <button id="egoClose" aria-label="关闭">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+        </button>
+      </div>
+    </div>
+    <div class="ego-body" id="egoBody"></div>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════════════════════════════════════
+     13 张流程演示图的原文，打包成 window.__FLOW_HTML__。
+     生成物，不要手改；改了 *_flow.html 之后重跑 `python docs/_build_flow_embeds.py`。
+
+     为什么要打包：用户是双击 HTML 文件打开这张图的（file:// 协议）。
+     2026-09-08 用无头 Chrome 在 file:// 下实测：fetch → TypeError、
+     XHR → NetworkError、<iframe src="本地.html"> → 根本不渲染，
+     只有 <script src="本地.js"> 还能加载。原来这里用的是 fetch，
+     所以用户每次双击打开点进来都是一片红字报错。
+     ═══════════════════════════════════════════════════════════════════════ -->
+<script src="flow_embeds.js?v=3f7922297c73"></script>
+
+<script>
+  /* ═══════════════════════════════════════════════════════════════
+     EDGES — 全部真实存在的依赖关系，唯一真相来源，不因为分组/切视图
+     而增删。2026-09-02重新逐条核对全部26个模块的desc/reuse原文才列出，
+     不是拍脑袋编的：每条edge的label都能在NODE_DATA对应节点的desc/
+     reuse字段里找到原句依据。查证结论（10轮资料，见对话记录）：数据
+     永远完整、视图只是取景，是Structurizr/Backstage/Datadog等所有
+     真实管理大量服务的工具的共同原则；但同时吸取Backstage真实用户的
+     教训——"什么关系都往上加，图会变得很吵"，所以这里只收真正有documented
+     依据的关系，不是每一处提及都算数。
+     ═══════════════════════════════════════════════════════════════ */
+  const EDGES = [
+    // 应用层 内部
+    { from:"viz", to:"dq", label:"只读投影 Finding/GateDecision" },
+    // 应用层 → 平台核心共享层
+    { from:"dq", to:"cred", label:"读密钥" },
+    { from:"dq", to:"obs", label:"写证据" },
+    { from:"dq", to:"release", label:"SBOM/SLSA" },
+    { from:"dq", to:"cost", label:"可选·成本(F-DQ-012)", optional:true },
+    { from:"viz", to:"obs", label:"查证据链" },
+    { from:"viz", to:"tenant", label:"权限脱敏" },
+    { from:"viz", to:"queue", label:"复用事件(F-VIZ-006)" },
+    // 平台核心共享层 内部
+    { from:"tenant", to:"cred", label:"查grantId取scope，不重复建表" },
+    { from:"queue", to:"obs", label:"任务派发/重试留痕" },
+    // AI员工执行体系 → 平台核心共享层
+    { from:"task", to:"queue", label:"共用同一套Temporal实例" },
+    { from:"aiemp", to:"cost", label:"Entitlement预算/配额" },
+    { from:"action", to:"cred", label:"commit时重新鉴权取凭证" },
+    { from:"approval", to:"queue", label:"共用Temporal基础设施" },
+    // AI员工执行体系 → 架构底层
+    { from:"aiemp", to:"provider-router", label:"能力注册表·模型策略引用" },
+    { from:"action", to:"provider-router", label:"经Provider Router执行模型调用" },
+    // 架构底层 → AI员工执行体系（反向：Agent Runtime是执行引擎）
+    { from:"agent-runtime", to:"task", label:"落实到TASK-F005 Kill Switch" },
+    { from:"agent-runtime", to:"aiemp", label:"落实到AIEMP-F005 Kill Switch" },
+    // 多端渲染与内容分发体系 → 平台核心共享层
+    { from:"channel", to:"cred", label:"签名证书/密钥" },
+    { from:"channel", to:"release", label:"构建产物追溯" },
+    { from:"channel", to:"tenant", label:"多租户隔离" },
+    { from:"page", to:"storage", label:"知识库原始数据落地" },
+    // 架构底层 → 平台核心共享层
+    { from:"knowledge-base", to:"storage", label:"原始数据落地(架构原则第7条)" },
+    // 全球多语言与本地化 → 各上游 Owner（只引用，不复制事实）
+    { from:"loc", to:"tenant", label:"读User/Tenant语言偏好，不建第二身份体系" },
+    { from:"loc", to:"page", label:"直接复用SiteInstance/ContentBinding/LocalizedRoute" },
+    { from:"loc", to:"provider-router", label:"翻译Provider可替换(Qwen/Google)" },
+    { from:"loc", to:"cred", label:"Provider密钥只存vault ref" },
+    { from:"loc", to:"cost", label:"每次付费翻译写usage/cost ref" },
+    { from:"loc", to:"release", label:"Catalog作为Release Artifact，可回滚" },
+    { from:"loc", to:"task", label:"长批量翻译复用共享Task，不用Tolgee BatchJob" },
+    { from:"loc", to:"aiemp", label:"注入AiLanguageContext(LOC-F014/F018)" },
+    { from:"loc", to:"action", label:"语言工具经Action/Tool Gateway授权(LOC-F019)" },
+  ];
+  const NODE_GROUP = {
+    dq:"consumer", viz:"consumer",
+    cred:"core", obs:"core", release:"core", cost:"core", tenant:"core", queue:"core", storage:"core",
+    task:"aiemployee", egress:"aiemployee", aiemp:"aiemployee", action:"aiemployee", approval:"aiemployee", notify:"aiemployee",
+    page:"render", mobile:"render", multiend:"render", handoff:"render", channel:"render",
+    loc:"core",
+    "provider-router":"foundation", "eval-framework":"foundation", "knowledge-base":"foundation", "agent-runtime":"foundation"
+  };
+  function nodeEdges(key){
+    return EDGES.filter(e => e.from === key || e.to === key).map(e => ({
+      other: e.from === key ? e.to : e.from,
+      dir: e.from === key ? "out" : "in",
+      label: e.label, optional: !!e.optional
+    }));
+  }
+
+  /* ═══════════════════════════════════════════════════════════════
+     节点卡片渲染 — 照抄 .claude/skills/architecture-diagram 技能自带、
+     已经在9张流程演示图里验证过的 .node 方形卡片样式（用户2026-09-02
+     明确要求，不是自己另外设计）。用<foreignObject>把这张真实HTML卡片
+     嵌进SVG世界坐标——拖拽/缩放/关系线高亮这些已经跑通的机制完全不用
+     碰，只是把"节点长什么样"从手画的SVG圆形换成真实的HTML卡片。整张
+     地图统一用这一个函数画节点，顶层功能、聚簇圆心、聚簇里的具体模块
+     长得都是同一套东西，不会到了内部就变成简化版。卡片4样东西：名字/
+     唯一编号/状态(颜色色条+文字合一)/关联数角标，不点不悬停全部直接
+     可见。尺寸比参考样式默认的150px更紧凑——架构地图最终要放到200个
+     节点，比参考样式常见的8-12个节点场景挤得多。
+     ═══════════════════════════════════════════════════════════════ */
+  const svgNS = "http://www.w3.org/2000/svg";
+  const STATUS_LABEL = { idle:"未开始", dev:"开发中", warn:"降级", ok:"正常", error:"故障", maint:"维护中" };
+  function renderNodeCard(container, opts){
+    const { key, x, y, name, idText, status, connCount, isHub, statsHtml } = opts;
+    const w = isHub ? 176 : 138, h = isHub ? (statsHtml ? 98 : 66) : 96;
+    const fo = document.createElementNS(svgNS, "foreignObject");
+    fo.setAttribute("class", "node-fo");
+    fo.setAttribute("x", x - w / 2);
+    fo.setAttribute("y", y - h / 2);
+    fo.setAttribute("width", w);
+    fo.setAttribute("height", h);
+    const div = document.createElement("div");
+    div.className = "node status-" + status + (isHub ? " hub-node" : "");
+    div.setAttribute("data-node", key);
+    div.setAttribute("aria-label", name + (idText ? "，" + idText : ""));
+    if(!isHub){ div.tabIndex = 0; div.setAttribute("role", "button"); }
+    div.innerHTML = `
+      ${isHub ? `<div class="node-badge node-badge-hub">${connCount}</div>` : `<div class="node-badge">${connCount}</div>`}
+      <div class="node-name">${name}</div>
+      <div class="node-id">${idText}</div>
+      ${isHub ? (statsHtml ? `<div class="node-stats">${statsHtml}</div>` : "") : `<div class="node-status">${STATUS_LABEL[status] || ""}</div>`}
+    `;
+    fo.appendChild(div);
+    container.appendChild(fo);
+    return div;
+  }
+  /* 组卡片的"综合统计"——不用单一颜色条代表整个组（30个子项的话，一条
+     颜色装不下"谁坏了/坏了几个"），改成"⚪未开始4 · 🟢正常2"这种真实
+     计数，只列组里真实存在的状态种类，不把6种状态全列出来占地方（用户
+     2026-09-03确认的方案）。 */
+  const STATUS_DOT = { idle:"#8492a8", dev:"#e08a2b", warn:"#c9a227", ok:"#1f9d55", error:"#d6393f", maint:"#3373dc" };
+  function groupStatsHtml(keys){
+    const counts = {};
+    keys.forEach(k => { const s = statusFromNodeData(k); counts[s] = (counts[s]||0) + 1; });
+    return Object.keys(STATUS_DOT).filter(s => counts[s]).map(s =>
+      `<span class="stat-dot" style="background:${STATUS_DOT[s]}"></span>${STATUS_LABEL[s]} ${counts[s]}`
+    ).join("  ");
+  }
+
+  /* TOP_FUNCTIONS — 架构地图顶层（架构原则47/49确认）：N个真实前端
+     功能入口，N不写死，往这个列表加一条就多一个，renderTopScene()按
+     数组长度自动重排，不用改画布代码。每个功能同时也是它自己那个
+     聚簇的圆心（用户2026-09-02明确要求：顶层和底层用同一套"圆心+一
+     圈成员"规则，不是两套东西）——现在还没给具体子内容，所以圆心周围
+     暂时没有一圈成员，只画圆心本身，不假装内容已经设计完。connections
+     如实标0——这6个功能具体各自用到底层哪些真实模块，还没有逐条核实
+     过，不能编一个数字充数（不像底层内部23条关系，那些是真查过原文
+     才列出来的）；等哪天核实了具体对应关系，这里再改成真实数字。点开
+     显示什么内容用户说"先不讨论"，故用占位提示，不编造内容。 */
+  const TOP_FUNCTIONS = [
+    { id:"page-home",    name:"首页",            status:"ok",   connections:0 },
+    { id:"page-mood",    name:"情绪版",           status:"dev",  connections:0 },
+    { id:"page-console", name:"AI 工作台",        status:"dev",  connections:0 },
+    { id:"page-site",    name:"独立站/移动端管理", status:"idle", connections:0 },
+    { id:"page-aiemp",   name:"AI员工管理中心",   status:"idle", connections:0 },
+    { id:"page-admin",   name:"后台管理",         status:"idle", connections:0 }
+  ];
+  function topFnPositions(){
+    const n = TOP_FUNCTIONS.length;
+    const gap = 158; // 卡片宽138px，留够间隙不重叠（之前写的128是按更早104px宽算的，忘了同步，导致6个功能卡片一直在轻微重叠，2026-09-03发现修复）
+    const totalW = (n - 1) * gap;
+    const startX = 780 - totalW / 2;
+    return TOP_FUNCTIONS.map((fn, i) => ({ ...fn, x: startX + i * gap, y: 90 }));
+  }
+  function renderTopScene(){
+    const host = document.getElementById("scene-top");
+    host.innerHTML = '<text class="section-label" x="20" y="24">架构地图 · 全部内容始终可见，拖拽平移/滚轮缩放查看，点任意节点看它自己的详情</text>';
+    topFnPositions().forEach(fn => {
+      renderNodeCard(host, { key: fn.id, x: fn.x, y: fn.y, name: fn.name, idText: STATUS_LABEL[fn.status], status: fn.status, connCount: fn.connections, isHub: false });
+    });
+  }
+
+  /* ═══════════════════════════════════════════════════════════════
+     结构化数据 — 每个模块的详情都从这里读取，不是写死在HTML里。
+     以后要做"自动生成图"时，这份数据可以直接复用（见架构原则第25条）。
+     ═══════════════════════════════════════════════════════════════ */
+  const NODE_DATA = {
+    dq: {
+      fullPage: true,
+      title: "代码持续质检与安全自检 Gate",
+      id: "F-DQ-001~013 · Platform Core Quality",
+      status: "✅ READY_FOR_STAGE10_BINDING",
+      desc: "按顺序执行①代码质检→②安全质检→③自动测试三道Gate，任一环节DENY自动返修并从头重新验证。具体每一步怎么走，见「流程演示图」。",
+      own: "QualityRun / GateDecision / NormalizedFinding 核心质检流程",
+      reuse: "SonarQube、OpenGrep、Betterleaks、Trivy、OPA（均固定commit，License已核查）",
+      features: [
+        ["F001","Dev Quality Run Orchestrator"],["F002","Evidence Normalizer / Finding Mapper"],
+        ["F003","SonarQube Code Quality Adapter"],["F004","OpenGrep SAST Adapter"],
+        ["F005","Betterleaks Secret Detection Adapter"],["F006","Trivy SBOM Adapter"],
+        ["F007","架构/Contract/Schema Guard"],["F008","OPA GatePolicy Evaluator"],
+        ["F009","Auto Repair / Revalidation Controller"],["F010","Suppression/Waiver治理"],
+        ["F011","SCM/PR/Merge/Release集成"],["F012","AI Code Review（可选）"],["F013","质检工具健康度/回归"]
+      ],
+      p0: ["所有P0 Hard Gate必须fail-closed：缺Evidence/ScannerError/PolicyError/Timeout/Incomplete都不能PASS","Confirmed高置信Secret finding必须DENY"]
+      // 注：fullPage:true 的模块不会走 renderModal()，link/linkLabel 在这里不生效，故不写
+    },
+    viz: {
+      fullPage: true,
+      title: "代码问题定位与人工修复台",
+      id: "F-VIZ-001~007",
+      status: "🟡 DESIGN_COMPLETE_POC_PENDING",
+      desc: "质检系统之上的只读可视化+交互界面（问题定位、影响分析、修复建议、修复闭环），明确不重建质检/证据/发布/队列/租户权限系统，全部复用已有事实源。源文档自称「开发指导版」，Stage 8真实POC待Matbox源码仓库+Base Commit后执行，尚未达到Codex Ready。",
+      own: "View Contract（字段/状态/置信度/降级规则）",
+      reuse: "F-DQ-002产出的Finding、F-OBS-001证据、F-TENANT-001权限、F-QUEUE-001事件队列",
+      features: [
+        ["F001","View Contract"],["F002","Projection API（只读投影）"],["F003","Finding UI"],
+        ["F004","Relation UI（关系图）"],["F005","Repair UX（隔离修复/审批）"],
+        ["F006","Realtime（复用队列事件）"],["F007","Security/QA（脱敏审计）"]
+      ],
+      p0: ["代码解析采用Tree-sitter主力+SCIP兜底混合方案，不是模糊枚举几个工具了事","AI解释/修复调用必须把源代码当不可信数据处理，且该调用不具备工具执行能力"]
+      // 注：fullPage:true 的模块不会走 renderModal()，link/linkLabel 在这里不生效，故不写
+    },
+    cred: {
+      fullPage: true, embedKey: "credTenant",
+      title: "密钥管理", id: "F-CRED-001", status: "🟢 DRAFT_RESEARCH_COMPLETE",
+      desc: "解决AI员工/人类用户的密码、密钥、Token统一存取问题。AI员工临时授权生命周期（签发端）与F-TENANT-001共享同一张「流程演示图」。",
+      own: "SecretRef、AgentCredentialGrant、HumanAccessGrant、RotationPolicy、CredentialAccessEvent",
+      reuse: "Infisical（MIT真开源，淘汰了HashiCorp Vault——2023年从MPL改为半开源BSL）",
+      features: [["F001","Infisical集成适配器"],["F002","人类用户访问控制"],["F003","AI员工身份签发"],
+        ["F004","运行时代理注入（密钥不经过AI员工）"],["F005","Token生命周期与轮换"],["F006","访问审计日志"],
+        ["F007","企业第三方集成凭证（2026-08-30从多端平台文档并入）"]],
+      p0: ["密钥明文出现在代码/Prompt/日志/文档/Artifact中：不可降级P0","AI员工被直接告知真实密钥明文：不可降级P0","人类账号和AI身份共用同一凭据：不允许"]
+      // 注：fullPage:true 的模块不会走 renderModal()，link/linkLabel 在这里不生效，故不写
+    },
+    obs: {
+      title: "证据审计与AI员工监控", id: "F-OBS-001", status: "🟢 DRAFT_RESEARCH_COMPLETE",
+      desc: "两件事：①防篡改证据记录（GateDecision等一旦写入不能被偷改）②AI员工行为监控（自动发现异常烧钱/编造/跳步骤）。",
+      own: "EvidenceBundle、GateDecision存证规则、告警规则",
+      reuse: "OpenTelemetry采集（Claude Agent SDK原生支持）+ SigNoz看板 + immudb防篡改存储",
+      features: [["F001","OpenTelemetry采集层"],["F002","自建监控看板SigNoz"],["F003","防篡改证据账本immudb"],
+        ["F004","高信号告警规则"],["F005","统一证据查询接口"],
+        ["F006","AI Evaluation评测框架（2026-08-30并入，原架构底层独立占位模块已取消）"]],
+      p0: ["证据类记录被直接修改或删除且无痕迹：不可降级P0","监控数据和证据数据混存导致证据被误删：不可降级P0"],
+    },
+    release: {
+      fullPage: true,
+      title: "发布与基线", id: "F-RELEASE-001", status: "🟢 DRAFT_RESEARCH_COMPLETE",
+      desc: "证明现在生产上跑的东西就是当初审核通过的那份代码——ReleaseArtifact和Baseline管理。追溯链条详见「流程演示图」。",
+      own: "BaselineID、ReleaseArtifactID编号规则、追溯链条业务逻辑",
+      reuse: "Harbor镜像仓库 + 复用F-DQ-006的Trivy SBOM产出 + CI原生SLSA Provenance签名",
+      features: [["F001","Harbor自建制品仓库"],["F002","SBOM复用接入（不重复生成）"],["F003","SLSA构建溯源签名"],
+        ["F004","追溯链条（Commit→依赖→构建→产物→部署）"],["F005","Baseline冻结与历史保留"],
+        ["F006","数据库迁移追溯（Flyway，2026-08-30从多端平台文档并入）"],
+        ["F007","灰度发布+自动回滚（2026-09-04补，纠正此前遗漏）"]],
+      p0: ["ReleaseArtifact被覆盖或事后修改：不可降级P0","Baseline历史PASS记录被删除或篡改：不可降级P0","声称已发布验证但追溯链条任一环节缺失：不允许","新版本未经灰度直接100%切量且未配置回滚阈值：不允许，紧急补丁除外且需留痕"]
+      // 注：fullPage:true 的模块不会走 renderModal()，link/linkLabel 在这里不生效，故不写
+    },
+    cost: {
+      fullPage: true,
+      title: "成本控制", id: "F-COST-001", status: "🟢 DRAFT_RESEARCH_COMPLETE",
+      desc: "AI员工花了多少钱、超没超预算、谁在烧钱。与Provider Router故意不合并——一个管路由，一个管花费。预算告警流程详见「流程演示图」。",
+      own: "预算规则、告警阈值、成本归因到WorkPackage/AI员工的业务逻辑（源头span/trace打租户标签，不靠账单事后反推——2026-08-29已确认并更正此前不准确的\"Langfuse Environment\"说法，实际是projectId三层结构）",
+      reuse: "Langfuse调用链路成本记录能力（否决了LiteLLM合并方案，其开源版预算治理功能被阉割）",
+      features: [["F001","Langfuse成本追踪接入"],["F002","预算规则与阈值配置"],["F003","软性配额告警(80%/100%)"],["F004","成本归因查询接口"],
+        ["F005","企业套餐用量账本/预算/权益（2026-08-30从多端平台文档并入）"]],
+      p0: ["成本数据被静默丢失或不归因到具体AI员工/任务：视为设计缺陷","为省钱擅自降级模型且不留痕迹、不经评测验证：不允许","靠月底账单事后反推按租户成本：不允许，必须源头打标签"]
+      // 注：fullPage:true 的模块不会走 renderModal()，link/linkLabel 在这里不生效，故不写
+    },
+    tenant: {
+      fullPage: true, embedKey: "credTenant",
+      title: "租户与权限体系", id: "F-TENANT-001", status: "🟢 DRAFT_RESEARCH_COMPLETE",
+      desc: "谁能看到什么数据、谁能做什么操作——覆盖人类用户和AI员工两类身份。跨租户隔离是RC5定义的最高优先级P0风险。AI员工临时授权生命周期（鉴权/收回端）与F-CRED-001共享同一张「流程演示图」。",
+      own: "TenantID模型、角色定义、权限判断业务规则",
+      reuse: "OPA策略引擎（已在F-DQ-008采用，不新增第二套）；AI员工授权直接查询F-CRED-001的AgentCredentialGrant，不重复建表",
+      features: [["F001","租户身份与会话模型"],["F002","人类用户角色权限(RBAC)"],["F003","AI员工策略授权(OPA)"],
+        ["F004","数据隔离实现"],["F005","权限决策审计接入"]],
+      p0: ["跨租户数据访问或隔离失效：不可降级P0，最高优先级","权限绕过：不可降级P0","AI员工权限任务结束后未收回（僵尸权限）：不可降级P0"]
+      // 注：fullPage:true 的模块不会走 renderModal()，link/linkLabel 在这里不生效，故不写
+    },
+    queue: {
+      fullPage: true,
+      title: "任务队列", id: "F-QUEUE-001", status: "🟢 DRAFT_RESEARCH_COMPLETE",
+      desc: "WorkPackage怎么派发给AI员工、任务失败了怎么恢复、多个AI员工同时干活会不会打架。RC5多AI并行标准的技术地基。失败重试升级流程详见「流程演示图」。",
+      own: "WorkPackage派发规则、冲突检测逻辑（QueueRun技术执行状态，注意区分RC5自己的WorkPackage业务状态）",
+      reuse: "Temporal的持久化工作流引擎、并发控制、Web UI（2026-08-30从Hatchet改为Temporal——Hatchet无官方Java SDK，跟多端平台文档定的Java/RuoYi技术栈不契合；且跟F-TASK-001共用同一套引擎，不维护两套）",
+      features: [["F001","Temporal集成（2026-08-30从Hatchet改）"],["F002","冲突检测前置拦截"],["F003","并发限额管理"],["F004","失败恢复与重试策略"],["F005","任务自认领机制（2026-09-04补）"],["F006","Worktree隔离派工（2026-09-04补）"],["F007","运行时资源队列（2026-09-04补）"],["F008","高风险公共文件强制转人工（2026-09-04补）"],["F009","派发附带架构决定摘要（2026-09-04补）"],["F010","施工期间实时动作拦截（2026-09-04补，纠正此前对DQ的误判）"]],
+      p0: ["两个WorkPackage同时对同一独占写入资源生效未被拦截：设计缺陷","任务失败后无限重试没有上限：不允许","同一WorkPackage被两个及以上Implementer同时认领成功：设计缺陷，认领必须是原子操作","改动命中高风险公共文件清单的WorkPackage，不论Gate判定结果如何自动合并：不允许，必须强制转人工"]
+      // 注：fullPage:true 的模块不会走 renderModal()，link/linkLabel 在这里不生效，故不写
+    },
+    storage: {
+      fullPage: true,
+      title: "对象存储", id: "F-STORAGE-001", status: "🟢 DRAFT_RESEARCH_COMPLETE",
+      desc: "知识库原始数据、AI生成素材、各类文档这类非结构化文件存哪里。STORAGE-F006资产生命周期状态机（上传→隔离扫描→可用/拒绝→软删除→物理清除）详见「流程演示图」——2026-09-02核实发现此前误判为无流程，已补建。",
+      own: "文件归属租户的元数据规则、访问控制、FileObject生命周期状态机",
+      reuse: "SeaweedFS（Apache 2.0真开源，淘汰了MinIO——2026年上半年社区版仓库被冻结停止维护）",
+      features: [["F001","SeaweedFS集成"],["F002","知识库原始数据落地"],["F003","租户隔离的文件归属"],["F004","签名上传/下载"],["F005","病毒扫描与隔离检疫"],["F006","资产生命周期状态机"]],
+      p0: ["知识库原始数据丢失或未落地存储：严重缺陷","文件跨租户可被访问：不可降级P0","未通过病毒扫描的文件进入READY可用状态：不可降级P0"]
+      // 注：fullPage:true 的模块不会走 renderModal()，link/linkLabel 在这里不生效，故不写
+    },
+    task: {
+      fullPage: true,
+      title: "AI 任务运行时", id: "F-TASK-001", status: "🟢 DRAFT_RESEARCH_COMPLETE",
+      desc: "AI员工执行小时级/天级长任务时的等待/暂停/恢复/人接管运行时。与F-QUEUE-001曾有Temporal/Hatchet引擎冲突，已解决：共用同一套Temporal实例，业务逻辑分开——本模块管AI员工通用长任务生命周期，QUEUE管WorkPackage派发。TASK-F008任务内自我纠错（生成→自我批判→修正→达标或触碰硬上限）详见「流程演示图」——2026-09-02核实发现此前误判为无流程，已补建。",
+      own: "ai_task/ai_task_step/ai_task_event状态机、Task API、pause/resume/takeover业务语义、自我纠错重试计数",
+      reuse: "Temporal Workflow/Activity/Timer/Signal（与F-QUEUE-001共用同一套基础设施，不建第二套持久化工作流系统）",
+      features: [["F001","Task状态机"],["F002","暂停/恢复/人接管"],["F003","Workflow版本管理"],["F004","断线重连状态补齐"],["F008","任务内自我纠错（Reflexion式）"]],
+      p0: ["Activity直接写client response：不允许，必须经Task API+事件序列","Redis或Temporal History被当作业务SoT查询：不允许","断线重连后前端信任本地缓存而非服务端真实状态：不允许","Workflow版本不兼容导致运行中任务执行错误逻辑：不可降级P0","任务内自我纠错无硬上限、无限重试：不允许，超限必须转人工审批"]
+      // 注：fullPage:true 的模块不会走 renderModal()，link/linkLabel 在这里不生效，故不写
+    },
+    egress: {
+      fullPage: false,
+      title: "出站请求安全", id: "F-EGRESS-001", status: "🟢 DRAFT_RESEARCH_COMPLETE",
+      desc: "统一所有服务端外呼URL的安全解析与执行边界，防SSRF——源码基线直接引用RuoYi真实漏洞issue（#1181/#1176/#1177，与架构原则第31条独立核实的漏洞清单一致）。被F-ACTION-001等所有涉及服务端外呼的模块依赖。",
+      own: "OutboundUrlPolicyService、EgressClient、allowlist/policy管理",
+      reuse: "DNS解析库、HTTP客户端底层实现（不重新造HTTP协议栈）",
+      features: [["F001","URL安全校验服务"],["F002","Egress Proxy/共享客户端"],["F003","Admin Allowlist配置"]],
+      p0: ["任何模块绕过EgressClient直接发起外部HTTP请求：不允许","私有网段/云元数据端点默认放行：不可降级P0","重试不重新校验URL（DNS-rebind窗口）：不允许"],
+    },
+    aiemp: {
+      fullPage: true,
+      title: "AI 员工身份", id: "F-AIEMP-001", status: "🟢 DRAFT_RESEARCH_COMPLETE",
+      desc: "企业可配置AI员工身份——角色/模型策略/工具权限/记忆策略/预算，纯配置层，不执行任何副作用。被F-TASK-001、F-ACTION-001消费。AIEMP-F005生命周期与Kill Switch（Draft→Validated→Active→Paused/Suspended→Retired）详见「流程演示图」——2026-09-02核实发现此前误判为无流程，已补建。2026-09-04新增AIEMP-F006：EmployeeTemplate与Skill之间插入独立推理的Subagent层，参照ServiceNow/Salesforce真实拆法，不是一个员工一个大Prompt。",
+      own: "EmployeeService、policy resolver、employee profile schema、生命周期状态机、Subagent/AgentBinding",
+      reuse: "Provider Router的能力注册表（模型策略引用）、F-COST-001的Entitlement（预算/配额）",
+      features: [["F001","员工Profile管理"],["F002","模型策略引用"],["F003","工具/记忆策略"],["F004","配置版本与审计"],["F005","生命周期与Kill Switch"],["F006","Subagent分工层"]],
+      p0: ["AI员工配置直接暴露供应商SDK token/secret：不允许","无权限用户修改AI员工配置：不允许","本模块自建执行queue/runtime：不允许","Revoke后关联Grant未同步失效：不可降级P0"]
+      // 注：fullPage:true 的模块不会走 renderModal()，link/linkLabel 在这里不生效，故不写
+    },
+    action: {
+      fullPage: true,
+      title: "Action 网关", id: "F-ACTION-001", status: "🟢 DRAFT_RESEARCH_COMPLETE",
+      desc: "所有Tool/MCP/内部/第三方Action调用的唯一受控执行入口。调用链详见「流程演示图」：propose→风险预览确认→commit时重新鉴权→经F-CRED-001/F-EGRESS-001/F-PROVIDER-001执行→幂等审计（架构原则第32条）。2026-09-04新增ACTION-F006：用BPMN+DMN定义确定性多步Workflow当整体工具调用，参照UiPath Maestro真实做法，内部每步仍完整走10步Pipeline不降级。2026-09-05新增ACTION-F007：用户指出底层架构没考虑Connector生态，深度复核Salesforce(MuleSoft)/ServiceNow(Spoke)/UiPath(Marketplace)三家真实商业与技术架构后确认——按业务平台（微信/抖音/小红书/Shopify/酷家乐等）分组ToolRegistration成具名Connector，架在ACTION-F002之上，同一Connector下工具强制共享凭证作用域。",
+      own: "ActionGateway/Policy/Risk评估/Reauth/Idempotency、ProposedAction schema、WorkflowDefinition(BPMN+DMN)、ConnectorDefinition",
+      reuse: "MCP Gateway生态（Obot/ContextForge/MCPX类方案）做Tool/MCP adapter层",
+      features: [["F001","ActionGateway核心"],["F002","Tool/MCP Adapter层"],["F003","Action预览与确认"],["F004","幂等与可逆性"],["F005","10步Enforcement Pipeline"],["F006","Workflow Registry"],["F007","Connector Registry"]],
+      p0: ["模型/业务代码绕过ActionGateway直接调用第三方API：不允许","commit时不重新校验permission/entitlement/budget/approval：不可降级P0","高风险动作预览暴露secret：不允许","重试产生重复副作用：不允许"]
+      // 注：fullPage:true 的模块不会走 renderModal()，link/linkLabel 在这里不生效，故不写
+    },
+    approval: {
+      fullPage: true,
+      title: "AI 动作审批 + Transactional Outbox", id: "F-APPROVAL-001", status: "🟢 DRAFT_RESEARCH_COMPLETE",
+      desc: "把高风险AI Action与Flowable审批可靠桥接，事务提交后才恢复durable workflow。Outbox桥接流程详见「流程演示图」：同事务写state+outbox→AFTER_COMMIT才dispatch→向Temporal发signal恢复workflow。2026-09-04起也服务F-QUEUE-001的QUEUE-F010（Implementer AI施工期间实时拦截转人工），不是只服务F-ACTION-001。",
+      own: "ApprovalBridge/OutboxDispatcher、ai_approval映射、businessKey契约",
+      reuse: "RuoYi Flowable BPM发布器、Temporal signal机制（与F-QUEUE-001/F-TASK-001共用基础设施）",
+      features: [["F001","ai_approval映射"],["F002","Transactional Outbox"],["F003","Outbox Dispatcher"],["F004","审批操作集"]],
+      p0: ["DB commit前触发外部signal或消息：不允许","dispatcher重启导致重复signal：不允许","审批记录不绑定具体action版本/actor/time：不允许"]
+      // 注：fullPage:true 的模块不会走 renderModal()，link/linkLabel 在这里不生效，故不写
+    },
+    notify: {
+      fullPage: false,
+      title: "通知中心", id: "F-NOTIFY-001", status: "🟢 DRAFT_RESEARCH_COMPLETE",
+      desc: "统一站内/Email/SMS/微信订阅消息/APNs/FCM通知、偏好、dedup与deep link。Novu无原生微信支持，自建微信Adapter补齐。",
+      own: "微信订阅消息/小程序模板消息Adapter、RouteResolver、Preference偏好管理",
+      reuse: "Novu（开源，38K+ stars，MIT核心）— dedup/delivery worker/retry/Email/SMS/APNs/FCM adapter",
+      features: [["F001","Novu集成"],["F002","微信通知Adapter"],["F003","偏好与免打扰管理"],["F004","Route Contract"]],
+      p0: ["must-deliver类型通知被用户偏好静默关闭：不允许","同一dedupKey重复轰炸用户：不允许","通知表直接复制业务resource全量数据：不允许"],
+    },
+    page: {
+      fullPage: false,
+      title: "页面内容 Schema", id: "F-PAGE-001", status: "🟢 DRAFT_RESEARCH_COMPLETE",
+      desc: "框架无关、可AI安全编辑、可preview/publish/rollback的内容事实，供F-MULTIEND-001多端Renderer消费。",
+      own: "Page/Block schema、Draft/Published版本管理、diff/revision guard、Block Registry",
+      reuse: "Puck（可选，仅作编辑器UI层，非核心）",
+      features: [["F001","Page/Block Schema"],["F002","Draft/Published版本管理"],["F003","Diff与Revision Guard"],["F004","Channel Overrides"]],
+      p0: ["已发布版本被直接覆写：不允许","并发编辑冲突被静默覆盖而非返回409：不允许","Page schema与渲染技术强耦合：不允许"],
+    },
+    mobile: {
+      fullPage: false,
+      title: "移动端 Shell", id: "F-MOBILE-001", status: "🟢 DRAFT_RESEARCH_COMPLETE",
+      desc: "微信/App/iPad/H5的生产级移动端基础——鉴权加固+离线队列+进度传输，基于已独立验证的yudao-ui-admin-uniapp。",
+      own: "auth/tenant/token加固、offline queue/save-resume、progress transport、device/session管理",
+      reuse: "yudao-ui-admin-uniapp mobile shell（架构原则第31条已独立验证，commit （哈希已在公开版隐去））",
+      features: [["F001","鉴权加固"],["F002","离线队列与断点续传"],["F003","进度传输"],["F004","设备能力矩阵"]],
+      p0: ["离线提交非幂等：不允许","移动端自建第二份业务数据副本作为SoT：不允许","断线重连后前端信任端侧缓存：不允许"],
+    },
+    multiend: {
+      fullPage: false,
+      title: "多端渲染 + Client Capability Registry", id: "F-MULTIEND-001", status: "🟢 DRAFT_RESEARCH_COMPLETE",
+      desc: "同一份Page内容在Web/微信/App/iPad/H5被各自Renderer安全消费，旧客户端优雅降级，不下发任意JS/Vue/React代码。",
+      own: "CapabilityRegistry、PublishGuard、BlockRenderer接口、schemaVersion/deprecation管理",
+      reuse: "Next.js（Web端SSR/SEO，行业无争议标准做法）、uni-app（移动端渲染）",
+      features: [["F001","Web端Renderer"],["F002","移动端Renderer"],["F003","Client Capability Registry"],["F004","Publish Guard"]],
+      p0: ["未知Block类型导致整页渲染崩溃：不允许，必须fallback","Preview页面被搜索引擎收录：不允许","不兼容schema版本被强行发布：不允许"],
+    },
+    handoff: {
+      fullPage: true,
+      title: "PC → 手机交接", id: "F-HANDOFF-001", status: "🟢 DRAFT_RESEARCH_COMPLETE",
+      desc: "把PC当前project/interview/task/asset/approval/page上下文安全交给手机，不是重新导航。交接流程详见「流程演示图」：创建交接码→扫码claim→重新鉴权（不信任二维码本身）→跳转正确资源→PC端presence更新→过期/撤销。",
+      own: "opaque code生成/claim/revoke/expiry、handoff_session模型、presence事件",
+      reuse: "微信小程序scene参数机制的设计思路（非强制依赖具体产品）",
+      features: [["F001","Opaque Code生成与Claim"],["F002","TTL与Revoke"],["F003","Presence与状态回传"],["F004","防滥用限流"]],
+      p0: ["二维码内容包含JWT/tenantId/客户PII：不允许","opaque code被claim多次（非one-time）：不允许","claim时不重新校验租户/资源权限：不允许"]
+      // 注：fullPage:true 的模块不会走 renderModal()，link/linkLabel 在这里不生效，故不写
+    },
+    channel: {
+      fullPage: false,
+      title: "租户渠道实例", id: "F-CHANNEL-001", status: "🟢 DRAFT_RESEARCH_COMPLETE",
+      desc: "每个企业的网站/独立站/小程序/App/iPad/H5作为受控Channel Instance管理，支持白标/集中运营，共享Matbox Core但各自有品牌/模板/域名/客户端身份。",
+      own: "ChannelInstanceService、DomainBinding、BrandTheme、BuildIdentity metadata校验",
+      reuse: "F-CRED-001（签名证书/密钥）、F-RELEASE-001（构建产物追溯）、F-TENANT-001（多租户隔离）",
+      features: [["F001","ChannelInstance管理"],["F002","Brand/Theme/Template绑定"],["F003","Domain/App身份绑定"],["F004","发布/构建身份"]],
+      p0: ["证书/私钥/secret明文写入业务DB或Git：不允许","跨租户渠道配置泄露：不可降级P0","模板升级覆盖企业已定制内容：不允许","域名/App身份冲突未被显式拦截：不允许"],
+    },
+    "provider-router": {
+      fullPage: true, embedKey: "providerRouter",
+      title: "Provider Router / 模型接入层", id: "✅ F-PROVIDER-001 · DRAFT_RESEARCH_COMPLETE", status: "🟢 DRAFT_RESEARCH_COMPLETE",
+      desc: "原则已定（架构原则第2、9条：不绑定单一供应商、支持故障转移+分级路由）。2026-08-30架构变更：《多端平台正式开发文档》的F-PROVIDER-001章节核对确认就是本模块的正式设计，不再是独立占位——按租户限流方案（架构原则第28条：RPM+TPM双维度、按F-COST-001历史花费自动分层、令牌桶+滑动窗口分层组合）已正式写入PROVIDER-F004，详见新建的正式开发文档、架构原则第31条。PROVIDER-F003健康检查/熔断/故障转移详见「流程演示图」——2026-09-02核实发现此前从未配图，已补建。"
+      // 注：fullPage:true 的模块不会走 renderModal()，link/linkLabel 在这里不生效，故不写
+    },
+    "eval-framework": {
+      title: "内部持续评测框架", id: "✅ 已并入 F-OBS-001 · OBS-F006", status: "🟢 DRAFT_RESEARCH_COMPLETE",
+      desc: "原则已定（架构原则第6条：用真实任务建基准测试集，新模型发布跑一遍打分）。2026-08-30架构变更：《多端平台正式开发文档》把AI Evaluation直接并入了F-OBS-001，用户确认按此为准——不再是独立的「尚未开始设计」占位模块，现在跟着F-OBS-001（已READY_FOR_STAGE10_BINDING）一起设计，具体见证据审计与监控文档OBS-F006、架构原则第31条。无评测的AI员工代码回滚率是有评测的5倍多(47% vs 9%)这条依据没变，变的是「现在就能设计」而不是「等Stage10才补」。",
+    },
+    "knowledge-base": {
+      title: "知识库 / 记忆系统", id: "🟡 专项27已完成技术选型审查 · 有意保持不锁定后端", status: "🟡 DRAFT_RESEARCH_COMPLETE（有意不锁定）",
+      desc: "数据保留原则已定（架构原则第7条：原始数据必须完整保留，落地到F-STORAGE-001）。F-MEM-001（Memory/Knowledge ACL Governance）覆盖AI员工检索记忆/RAG时的权限控制（按tenant/project/resource的ACL、来源、TTL、撤销传播），设计完整。2026-09-02专项27完成核心后端（向量数据库/Embedding/RAG检索链路）的技术选型审查——结论不是遗漏未做，是调研完毕后确认「现在不锁定厂商」本身就是正确判断：Mem0/Zep(Graphiti)/Letta/pgvector自建之间没有绝对赢家，胜负取决于Matbox真实对话量级/查询模式等目前不存在的场景数据。现在就能做、成本几乎为零的动作：把MEM-F001的ACL契约做成后端无关的MemoryStore适配器接口，用已在用的PostgreSQL+pgvector做最小参考后端验证接口设计。新发现需更正：Zep已于2025年4月停运自托管社区版，只剩纯SaaS的Zep Cloud。",
+    },
+    loc: {
+      title: "全球多语言与本地化", id: "F-LOC-001 · LOC-F001~F020 · 基础层公共能力", status: "🟢 DRAFT_RESEARCH_COMPLETE",
+      desc: "2026-09-08建立。来源：用户侧交接包语言包.zip（Stage 9 PASS，DEV.docx 2028段+4个JSON+可运行POC）。定位是基础层公共能力，不是AI员工下属模块——被平台/独立站/小程序/App/iPad/AI员工/在线聊天共同消费。本会话独立核验：MANIFEST SHA-256 8/8一致；实跑poc.py确认12/12 PASS；三个锁定commit经GitHub API核实真实。选型已调整升至上游latest：vue-i18n 9.1.9(2021-10发布·官方已EOL)→11.4.10、next-intl→4.14.2、Tolgee→v3.221.0；废止包中禁止升v11规则（核查uni-app各dist-tag依赖树，uni-app根本不依赖vue-i18n，自带@dcloudio/uni-i18n，其锁定理由不成立）。三条核心分离：UI Context/Content Context/AI Session Context不得互相覆盖；Language/Locale/Region/Timezone/Currency/Measurement分开建模；原文永远归原Domain Owner，翻译只是派生，source_hash变化即自动outdated。新增5个Matbox侧Gate，其中G-LOC-MATBOX-002阻塞P0的LOC-F020（在线聊天Messaging Owner在本图中不存在）。",
+      own: "EffectiveLocaleContext解析、Localization Catalog契约、BusinessContentTranslation派生记录、LanguagePolicyProfile（术语/BrandVoice/市场规则版本引用）、Cross-End语言连续性",
+      reuse: "F-TENANT-001(Tenant/User偏好)、F-PAGE-001(SiteInstance/ContentBinding/LocalizedRoute直接复用不重建)、F-PROVIDER-001+F-CRED-001(翻译Provider与密钥)、F-COST-001(每次付费翻译写usage/cost ref)、F-RELEASE-001(Catalog作为Release Artifact)、F-TASK-001+F-QUEUE-001(长批量翻译)、F-AIEMP-001+F-RUNTIME-001(AI会话语言上下文)、F-ACTION-001(语言工具经Action/Tool Gateway授权)",
+      features: [["F001","Effective Locale 解析策略"],["F008","业务内容翻译库(⚠️依赖尚不存在的Product Master)"],["F009","翻译网关与Provider路由"],["F014","AI员工/会话语言桥接"],["F018","AI员工语言智能策略(P0)"],["F019","AI语言质量Gate(P0·Agent自评不算PASS)"],["F020","实时多语言聊天+手机指挥AI(P0·⚠️Messaging Owner缺失阻塞)"]],
+    },
+    "agent-runtime": {
+      title: "Agent Runtime", id: "✅ 正式开发文档已建立 · 自研（Java + Temporal）", status: "🟢 DRAFT_RESEARCH_COMPLETE",
+      desc: "2026-09-05建立正式开发文档（用户要求排查遗留项时发现：此前长期只有专项28技术选型报告，没有对应正式文档本体，跟AIEMP-001/ACTION-001等模块不是同一进度，现已补齐，拆出RUNTIME-F001~F008）。技术选型结论（专项28，2026-08-30）：自研（Java+Temporal），明确否决LangGraph/CrewAI/AutoGen/OpenAI Agents SDK等全部Python-only候选（语言栈与架构原则第33条Java单语言栈冲突），Google ADK Java版评为Top-3但因需要削足适履改造未整体采纳。「AI员工执行过程安全防护」（架构原则第10条）、Kill Switch（架构原则第28条：Pause/Suspend/Revoke/Retire）、心跳检测（2-3分钟一次、必须从工作循环内部主动发出、连续漏2次才报警）、进度表更新（30分钟一次）均已落实到TASK-F005/AIEMP-F005等具体Feature。2026-09-02专项00m事后核查conductor-oss/conductor（原Netflix Conductor）作为验证性候选，同属durable execution引擎赛道但结论REFERENCE-ONLY——Temporal「代码即workflow」模式对TASK-F008自我纠错这类复杂条件分支场景更合适，不构成推翻本选型的理由。唯一真实协调缺口：F-PROVIDER-001响应schema尚未定义跨供应商统一的normalized_tool_calls[]字段，已登记协调需求，不阻塞P0开工。",
+    }
+  };
+
+  const CONSUMER_KEYS = new Set(["dq","viz"]);
+  const FUTURE_KEYS = new Set(["knowledge-base","agent-runtime"]);
+
+  /* ═══════════════════════════════════════════════════════════════
+     聚簇渲染 — 底层的5个真实组（应用层/平台核心共享层/AI员工执行体系/
+     多端渲染/架构底层，NODE_GROUP早就有的真实分组，不是新数据）。
+     用户2026-09-02原话的画法：每个组自己先在一个大圆上占一个位置，
+     组里的真实成员再围着这个组的中心点摆成一圈——两层同心圆结构，
+     不是方块网格，不是分场景切换。全部成员永远同时可见，见memory
+     feedback_never_hide_content。成员的状态色直接从NODE_DATA已有的
+     status字段真实映射过来，不是编的；关联数用已有的nodeEdges()真实
+     计算，不是编的。
+     ═══════════════════════════════════════════════════════════════ */
+  const GROUP_ORDER = ["consumer","core","aiemployee","render","foundation"];
+  const GROUP_NAMES = {
+    consumer:"应用层", core:"平台核心共享层", aiemployee:"AI员工执行体系",
+    render:"多端渲染与内容分发", foundation:"架构底层"
+  };
+  /* 组卡片自己的编号——方案B（用户2026-09-03确认）：现有24个FeatureID
+     一个不改，组另外单独有编号，"谁属于哪个组"这层关系继续靠下面的
+     NODE_GROUP这份数据记录，不把父子关系拼进编号字符串里（参照真实
+     Backstage的System/Component做法：Component自己编号不变，另外记一个
+     指向父级System的字段）。G-前缀表示"这是组级编号"，跟"F-"开头的
+     功能编号一眼区分开，不会混淆。 */
+  const GROUP_ID = {
+    consumer:"G-APP", core:"G-CORE", aiemployee:"G-AIEMP",
+    render:"G-RENDER", foundation:"G-INFRA"
+  };
+  function groupMembers(g){ return Object.keys(NODE_GROUP).filter(k => NODE_GROUP[k] === g); }
+  /* 状态映射按真实的NODE_DATA.status文本来，不是拍脑袋——Matbox还没到
+     Stage 10真实开发阶段，现有模块绝大多数都停在"技术选型/研究完成"
+     （DRAFT_RESEARCH_COMPLETE），按架构原则50的阶段定义，这实际对应
+     "预开发"（还没真正动手写代码），颜色上更接近"未开始"（灰），不是
+     "开发中"（橙）——之前全映射成橙色是错的，不是配色好看不好看的
+     问题，是状态语义本身就映射错了。只有明确写着READY_FOR_STAGE10的
+     才是真的"正常/绿"，明确带🟡的才是"降级/黄"（有意不锁定/待验证）。 */
+  function statusFromNodeData(key){
+    const s = (NODE_DATA[key] && NODE_DATA[key].status) || "";
+    if(/READY_FOR_STAGE10/.test(s)) return "ok";
+    if(/🟡/.test(s) || /DESIGN_COMPLETE|POC_PENDING/.test(s)) return "warn";
+    return "idle";
+  }
+  /* 组卡片的颜色，不能写死灰色——查证到真实做法：ArgoCD官方就是"一个
+     东西的健康状态，取决于它下面所有子项里最差的那个"（"based on the
+     worst health of its immediate child resources"），组员里只要有一个
+     故障/降级，这个组本身的颜色就要跟着变，不能假装没事。数字越小越
+     严重，取组内成员里数字最小(最严重)的那个。 */
+  const STATUS_SEVERITY = { error:1, warn:2, maint:3, dev:4, idle:5, ok:6 };
+  function worstStatus(keys){
+    let worst = "idle";
+    keys.forEach(k => {
+      const s = statusFromNodeData(k);
+      if(STATUS_SEVERITY[s] < STATUS_SEVERITY[worst]) worst = s;
+    });
+    return worst;
+  }
+  /* 布局改成"一组一行"的行列布局，不再用圆形/放射状——用户2026-09-03
+     明确否决圆形（"完全是乱排"），要求"规矩的拍成一排一排"。查证了
+     真实先例才改的：ArchiMate官方"分层视图"用Grouping把同层元素横向
+     排在一起；泳道图（swimlane，Lucidchart/Miro等工具的标准做法）一
+     行一个类别，组员横向排在这一行里；AWS自己的架构图规范也明确写
+     "按层/按服务分组、让每组在视觉上分开"——三个独立真实来源都指向
+     同一个做法，不是我自己发明的。 */
+  /* ROW_LABEL_W必须留够组卡片自己的真实宽度(176px)+间隙——之前组卡片
+     加宽到176px去装状态统计文字的时候，忘了同步调大这个数字，导致组
+     卡片右边缘和第一个子卡片几乎贴在一起（用户2026-09-03截图指出）。
+     现在按"组卡片176px宽，卡片中心在ROW_LABEL_W/2处"重新算：组卡片
+     右边缘= ROW_LABEL_W/2 + 88，要求这个数字加上间隙(30) ≤ ROW_LABEL_W，
+     所以ROW_LABEL_W至少要236，取240留一点余量。 */
+  const ROW_START_X = 70, ROW_LABEL_W = 240, CARD_GAP = 18, MEMBER_W = 138;
+  /* ROW_Y_START/ROOT_Y留够跟顶层功能行(y=90，卡片下边缘约到120)的安全
+     间隙——上一版直接写290-150=130，没算过跟顶层功能行会撞在一起，
+     这次两个数字都是算过的：0底层卡片(rootY=210)上边缘约179，离顶层
+     功能下边缘120有约60px空隙；0底层卡片下边缘约241，离第一行(320)
+     有约80px空隙，不是拍脑袋改的数字。 */
+  const ROOT_Y = 210;
+  const ROW_Y_START = 320, ROW_GAP = 130;
+  let clusterPositions = {};
+  function renderClusters(){
+    const host = document.getElementById("scene-clusters");
+    host.innerHTML = "";
+    clusterPositions = {};
+    const rowLabelPos = {};
+
+    GROUP_ORDER.forEach((g, gi) => {
+      const rowY = ROW_Y_START + gi * ROW_GAP;
+      rowLabelPos[g] = { x: ROW_START_X + ROW_LABEL_W / 2, y: rowY };
+      const members = groupMembers(g);
+      members.forEach((key, mi) => {
+        clusterPositions[key] = {
+          x: ROW_START_X + ROW_LABEL_W + CARD_GAP + MEMBER_W / 2 + mi * (MEMBER_W + CARD_GAP),
+          y: rowY
+        };
+      });
+    });
+
+    /* 组卡+它自己的成员，用一个虚线框圈在一起——用户2026-09-03明确指出
+       "挨得近"看不出关联，尤其背景里还有一堆真实关系线在跑，必须真的
+       画一个框才能一眼看出"这一排是一个组"。框画在最底层(先插入)，
+       不挡卡片和线。 */
+    const boundsG = document.createElementNS(svgNS, "g");
+    boundsG.setAttribute("class", "row-bounds");
+    host.appendChild(boundsG);
+    GROUP_ORDER.forEach(g => {
+      const rowY = rowLabelPos[g].y;
+      const members = groupMembers(g);
+      const left = ROW_START_X + ROW_LABEL_W / 2 - 88 - 14;
+      const right = members.length
+        ? ROW_START_X + ROW_LABEL_W + CARD_GAP + MEMBER_W + (members.length - 1) * (MEMBER_W + CARD_GAP) + 14
+        : ROW_START_X + ROW_LABEL_W / 2 + 88 + 14;
+      const rect = document.createElementNS(svgNS, "rect");
+      rect.setAttribute("class", "row-bound-box");
+      rect.setAttribute("x", left);
+      rect.setAttribute("y", rowY - 62);
+      rect.setAttribute("width", right - left);
+      rect.setAttribute("height", 124);
+      rect.setAttribute("rx", 16);
+      boundsG.appendChild(rect);
+    });
+
+    /* "0 底层"——跟其他卡片同款式的普通卡片（用户2026-09-02明确纠正：
+       不该是个圈住一切的大框，应该"跟其他框一样"），摆在5行的正上方，
+       顶层功能→它有一条带箭头的虚线，它→每一行的组名标签各有一条线，
+       把"上面调用底层，底层由这5行构成"两层关系都显式画出来。 */
+    const rootX = 780, rootY = ROOT_Y;
+    renderNodeCard(host, { key: "root-foundation", x: rootX, y: rootY, name: "底层", idText: "5个真实聚簇", status: "idle", connCount: EDGES.length, isHub: true });
+
+    const spokesG = document.createElementNS(svgNS, "g");
+    host.appendChild(spokesG);
+    GROUP_ORDER.forEach(g => {
+      const p = rowLabelPos[g];
+      const line = document.createElementNS(svgNS, "path");
+      line.setAttribute("class", "cluster-spoke-root");
+      line.setAttribute("d", `M${rootX},${rootY+31} Q${rootX},${(rootY+p.y)/2} ${p.x},${p.y-31}`);
+      spokesG.appendChild(line);
+    });
+
+    /* 顶层功能→"0 底层"卡片的连接指示——用户明确说"根本不知道这几个是
+       从底层调用的"，加一条从顶层功能行指向这张卡片的虚线箭头，把
+       "上面调用下面"这个方向显式画出来。 */
+    const linkTopX = rootX, linkTopY = 150, linkBotY = rootY - 31;
+    const connG = document.createElementNS(svgNS, "g");
+    connG.innerHTML = `
+      <line class="top-to-bottom-link" x1="${linkTopX}" y1="${linkTopY}" x2="${linkTopX}" y2="${linkBotY - 14}"/>
+      <polygon class="top-to-bottom-arrow" points="${linkTopX - 7},${linkBotY - 14} ${linkTopX + 7},${linkBotY - 14} ${linkTopX},${linkBotY}"/>
+      <text class="section-label" x="${linkTopX}" y="${(linkTopY + linkBotY) / 2}" text-anchor="middle">全部功能都调用底层</text>
+    `;
+    host.appendChild(connG);
+
+    const edgesG = document.createElementNS(svgNS, "g");
+    host.appendChild(edgesG);
+    EDGES.forEach(e => {
+      const a = clusterPositions[e.from], b = clusterPositions[e.to];
+      if(!a || !b) return;
+      const mx = (a.x+b.x)/2, my = (a.y+b.y)/2;
+      const dx = b.x-a.x, dy = b.y-a.y;
+      const len = Math.hypot(dx,dy) || 1;
+      const bend = Math.min(70, len*0.18);
+      const cx = mx + (-dy/len)*bend, cy = my + (dx/len)*bend;
+      const d3 = `M${a.x},${a.y} Q${cx},${cy} ${b.x},${b.y}`;
+      const wrap = document.createElementNS(svgNS, "g");
+      wrap.setAttribute("class", "rel-edge-wrap");
+      wrap.setAttribute("data-from", e.from);
+      wrap.setAttribute("data-to", e.to);
+      wrap.setAttribute("data-label", e.label);
+      wrap.setAttribute("data-mid", `${cx},${cy}`);
+      wrap.innerHTML = `<path class="rel-edge-hit" d="${d3}"/><path class="rel-edge${e.optional ? " optional" : ""}" d="${d3}"/>`;
+      edgesG.appendChild(wrap);
+
+      /* 数据包动画节点 — 照抄quality_gate_flow.html的animateMotion做法，
+         沿这条边的真实路径飞，方向就是from→to，不是随便摆的。 */
+      const pkt = document.createElementNS(svgNS, "circle");
+      pkt.setAttribute("class", "rel-packet");
+      const motion = document.createElementNS(svgNS, "animateMotion");
+      motion.setAttribute("dur", "1.3s");
+      motion.setAttribute("repeatCount", "indefinite");
+      motion.setAttribute("begin", "indefinite");
+      motion.setAttribute("path", d3);
+      pkt.appendChild(motion);
+      edgesG.appendChild(pkt);
+      wrap._packet = pkt;
+      wrap._motion = motion;
+    });
+
+    GROUP_ORDER.forEach(g => {
+      const c = rowLabelPos[g];
+      const members = groupMembers(g);
+      /* 组卡片右上角的关联数角标——不是成员数(那个已经用"N个模块"这行
+         显示了)，是这个组里所有子卡片关联数真实加起来的总和，跟子卡片
+         角标的含义一致，都是"真实连着多少个别的东西"（用户2026-09-03
+         确认的定义）。 */
+      const groupConnTotal = members.reduce((sum, k) => sum + nodeEdges(k).length, 0);
+      const hub = renderNodeCard(host, { key: "group-"+g, x:c.x, y:c.y, name: GROUP_NAMES[g], idText: GROUP_ID[g] + " · " + members.length + " 个模块", status:"idle", connCount: groupConnTotal, isHub:true, statsHtml: groupStatsHtml(members) });
+      hub.classList.add("group-hub");
+      hub.removeAttribute("tabindex");
+      hub.removeAttribute("role");
+      hub.style.cursor = "default";
+    });
+
+    GROUP_ORDER.forEach(g => {
+      groupMembers(g).forEach(key => {
+        const p = clusterPositions[key];
+        const d = NODE_DATA[key] || {};
+        /* 卡片上的名字只取主名，"+"后面那截是补充说明，不是名字本身
+           的一部分（比如"AI动作审批 + Transactional Outbox"），完整
+           名字点开详情弹窗还能看到，不影响信息完整性，只是卡片上不
+           重复放技术性后缀，省下空间给真正的名字。 */
+        const cardName = (d.title || key).split(" + ")[0].trim();
+        /* 编号文字去掉残留的✅/🟢/🟡这类emoji——那是更早期人工标注状态
+           用的，现在卡片已经有自己一套颜色系统(色条+角标+状态文字)，
+           两套状态标记同时出现容易让人误会（用户2026-09-03指出）。 */
+        /* 编号最前面多余的"F-"去掉（比如F-CRED-001显示成CRED-001，
+           F-DQ-001~013显示成DQ-001~013）——用户2026-09-03明确要求，
+           理由是现在前面已经有组编号(G-CORE)打头，不需要再用"F"额外
+           说明"这是个功能"，多余。真实存的NODE_DATA.id完全不变，只是
+           卡片显示层处理。（原来DQ/VIZ是"XX-F001"这种F在中间的格式，
+           跟其他模块的"F-XXX-001"两套格式混用——2026-09-03用户要求
+           彻底统一，已经把DQ/VIZ内部20个真实FeatureID连同全部42份
+           引用它们的文档一起改成了"F-DQ-NNN"/"F-VIZ-NNN"格式，不再
+           是特例，见架构原则第57条。） */
+        const rawId = (d.id || "").split("·")[0].replace(/[\u{1F300}-\u{1FAFF}\u{2600}-\u{27BF}]/gu, "").trim().replace(/^F-/, "");
+        /* 子卡片编号前面带上所属组的编号、用"-"连成一个连续整体
+           (G-CORE-CRED-001，不是空格断开的两截)——用户2026-09-03
+           明确要求："一看就知道是哪个组编号出来的"，且"哪有编号是
+           断的，将来查找和复制编号怎么弄"。真正存的原始FeatureID
+           (d.id/NODE_DATA)完全不变，这只是卡片显示层面把两个编号
+           拼在一起显示，不涉及改文档里的真实编号本身的存储值。 */
+        /* 组编号+原编号用"-"连成一个连续整体（G-CORE-CRED-001），不是
+           中间空一格的两截（用户2026-09-03指出："哪有编号是断的"——
+           断开的话以后没法直接复制/搜索，必须是一个连续字符串）。 */
+        const cardId = GROUP_ID[g] + "-" + rawId;
+        renderNodeCard(host, { key, x:p.x, y:p.y, name: cardName, idText: cardId, status: statusFromNodeData(key), connCount: nodeEdges(key).length, isHub:false });
+      });
+    });
+  }
+
+  /* ═══════════════════════════════════════════════════════════════
+     关系线不是死的——碰一个节点，它真正连着的线会亮起来变粗、其他
+     节点淡下去；直接把鼠标停在一条线上，看它到底代表什么关系（真实
+     的label文字，比如"读密钥"），这是Neo4j Bloom等真实工具的hover/
+     select高亮做法（本轮查证），不是纯装饰的静态线。
+     ═══════════════════════════════════════════════════════════════ */
+  function setupHoverHighlight(){
+    const tip = document.createElementNS(svgNS, "g");
+    tip.id = "edgeTip";
+    tip.style.display = "none";
+    tip.innerHTML = '<rect class="edge-tip-bg"/><text class="edge-tip"></text>';
+    viewport.appendChild(tip);
+    const tipBg = tip.querySelector(".edge-tip-bg");
+    const tipText = tip.querySelector(".edge-tip");
+
+    function showTip(x, y, label){
+      tipText.textContent = label;
+      tip.setAttribute("transform", `translate(${x},${y - 14})`);
+      tip.style.display = "";
+      const bb = tipText.getBBox();
+      tipBg.setAttribute("x", bb.x - 8); tipBg.setAttribute("y", bb.y - 5);
+      tipBg.setAttribute("width", bb.width + 16); tipBg.setAttribute("height", bb.height + 10);
+    }
+    function hideTip(){ tip.style.display = "none"; }
+
+    function highlightFor(key){
+      const edges = nodeEdges(key);
+      canvasWrap.classList.add("hovering");
+      const related = new Set([key]);
+      edges.forEach(ed => related.add(ed.other));
+      document.querySelectorAll(".node").forEach(n => {
+        const k = n.getAttribute("data-node");
+        if(k.startsWith("group-")) return;
+        n.classList.toggle("rel-dim", !related.has(k));
+      });
+      document.querySelectorAll(".rel-edge-wrap").forEach(w => {
+        const active = w.getAttribute("data-from") === key || w.getAttribute("data-to") === key;
+        w.querySelector(".rel-edge").classList.toggle("rel-active", active);
+        if(active) runPacket(w); else stopPacket(w);
+      });
+    }
+    function runPacket(wrap){
+      if(!wrap._packet) return;
+      wrap._packet.classList.add("run");
+      try{ wrap._motion.beginElement(); }catch(err){}
+    }
+    function stopPacket(wrap){
+      if(!wrap._packet) return;
+      wrap._packet.classList.remove("run");
+    }
+    function clearHighlight(){
+      canvasWrap.classList.remove("hovering");
+      document.querySelectorAll(".node.rel-dim").forEach(n => n.classList.remove("rel-dim"));
+      document.querySelectorAll(".rel-edge.rel-active").forEach(p => p.classList.remove("rel-active"));
+      document.querySelectorAll(".rel-edge-wrap").forEach(w => stopPacket(w));
+      hideTip();
+    }
+
+    viewport.addEventListener("pointerover", (e) => {
+      const node = e.target.closest(".node");
+      if(node && !node.classList.contains("hub-node")){
+        highlightFor(node.getAttribute("data-node"));
+        return;
+      }
+      const wrap = e.target.closest(".rel-edge-wrap");
+      if(wrap){
+        const [mx, my] = wrap.getAttribute("data-mid").split(",").map(Number);
+        wrap.querySelector(".rel-edge").classList.add("rel-active");
+        runPacket(wrap);
+        showTip(mx, my, wrap.getAttribute("data-label"));
+      }
+    });
+    viewport.addEventListener("pointerout", (e) => {
+      if(e.target.closest(".node") || e.target.closest(".rel-edge-wrap")) clearHighlight();
+    });
+  }
+
+  let currentOpenNode = null;
+  function renderModal(key){
+    const d = NODE_DATA[key];
+    if(!d) return;
+    currentOpenNode = key;
+
+    document.getElementById("modalStep").textContent =
+      CONSUMER_KEYS.has(key) ? "应用层" : FUTURE_KEYS.has(key) ? "架构底层" : "平台核心共享层";
+
+    const statusEl = document.getElementById("modalStatus");
+    statusEl.className = "panel-mode";
+    if(/READY_FOR_STAGE10/.test(d.status||"")){ statusEl.classList.add("ok"); statusEl.textContent = "READY"; }
+    else if(/DRAFT_RESEARCH|DESIGN_COMPLETE/.test(d.status||"")){ statusEl.classList.add("draft"); statusEl.textContent = "DRAFT"; }
+    else { statusEl.classList.add("notstarted"); statusEl.textContent = "NOT_STARTED"; }
+
+    document.getElementById("modalTitle").textContent = d.title;
+    document.getElementById("modalRoute").innerHTML = `<span class="v">${d.id}</span>`;
+    document.getElementById("modalDesc").textContent = d.desc;
+
+    const payloadEl = document.getElementById("modalPayload");
+    if(d.own){
+      payloadEl.style.display = "";
+      payloadEl.innerHTML = `<span class="lbl">OWN</span>  ${d.own}\n\n<span class="lbl">REUSE</span>  ${d.reuse}`;
+    } else {
+      payloadEl.style.display = "none";
+    }
+
+    const metaEl = document.getElementById("modalMeta");
+    if(d.features){
+      metaEl.style.display = "";
+      metaEl.innerHTML = d.features.map(f => `<span class="chip"><span class="fid">${f[0]}</span>${f[1]}</span>`).join("");
+    } else {
+      metaEl.style.display = "none";
+    }
+
+    const p0Wrap = document.getElementById("modalP0Wrap");
+    if(d.p0){
+      p0Wrap.innerHTML = `<div class="modal-p0"><h4>P0 冻结规则</h4><ul>${d.p0.map(p => `<li>${p}</li>`).join("")}</ul></div>`;
+    } else {
+      p0Wrap.innerHTML = "";
+    }
+
+    const linkWrap = document.getElementById("modalLinkWrap");
+    linkWrap.innerHTML = "";
+    if(d.link){
+      const a = document.createElement("a");
+      a.className = "modal-link"; a.href = d.link; a.target = "_blank"; a.rel = "noopener";
+      a.textContent = d.linkLabel || "打开正式文档 →";
+      linkWrap.appendChild(a);
+    }
+
+    overlay.classList.add("open");
+    lastFocused = document.activeElement;
+    modalClose.focus();
+  }
+
+  const overlay = document.getElementById("modalOverlay");
+  const modalClose = document.getElementById("modalClose");
+  let lastFocused = null;
+  function closeModal(){
+    overlay.classList.remove("open");
+    if(lastFocused) lastFocused.focus();
+  }
+
+  /* full-page overlay — used when the module already has its own complete
+     page (currently: quality_gate_flow.html). Its HTML/CSS/JS were copied
+     verbatim into the <template>/<script type="text/plain"> above at build
+     time; this only clones + executes them into a Shadow DOM the first time
+     the module is opened, so this file stays a single self-contained page
+     (works standalone, works published, no dependency on a sibling file). */
+  const iframeOverlay = document.getElementById("iframeOverlay");
+  const iframeClose = document.getElementById("iframeClose");
+  let iframeLastFocused = null;
+
+  /* 每个"有完整流程图"的模块一份 host/template/script，key对应NODE_DATA的key。
+     以后哪个模块也做了专属流程演示图，在这里加一行就行，不用再改其余逻辑。 */
+  /* cred + tenant 的NODE_DATA各自独立，但两个模块共享同一张流程演示图——
+     openThis() 会把 key 解析成 NODE_DATA[key].embedKey（"credTenant"），
+     所以这里只登记一个 credTenant 条目，不需要 cred/tenant 各一份。 */
+  /* 每个条目的 url 是同目录下的流程演示图文件——现场 fetch 取回、解析、
+     做跟质检系统弹窗一样的转换（去掉主题/全屏按钮，document.*重定向进
+     Shadow DOM 的 root），装进对应 host 的 Shadow DOM。跟以前"构建时复制
+     进<template>"的区别：改一处原文，这里永远读到最新内容，不会漏改；
+     代价是这个文件必须跟着这6个流程图文件放在同一个目录/同一次发布里
+     才能正常显示，不能再单独发一个Artifact链接（2026-08-30 用户确认，
+     见架构原则第26条"复制进弹窗 vs 现读现用"选型记录）。 */
+  const FULL_PAGE_EMBEDS = {
+    dq:         { hostId: "dqEmbedHost",         url: "quality_gate_flow.html",              built: false },
+    viz:        { hostId: "vizEmbedHost",        url: "viz_repair_loop_flow.html",            built: false },
+    release:    { hostId: "releaseEmbedHost",    url: "release_traceability_flow.html",       built: false },
+    cost:       { hostId: "costEmbedHost",       url: "budget_alert_flow.html",               built: false },
+    credTenant: { hostId: "credTenantEmbedHost", url: "cred_tenant_auth_lifecycle_flow.html", built: false },
+    queue:      { hostId: "queueEmbedHost",      url: "queue_retry_escalation_flow.html",     built: false },
+    action:     { hostId: "actionEmbedHost",     url: "action_gateway_flow.html",             built: false },
+    approval:   { hostId: "approvalEmbedHost",   url: "approval_outbox_flow.html",             built: false },
+    handoff:    { hostId: "handoffEmbedHost",    url: "handoff_claim_flow.html",               built: false },
+    task:       { hostId: "taskEmbedHost",       url: "task_self_correction_flow.html",       built: false },
+    storage:    { hostId: "storageEmbedHost",    url: "storage_asset_lifecycle_flow.html",    built: false },
+    providerRouter: { hostId: "providerRouterEmbedHost", url: "provider_failover_flow.html",  built: false },
+    aiemp:      { hostId: "aiempEmbedHost",      url: "aiemp_lifecycle_killswitch_flow.html", built: false }
+  };
+  /* ═══════════════════════════════════════════════════════════════════════
+     2026-09-08 重写。旧写法（fetch + 把 HTML 拆成 css/html/js 三段 + 改写
+     document.* 成 root.* + 塞进 Shadow DOM）有两个各自独立的坏点，用户
+     两天里反复撞上：
+
+     ① 用户是双击文件打开的（file:// 协议），fetch 被浏览器拦死 →
+        点进来只有一片红字。当天用无头 Chrome 在 file:// 下实测：
+        fetch → TypeError、XHR → NetworkError、<iframe src="本地.html"> →
+        根本不渲染，只有 <script src="本地.js"> 还通。所以流程图原文改由
+        flow_embeds.js 提前带进来（见上面那个 script 标签）。
+
+     ② 拆出来的 HTML 段是用 innerHTML 塞进去的，而 **innerHTML 塞进去的
+        <script> 浏览器不执行**。quality_gate_flow.html 第 955 行"开发前/
+        开发中/运行中"的标签切换脚本正好写在那一段里，所以三个标签点了
+        没反应——内容一直都在，只是切不过去。
+
+     现在整篇原文丢进 iframe 的 srcdoc：iframe 是一个真的文档，它自己的
+     脚本自己跑，不需要任何改写，摊开的样子跟单独打开那个文件一模一样。
+     不再有"每次点开都不一样"的加工环节。
+     ═══════════════════════════════════════════════════════════════════════ */
+  function ensureEmbedBuilt(key){
+    const cfg = FULL_PAGE_EMBEDS[key];
+    if(!cfg || cfg.built) return;
+    const host = document.getElementById(cfg.hostId);
+    const text = (window.__FLOW_HTML__ || {})[cfg.url];
+    if(typeof text !== "string"){
+      host.innerHTML = '<div style="padding:40px;font-family:monospace;color:#c0392b;line-height:1.8;">'
+        + '找不到「' + cfg.url + '」的内嵌副本。<br><br>'
+        + '这张图靠同目录下的 <b>flow_embeds.js</b> 带流程图原文。要么这个文件没跟着一起拷过来，'
+        + '要么 *_flow.html 改过之后没重新生成。<br><br>'
+        + '重新生成：<code>python docs/_build_flow_embeds.py</code></div>';
+      cfg.built = true;
+      return;
+    }
+    /* 只加一条样式：把流程图自己的主题切换/全屏两个悬浮按钮藏起来——它们在
+       独立打开那个文件时才有意义，嵌在弹窗里点了会打架。除此之外原文一个
+       字不动。 */
+    const HIDE = '<style>.theme-toggle,.fullscreen-toggle{display:none !important;}</style>';
+    const doc = text.replace("</head>", HIDE + "</head>");
+    const frame = document.createElement("iframe");
+    frame.className = "full-page-frame";
+    frame.setAttribute("title", cfg.url);
+    frame.srcdoc = doc;
+    host.appendChild(frame);
+    cfg.built = true;
+  }
+  async function openFullPage(key){
+    Object.entries(FULL_PAGE_EMBEDS).forEach(([k, cfg]) => {
+      document.getElementById(cfg.hostId).style.display = (k === key) ? "block" : "none";
+    });
+    iframeOverlay.classList.add("open");
+    iframeLastFocused = document.activeElement;
+    iframeClose.focus();
+    await ensureEmbedBuilt(key);
+  }
+  function closeFullPage(){
+    iframeOverlay.classList.remove("open");
+    if(iframeLastFocused) iframeLastFocused.focus();
+  }
+  iframeClose.addEventListener("click", closeFullPage);
+  document.addEventListener("keydown", (e) => { if(e.key === "Escape" && iframeOverlay.classList.contains("open")) closeFullPage(); });
+
+  /* ═══════════════════════════════════════════════════════════════
+     真正的无限画布 — 拖拽平移 + 滚轮缩放，一个连续坐标空间，不是切换
+     显示哪张图（旧版是viewBox在几个固定取景框之间跳，2026-09-02被
+     用户指出这不是真的画布，见memory feedback_never_hide_content）。
+     用SVG自带的getScreenCTM()把屏幕坐标换算成SVG内部坐标，不管外层
+     viewBox缩放成什么样都准——不是自己拿像素数字瞎换算。
+     ═══════════════════════════════════════════════════════════════ */
+  const mainSvg = document.getElementById("mainSvg");
+  const canvasWrap = document.getElementById("canvasWrap");
+  const viewport = document.getElementById("viewport");
+  const btnResetView = document.getElementById("btnResetView");
+  let camX = 0, camY = 0, camScale = 1;
+  const SCALE_MIN = 0.25, SCALE_MAX = 3;
+  function applyCamera(){
+    viewport.setAttribute("transform", `translate(${camX},${camY}) scale(${camScale})`);
+  }
+  function svgPoint(clientX, clientY){
+    const pt = mainSvg.createSVGPoint();
+    pt.x = clientX; pt.y = clientY;
+    return pt.matrixTransform(mainSvg.getScreenCTM().inverse());
+  }
+  function fitToView(){
+    camX = 0; camY = 0; camScale = 1;
+    applyCamera();
+  }
+  let dragging = false, dragStart = null, camStart = null;
+  canvasWrap.addEventListener("pointerdown", (e) => {
+    if(e.target.closest("[data-node]")) return; // 点节点走点击逻辑，不触发拖拽
+    dragging = true;
+    canvasWrap.classList.add("panning");
+    dragStart = { x: e.clientX, y: e.clientY };
+    camStart = { x: camX, y: camY };
+    canvasWrap.setPointerCapture(e.pointerId);
+  });
+  canvasWrap.addEventListener("pointermove", (e) => {
+    if(!dragging) return;
+    const p0 = svgPoint(dragStart.x, dragStart.y);
+    const p1 = svgPoint(e.clientX, e.clientY);
+    camX = camStart.x + (p1.x - p0.x) * camScale;
+    camY = camStart.y + (p1.y - p0.y) * camScale;
+    applyCamera();
+  });
+  function endDrag(e){
+    if(!dragging) return;
+    dragging = false;
+    canvasWrap.classList.remove("panning");
+    try{ canvasWrap.releasePointerCapture(e.pointerId); }catch(err){}
+  }
+  canvasWrap.addEventListener("pointerup", endDrag);
+  canvasWrap.addEventListener("pointercancel", endDrag);
+  canvasWrap.addEventListener("wheel", (e) => {
+    e.preventDefault();
+    const before = svgPoint(e.clientX, e.clientY);
+    const factor = e.deltaY < 0 ? 1.12 : 1/1.12;
+    const next = Math.min(SCALE_MAX, Math.max(SCALE_MIN, camScale * factor));
+    if(next === camScale) return;
+    camScale = next;
+    applyCamera();
+    const after = svgPoint(e.clientX, e.clientY);
+    camX += (after.x - before.x) * camScale;
+    camY += (after.y - before.y) * camScale;
+    applyCamera();
+  }, { passive: false });
+  btnResetView.addEventListener("click", fitToView);
+
+  /* 点击任意节点：事件委托在#viewport上，不管节点是静态HTML还是JS动态
+     生成的（聚簇成员是renderClusters()现场生成的），点击都能接住。
+     顶层功能→详情内容用户说"先不讨论"，给如实占位提示，不编造内容；
+     聚簇的组圆心（"group-"开头，纯粹是空间聚簇标记，不是真实功能）
+     不响应点击——不隐藏任何东西，也不需要额外展开。 */
+  function openTopFunction(fn){
+    document.getElementById("modalStep").textContent = "顶层功能";
+    const statusEl = document.getElementById("modalStatus");
+    statusEl.className = "panel-mode draft";
+    statusEl.textContent = STATUS_LABEL[fn.status] || "—";
+    document.getElementById("modalTitle").textContent = fn.name;
+    document.getElementById("modalRoute").innerHTML = `<span class="v">${STATUS_LABEL[fn.status]}</span>`;
+    document.getElementById("modalDesc").textContent = "功能档案的具体内容（开发资料/验收方案/数据关系图等）还在讨论中，尚未确认，这里先不展示编造的内容。";
+    document.getElementById("modalPayload").style.display = "none";
+    document.getElementById("modalMeta").style.display = "none";
+    document.getElementById("modalP0Wrap").innerHTML = "";
+    document.getElementById("modalLinkWrap").innerHTML = "";
+    overlay.classList.add("open");
+    lastFocused = document.activeElement;
+    modalClose.focus();
+  }
+  function openNode(key){
+    if(key.startsWith("group-")) return; // 聚簇圆心，纯空间标记，不是真实节点
+    const fn = TOP_FUNCTIONS.find(f => f.id === key);
+    if(fn){ openTopFunction(fn); return; }
+    const d = NODE_DATA[key];
+    if(!d) return;
+    if(d.fullPage) openFullPage(d.embedKey || key); else renderModal(key);
+  }
+  viewport.addEventListener("click", (e) => {
+    const node = e.target.closest("[data-node]");
+    if(node) openNode(node.getAttribute("data-node"));
+  });
+  viewport.addEventListener("keydown", (e) => {
+    if(e.key !== "Enter" && e.key !== " ") return;
+    const node = e.target.closest("[data-node]");
+    if(node){ e.preventDefault(); openNode(node.getAttribute("data-node")); }
+  });
+
+  renderTopScene();
+  renderClusters();
+  setupHoverHighlight();
+  fitToView();
+
+  modalClose.addEventListener("click", closeModal);
+  overlay.addEventListener("click", (e) => { if(e.target === overlay) closeModal(); });
+  document.addEventListener("keydown", (e) => { if(e.key === "Escape" && overlay.classList.contains("open")) closeModal(); });
+</script>
+
+</body>
+</html>
