@@ -33,7 +33,7 @@ source:
 
 # ── 全模块通用：任何一个 F-DQ-00X 都不得越过 ──────────────────────
 module_wide:
-  allowed_root: "backend/modules/dev-quality/**"
+  allowed_root: "backend/modules/dev-quality/src/main/java/com/matbox/devquality/**"
   frontend_root: "frontend/apps/ops-console/features/dev-quality/**"
 
   # 依赖方向铁律（专项01 §22 原文）
@@ -49,7 +49,7 @@ module_wide:
     - id: DEP-3
       rule: "adapters/* 之间禁止互相依赖——每个 Adapter 独立可插拔，移除任一个只影响 CheckSet 适用性矩阵，不影响其余 Adapter 运行"
       forbid_cross_import_within:
-        - "backend/modules/dev-quality/adapters/*"
+        - "backend/modules/dev-quality/src/main/java/com/matbox/devquality/adapters/*"
 
   # 只读：这些是别的模块的事实源，DQ 只能调用，不能改
   read_only:
@@ -66,7 +66,7 @@ module_wide:
 
   # 改动需要走 Change Register，不能直接提交
   frozen_contract:
-    - path: "backend/modules/dev-quality/shared/contracts/**"
+    - path: "backend/modules/dev-quality/src/main/java/com/matbox/devquality/shared/contracts/**"
       why: "六个 Own 数据模型（QualityRun / ScannerRun / NormalizedFinding / GateDecision / RepairAttempt / SuppressionRef）的 DTO。.docx §7 明确：一旦施工开始不得随意改，改要走 Change Register"
 
   # Must Not Rebuild —— 命中即判违规，不是「尽量别」
@@ -84,59 +84,72 @@ module_wide:
     - "Release / branch protection 配置"
     - "GatePolicy 本身"
 
+# ⚠️ 2026-09-09 更正：路径从「概念树」改成「磁盘真实路径」
+#
+# 专项01 §22 画的那棵目录树是**概念树**：backend/modules/dev-quality/adapters/sonar/。
+# 但真实的 Maven 工程里，Java 源码在 src/main/java/<包路径>/ 下面，
+# 实际是 backend/modules/dev-quality/src/main/java/com/matbox/devquality/adapters/sonar/。
+#
+# 一个 AI 照着概念树字面去建目录，会建在错的位置，而且 **Maven 根本不会编译它**——
+# 它会以为自己写完了，代码却一行都没进构建。这是 2026-09-09 骨架建成后，
+# 开工真实性检查 R8 比对「工作包写的路径」与「仓库里真实存在的路径」时抓到的。
+#
+# 本文件的 features.*.write 现在给的是**磁盘真实路径**，可以直接 mkdir 的那种。
+# resources（SQL/Rego/规则包）不在 java 目录下，各功能按需放 src/main/resources/。
+
 # ── 每个功能自己的写入范围 ────────────────────────────────────────
 features:
   F-DQ-001:
     name: 质检调度器 Dev Quality Run Orchestrator
-    write: ["backend/modules/dev-quality/orchestrator/**"]
+    write: ["backend/modules/dev-quality/src/main/java/com/matbox/devquality/orchestrator/**"]
   F-DQ-002:
     name: 证据归一化 Evidence Normalizer / Finding Mapper
-    write: ["backend/modules/dev-quality/normalizer/**"]
+    write: ["backend/modules/dev-quality/src/main/java/com/matbox/devquality/normalizer/**"]
   F-DQ-003:
     name: SonarQube 适配器
-    write: ["backend/modules/dev-quality/adapters/sonar/**"]
+    write: ["backend/modules/dev-quality/src/main/java/com/matbox/devquality/adapters/sonar/**"]
   F-DQ-004:
     name: OpenGrep 适配器 + Matbox 自有规则包
     write:
-      - "backend/modules/dev-quality/adapters/opengrep/**"
-      - "backend/modules/dev-quality/adapters/opengrep/rulepacks/**"
+      - "backend/modules/dev-quality/src/main/java/com/matbox/devquality/adapters/opengrep/**"
+      - "backend/modules/dev-quality/src/main/java/com/matbox/devquality/adapters/opengrep/rulepacks/**"
   F-DQ-005:
     name: Betterleaks 密钥检测适配器
     write:
-      - "backend/modules/dev-quality/adapters/secrets/**"
-      - "backend/modules/dev-quality/adapters/secrets/betterleaks/**"
-      - "backend/modules/dev-quality/adapters/secrets/gitleaks/**"   # 过渡期并行
-      - "backend/modules/dev-quality/adapters/secrets/merge/**"      # 并集判定
+      - "backend/modules/dev-quality/src/main/java/com/matbox/devquality/adapters/secrets/**"
+      - "backend/modules/dev-quality/src/main/java/com/matbox/devquality/adapters/secrets/betterleaks/**"
+      - "backend/modules/dev-quality/src/main/java/com/matbox/devquality/adapters/secrets/gitleaks/**"   # 过渡期并行
+      - "backend/modules/dev-quality/src/main/java/com/matbox/devquality/adapters/secrets/merge/**"      # 并集判定
   F-DQ-006:
     name: Trivy 供应链适配器
-    write: ["backend/modules/dev-quality/adapters/trivy/**"]
+    write: ["backend/modules/dev-quality/src/main/java/com/matbox/devquality/adapters/trivy/**"]
   F-DQ-007:
     name: 架构 / 契约 / Schema 守卫
-    write: ["backend/modules/dev-quality/adapters/architecture-guard/**"]
+    write: ["backend/modules/dev-quality/src/main/java/com/matbox/devquality/adapters/architecture-guard/**"]
     note: "本功能是唯一有权读取 rc5-registry-client 全量快照的；但仍然只读"
   F-DQ-008:
     name: OPA 策略裁决
     write:
-      - "backend/modules/dev-quality/adapters/opa/**"
-      - "backend/modules/dev-quality/adapters/opa/policies/**"       # Rego bundle
+      - "backend/modules/dev-quality/src/main/java/com/matbox/devquality/adapters/opa/**"
+      - "backend/modules/dev-quality/src/main/java/com/matbox/devquality/adapters/opa/policies/**"       # Rego bundle
     note: "策略每次改动必须先经 opa test 跑通 PolicyChallengeSet；新增/修改用例不得由改动策略的同一人或同一 AI 闭环拍板"
   F-DQ-009:
     name: 自动返修与重验
-    write: ["backend/modules/dev-quality/repair/**"]
+    write: ["backend/modules/dev-quality/src/main/java/com/matbox/devquality/repair/**"]
     note: "依赖 shared-clients 里的 agent-runtime-client（F-TASK-001），只调用不修改"
   F-DQ-010:
     name: 误报与豁免治理
-    write: ["backend/modules/dev-quality/suppression/**"]
+    write: ["backend/modules/dev-quality/src/main/java/com/matbox/devquality/suppression/**"]
   F-DQ-011:
     name: SCM / 合并 / 发布集成
-    write: ["backend/modules/dev-quality/scm-integration/**"]
+    write: ["backend/modules/dev-quality/src/main/java/com/matbox/devquality/scm-integration/**"]
   F-DQ-012:
     name: AI 代码审查补充证据（可选，独立可关闭）
-    write: ["backend/modules/dev-quality/adapters/ai-review/**"]
+    write: ["backend/modules/dev-quality/src/main/java/com/matbox/devquality/adapters/ai-review/**"]
     note: "发往外部 Provider 的代码范围必须受显式白名单约束（.docx §16 第6条）"
   F-DQ-013:
     name: 工具健康与回归台
-    write: ["backend/modules/dev-quality/ops/**"]
+    write: ["backend/modules/dev-quality/src/main/java/com/matbox/devquality/ops/**"]
     note: "依赖 shared-clients 里的 obs-client（F-OBS-001），只调用不修改"
 
 # ── 还没定的，老实标出来 ──────────────────────────────────────────
@@ -146,5 +159,6 @@ open:
     why_not_now: "QUEUE-F008 原文：具体路径待 Stage10 真实 Repo 确定后填充。该清单归 F-QUEUE-001 维护，不归 DQ"
     dq_side: "DQ 已知会命中的类别见 module_wide.auto_repair_forbidden；真实路径出来后需与那份全局清单对齐"
   - id: SCOPE-OPEN-2
-    what: "上面所有路径都还是设计约定，尚未与真实 Repo 目录对照过"
-    why_not_now: "Matbox 真代码库还没有第一行代码。Stage 10 绑定 G-STAGE10-REPO-001 时必须逐条核对，对不上的以真实目录为准并回填本文件"
+    what: "上面的路径已与真实 Repo 对照过（2026-09-09 关闭）"
+    resolved: "骨架建成后用开工真实性检查 R8 逐条比对，当场查出这些路径原先写的是专项01 §22 的概念树，而不是磁盘真实路径——照着它建目录会建错位置，且 Maven 不会编译。已全部改为真实路径。"
+    remaining: "resources 类产物（SQL / Rego bundle / 规则包）不在 java 目录下，各功能按需放 src/main/resources/，本文件暂未逐条列出。"

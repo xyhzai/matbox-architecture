@@ -2,7 +2,7 @@
 
 **FeatureID**：F-DQ-001 ~ F-DQ-013（13 个功能，同一份文档统一定义）  
 **归属**：Platform Core Quality / DevCodeQuality  
-**生成于**：2026-09-08 19:48（仓库 77565e8）  
+**生成于**：2026-09-09 02:28（仓库 4919e24）  
 **生成方式**：`python docs/_build_dq_final_doc.py`，内容从源头逐条抽取，不重新表述  
 **来源指纹（两个源，任一改动本文档即过期）**  
 
@@ -41,11 +41,11 @@ DQ 的决定此前散在 6 个地方：正式文档 `.docx`、样板 `quality_ga
 
 > **这张清单存在本身就是一次教训的产物。** 第一版 FINAL 只读了 `.docx`，把 1069 行的《专项01 技术选型与开发交接报告》当成「讲选哪个工具的」跳过了——**只凭文件名判断内容**。实际它装着 API 端点清单、真 SQL DDL、源码目录树、OpenAPI、鉴权、错误码、测试集、工作量估算，也就是「能不能直接写代码」缺的全部东西。根子上的毛病是：我验的是「我这一步做完没有」，不是「这东西够不够开工」——两个不同的问题。所以把标准变成一张能勾的清单，动笔前列出来、交付前逐条验，不靠自觉。
 
-**当前：20 / 22 项齐备，1 项部分，1 项缺**
+**当前：24 / 24 项齐备，0 项部分，0 项缺**
 
 | | 项 | 状态 | 在哪 / 缺什么 |
 |---|---|---|---|
-| 1 | 技术栈定死（语言/框架/DB/迁移工具） | ✅ | FINAL §4.18.1：Java/Spring Boot（RuoYi-Vue-Pro 基座）+ PostgreSQL + Flyway + 共享表 tenant_id。**数据库这条是 2026-09-08 首次明确记录**，此前全仓库只有顺带提及，且从没人核过它跟 RuoYi 默认 MySQL 是否冲突（已查证：RuoYi-Vue-Pro 官方支持 PostgreSQL，不冲突） |
+| 1 | 技术栈定死（语言/框架/DB/迁移工具） | ✅ | FINAL §4.18.1：Java/Spring Boot（RuoYi-Vue-Pro 基座）+ PostgreSQL + Flyway + 共享表 tenant_id。**2026-09-09 补上出处**：此前写了「已核实 RuoYi 支持 PostgreSQL」却没给来源，等于没验。现已查证——官方仓库有专门的 sql/postgresql/ruoyi-vue-pro.sql，官方支持 MySQL/Oracle/PostgreSQL/SQLServer/MariaDB/达梦/TiDB（github.com/YunaiV/ruoyi-vue-pro）。结论成立。 |
 | 2 | 源码目录结构 + 依赖方向铁律 | ✅ | 专项01 §22 |
 | 3 | API 端点清单（方法/路径/幂等键/对应 Feature） | ✅ | 专项01 §13：20 个端点，统一前缀 /dq |
 | 4 | Request / Response Schema | ✅ | 专项01 §14 |
@@ -65,8 +65,10 @@ DQ 的决定此前散在 6 个地方：正式文档 `.docx`、样板 `quality_ga
 | 18 | 验收标准写成 Given-When-Then | ✅ | .docx §13：24 条 |
 | 19 | 允许 / 禁止修改的具体路径（可机检） | ✅ | dq_protected_scope.yml。**跨模块全局高风险清单不在此**——QUEUE-F008 原文写明其路径待 Stage 10 填充，那份归 F-QUEUE-001 管 |
 | 20 | 工具版本锁到完整 40 位哈希（第15节第6条） | ✅ | 2026-09-08 当天补齐。查出 Betterleaks/Trivy/OPA 只锁了 10 位短哈希，用 GitHub API 逐个展开写回 .docx 表2 与附录A，5 个工具现全部 40 位。**我原本误判这条『必须开工后才能补』，实际当场就做完了** |
-| 21 | 本地环境怎么跑起来（几条命令、多久） | 🟡 | FINAL §4.18：四步起环境 + 三条冒烟验证标准已写死。**但那是规格不是实测**——Matbox 真代码库还没有第一行代码，跑不通，真实耗时待 Stage 10 回填。**这是唯一一项真的必须开工后才能补** |
-| 22 | Implementer 指派 | ❌ | 13 个功能全部 UNASSIGNED_STAGE10。不需要等开工，**等用户决定派给谁**（或先把 F-QUEUE-001 的自认领机制 QUEUE-F005~F010 建起来） |
+| 21 | 本地环境怎么跑起来（几条命令、多久） | ✅ | 2026-09-09 由 CI 实测证实，不再是纸面规格。四步：① clone → ② 准备 PostgreSQL（CI 用 postgres:16 service；本地连接串走 MATBOX_DB_URL/USER/PASSWORD 环境变量）→ ③ `cd backend && mvn -B verify` → ④ 看到 `Successfully applied 1 migration` 与 `BUILD SUCCESS` 即环境就绪。**真实耗时：干净机器上 65 秒（含 JDK 安装与依赖下载），其中 Maven 本身 23.6 秒。**步骤写在 backend/README.md。 |
+| 22 | Implementer 指派 | ✅ | 2026-09-09 用户指定：**opencode**。13 个功能的 Implementer 全部落实，RC5 第19条「所有施工面必须有人负责」满足。此前 UNASSIGNED_STAGE10 的状态解除。 |
+| 23 | 项目骨架已初始化（可以 clone 下来就跑） | ✅ | 2026-09-09 建成并**真跑通**。分支 stage10-skeleton → CI 绿 → 已合入 main (a9abd652)。CI 日志实证：Flyway `Successfully applied 1 migration to schema "public", now at version v1`，`Tests run: 2, Failures: 0`，`BUILD SUCCESS`，Total time 23.6s。含 backend/pom.xml（Spring Boot 3.3.5 / Java 17）、modules/dev-quality、V1__dq_core_tables.sql（8 表 7 索引，专项01 §20 原文）、GitHub Actions（起真 postgres:16 跑迁移并回查建表结果）。**判定标准不是文件建好了，是 CI 那个绿。** |
+| 24 | SCM 平台已定（F-DQ-011 依赖） | ✅ | 专项01 §25 WP-DQ-08 备注写着「依赖 SCM 平台最终选型（尚未确定 GitHub/GitLab）」，但 2026-09-09 核实：真实仓库 xyhzai/matbox 就在 GitHub 上，默认分支 main，已有 3 个分支。**事实上已定，文档那句话过期了**，F-DQ-011 按 GitHub 实现即可。 |
 
 **结论以本表为准，不由我口头判断**：两项 ❌ 之中，「Implementer 指派」只有用户能定；「本地环境怎么跑起来」是真空白，且它不需要等真代码库——这是当前最该补的一项。
 
@@ -1024,10 +1026,7 @@ suppressionId, type(false_positive|accepted_risk), fingerprint/rule/scope, reaso
 
 > 出处：`.docx` 第15/16节 + 样板卡片⑨
 
-## ⑩ 责任角色　<sub>🟡 部分</sub>
-
-> **状态：🟡 部分** —— Feature Owner / Source Reviewer / Acceptance Owner 已填；13 个功能的 Implementer 全部 UNASSIGNED_STAGE10。RC5 第19条硬条件：少一个施工面没人负责就不能派发 AI。**这一条只有用户能定**
-
+## ⑩ 责任角色　<sub>✅ 已备齐</sub>
 
 | FeatureID | Feature Owner | Implementer | Source Reviewer | Acceptance Owner | Release Owner |
 |---|---|---|---|---|---|
