@@ -45,6 +45,13 @@ import re
 import sys
 from collections import defaultdict
 
+# Windows 控制台默认 GBK，本脚本打印的 ✅ / ⚠️ 之类符号会直接
+# UnicodeEncodeError 崩掉——审计其实是绿的，人却只看到一段 traceback。
+# 2026-09-09 一次性给全部脚本补上；缘由详见 _build_public_export.py 顶部。
+for _s in (sys.stdout, sys.stderr):
+    if hasattr(_s, "reconfigure"):
+        _s.reconfigure(encoding="utf-8", errors="replace")
+
 DOCS = os.path.dirname(os.path.abspath(__file__))
 REPO = os.path.dirname(DOCS)
 SELF = os.path.basename(__file__)
