@@ -612,7 +612,7 @@
      只有 <script src="本地.js"> 还能加载。原来这里用的是 fetch，
      所以用户每次双击打开点进来都是一片红字报错。
      ═══════════════════════════════════════════════════════════════════════ -->
-<script src="flow_embeds.js?v=3f7922297c73"></script>
+<script src="flow_embeds.js?v=1ae7bc27c349"></script>
 
 <script>
   /* ═══════════════════════════════════════════════════════════════
@@ -829,6 +829,7 @@
         ["F004","高信号告警规则"],["F005","统一证据查询接口"],
         ["F006","AI Evaluation评测框架（2026-08-30并入，原架构底层独立占位模块已取消）"]],
       p0: ["证据类记录被直接修改或删除且无痕迹：不可降级P0","监控数据和证据数据混存导致证据被误删：不可降级P0"],
+      link: "Matbox_证据审计与监控_正式开发文档_V1.0-RC.md", linkLabel: "打开正式开发文档 →"
     },
     release: {
       fullPage: true,
@@ -903,6 +904,7 @@
       reuse: "DNS解析库、HTTP客户端底层实现（不重新造HTTP协议栈）",
       features: [["F001","URL安全校验服务"],["F002","Egress Proxy/共享客户端"],["F003","Admin Allowlist配置"]],
       p0: ["任何模块绕过EgressClient直接发起外部HTTP请求：不允许","私有网段/云元数据端点默认放行：不可降级P0","重试不重新校验URL（DNS-rebind窗口）：不允许"],
+      link: "Matbox_出站请求安全_正式开发文档_V1.0-RC.md", linkLabel: "打开正式开发文档 →"
     },
     aiemp: {
       fullPage: true,
@@ -942,6 +944,7 @@
       reuse: "Novu（开源，38K+ stars，MIT核心）— dedup/delivery worker/retry/Email/SMS/APNs/FCM adapter",
       features: [["F001","Novu集成"],["F002","微信通知Adapter"],["F003","偏好与免打扰管理"],["F004","Route Contract"]],
       p0: ["must-deliver类型通知被用户偏好静默关闭：不允许","同一dedupKey重复轰炸用户：不允许","通知表直接复制业务resource全量数据：不允许"],
+      link: "Matbox_通知中心_正式开发文档_V1.0-RC.md", linkLabel: "打开正式开发文档 →"
     },
     page: {
       fullPage: false,
@@ -951,15 +954,17 @@
       reuse: "Puck（可选，仅作编辑器UI层，非核心）",
       features: [["F001","Page/Block Schema"],["F002","Draft/Published版本管理"],["F003","Diff与Revision Guard"],["F004","Channel Overrides"]],
       p0: ["已发布版本被直接覆写：不允许","并发编辑冲突被静默覆盖而非返回409：不允许","Page schema与渲染技术强耦合：不允许"],
+      link: "Matbox_页面内容Schema_正式开发文档_V1.0-RC.md", linkLabel: "打开正式开发文档 →"
     },
     mobile: {
       fullPage: false,
       title: "移动端 Shell", id: "F-MOBILE-001", status: "🟢 DRAFT_RESEARCH_COMPLETE",
       desc: "微信/App/iPad/H5的生产级移动端基础——鉴权加固+离线队列+进度传输，基于已独立验证的yudao-ui-admin-uniapp。",
       own: "auth/tenant/token加固、offline queue/save-resume、progress transport、device/session管理",
-      reuse: "yudao-ui-admin-uniapp mobile shell（架构原则第31条已独立验证，commit （哈希已在公开版隐去））",
+      reuse: "yudao-ui-admin-uniapp mobile shell（架构原则第31条已独立验证，commit 00b82424085a02542cc451af14d8d0e051e667f7）",
       features: [["F001","鉴权加固"],["F002","离线队列与断点续传"],["F003","进度传输"],["F004","设备能力矩阵"]],
       p0: ["离线提交非幂等：不允许","移动端自建第二份业务数据副本作为SoT：不允许","断线重连后前端信任端侧缓存：不允许"],
+      link: "Matbox_移动端Shell_正式开发文档_V1.0-RC.md", linkLabel: "打开正式开发文档 →"
     },
     multiend: {
       fullPage: false,
@@ -969,6 +974,7 @@
       reuse: "Next.js（Web端SSR/SEO，行业无争议标准做法）、uni-app（移动端渲染）",
       features: [["F001","Web端Renderer"],["F002","移动端Renderer"],["F003","Client Capability Registry"],["F004","Publish Guard"]],
       p0: ["未知Block类型导致整页渲染崩溃：不允许，必须fallback","Preview页面被搜索引擎收录：不允许","不兼容schema版本被强行发布：不允许"],
+      link: "Matbox_多端渲染与能力注册_正式开发文档_V1.0-RC.md", linkLabel: "打开正式开发文档 →"
     },
     handoff: {
       fullPage: true,
@@ -988,6 +994,7 @@
       reuse: "F-CRED-001（签名证书/密钥）、F-RELEASE-001（构建产物追溯）、F-TENANT-001（多租户隔离）",
       features: [["F001","ChannelInstance管理"],["F002","Brand/Theme/Template绑定"],["F003","Domain/App身份绑定"],["F004","发布/构建身份"]],
       p0: ["证书/私钥/secret明文写入业务DB或Git：不允许","跨租户渠道配置泄露：不可降级P0","模板升级覆盖企业已定制内容：不允许","域名/App身份冲突未被显式拦截：不允许"],
+      link: "Matbox_租户渠道实例_正式开发文档_V1.0-RC.md", linkLabel: "打开正式开发文档 →"
     },
     "provider-router": {
       fullPage: true, embedKey: "providerRouter",
@@ -998,10 +1005,12 @@
     "eval-framework": {
       title: "内部持续评测框架", id: "✅ 已并入 F-OBS-001 · OBS-F006", status: "🟢 DRAFT_RESEARCH_COMPLETE",
       desc: "原则已定（架构原则第6条：用真实任务建基准测试集，新模型发布跑一遍打分）。2026-08-30架构变更：《多端平台正式开发文档》把AI Evaluation直接并入了F-OBS-001，用户确认按此为准——不再是独立的「尚未开始设计」占位模块，现在跟着F-OBS-001（已READY_FOR_STAGE10_BINDING）一起设计，具体见证据审计与监控文档OBS-F006、架构原则第31条。无评测的AI员工代码回滚率是有评测的5倍多(47% vs 9%)这条依据没变，变的是「现在就能设计」而不是「等Stage10才补」。",
+      link: "Matbox_证据审计与监控_正式开发文档_V1.0-RC.md", linkLabel: "打开证据审计与监控文档（含OBS-F006）→"
     },
     "knowledge-base": {
       title: "知识库 / 记忆系统", id: "🟡 专项27已完成技术选型审查 · 有意保持不锁定后端", status: "🟡 DRAFT_RESEARCH_COMPLETE（有意不锁定）",
       desc: "数据保留原则已定（架构原则第7条：原始数据必须完整保留，落地到F-STORAGE-001）。F-MEM-001（Memory/Knowledge ACL Governance）覆盖AI员工检索记忆/RAG时的权限控制（按tenant/project/resource的ACL、来源、TTL、撤销传播），设计完整。2026-09-02专项27完成核心后端（向量数据库/Embedding/RAG检索链路）的技术选型审查——结论不是遗漏未做，是调研完毕后确认「现在不锁定厂商」本身就是正确判断：Mem0/Zep(Graphiti)/Letta/pgvector自建之间没有绝对赢家，胜负取决于Matbox真实对话量级/查询模式等目前不存在的场景数据。现在就能做、成本几乎为零的动作：把MEM-F001的ACL契约做成后端无关的MemoryStore适配器接口，用已在用的PostgreSQL+pgvector做最小参考后端验证接口设计。新发现需更正：Zep已于2025年4月停运自托管社区版，只剩纯SaaS的Zep Cloud。",
+      link: "技术选型报告/Matbox_专项27_知识库记忆系统_技术选型与开发交接报告_2026-08-30.md", linkLabel: "打开专项27技术选型报告 →"
     },
     loc: {
       title: "全球多语言与本地化", id: "F-LOC-001 · LOC-F001~F020 · 基础层公共能力", status: "🟢 DRAFT_RESEARCH_COMPLETE",
@@ -1009,10 +1018,12 @@
       own: "EffectiveLocaleContext解析、Localization Catalog契约、BusinessContentTranslation派生记录、LanguagePolicyProfile（术语/BrandVoice/市场规则版本引用）、Cross-End语言连续性",
       reuse: "F-TENANT-001(Tenant/User偏好)、F-PAGE-001(SiteInstance/ContentBinding/LocalizedRoute直接复用不重建)、F-PROVIDER-001+F-CRED-001(翻译Provider与密钥)、F-COST-001(每次付费翻译写usage/cost ref)、F-RELEASE-001(Catalog作为Release Artifact)、F-TASK-001+F-QUEUE-001(长批量翻译)、F-AIEMP-001+F-RUNTIME-001(AI会话语言上下文)、F-ACTION-001(语言工具经Action/Tool Gateway授权)",
       features: [["F001","Effective Locale 解析策略"],["F008","业务内容翻译库(⚠️依赖尚不存在的Product Master)"],["F009","翻译网关与Provider路由"],["F014","AI员工/会话语言桥接"],["F018","AI员工语言智能策略(P0)"],["F019","AI语言质量Gate(P0·Agent自评不算PASS)"],["F020","实时多语言聊天+手机指挥AI(P0·⚠️Messaging Owner缺失阻塞)"]],
+      link: "Matbox_全球多语言与本地化_正式开发文档_V1.0-RC.md", linkLabel: "打开正式开发文档 →"
     },
     "agent-runtime": {
       title: "Agent Runtime", id: "✅ 正式开发文档已建立 · 自研（Java + Temporal）", status: "🟢 DRAFT_RESEARCH_COMPLETE",
       desc: "2026-09-05建立正式开发文档（用户要求排查遗留项时发现：此前长期只有专项28技术选型报告，没有对应正式文档本体，跟AIEMP-001/ACTION-001等模块不是同一进度，现已补齐，拆出RUNTIME-F001~F008）。技术选型结论（专项28，2026-08-30）：自研（Java+Temporal），明确否决LangGraph/CrewAI/AutoGen/OpenAI Agents SDK等全部Python-only候选（语言栈与架构原则第33条Java单语言栈冲突），Google ADK Java版评为Top-3但因需要削足适履改造未整体采纳。「AI员工执行过程安全防护」（架构原则第10条）、Kill Switch（架构原则第28条：Pause/Suspend/Revoke/Retire）、心跳检测（2-3分钟一次、必须从工作循环内部主动发出、连续漏2次才报警）、进度表更新（30分钟一次）均已落实到TASK-F005/AIEMP-F005等具体Feature。2026-09-02专项00m事后核查conductor-oss/conductor（原Netflix Conductor）作为验证性候选，同属durable execution引擎赛道但结论REFERENCE-ONLY——Temporal「代码即workflow」模式对TASK-F008自我纠错这类复杂条件分支场景更合适，不构成推翻本选型的理由。唯一真实协调缺口：F-PROVIDER-001响应schema尚未定义跨供应商统一的normalized_tool_calls[]字段，已登记协调需求，不阻塞P0开工。",
+      link: "Matbox_AgentRuntime_正式开发文档_V1.0-RC.md", linkLabel: "打开正式开发文档 →"
     }
   };
 

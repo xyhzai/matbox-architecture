@@ -1,0 +1,150 @@
+# ══════════════════════════════════════════════════════════════════════
+# F-DQ-001~013 的「允许 / 禁止修改范围」——机器可读版
+#
+# 2026-09-08 建立。为什么要有这个文件：
+#
+# 「可直接开发」验收清单第 19 项此前是 🟡：专项01 §22 的目录树已经回答了
+# 「哪个功能写哪个目录」，但「禁止碰什么」只散在正文里（Own/Reuse/Must Not
+# Rebuild、依赖铁律、Protected 行），是给人读的散文，机器读不了。而 RC5 的
+# PARALLEL_READY 硬条件要求「允许修改的代码/资产范围明确，禁止修改边界明确」
+# ——散文形式满足不了「明确」。
+#
+# 谁来消费这个文件：
+#   · F-DQ-007（Matbox Architecture/Contract/Schema Guard）——施工时校验
+#     改动是否越界
+#   · QUEUE-F008（高风险公共文件强制转人工）——命中即强制人工审核
+#   · WorkPackage 派发时，抽出该功能自己那一段随材料一并交给 Implementer AI
+#
+# ⚠️ 一条必须说清楚的边界：
+# 下面 dev-quality 内部的路径**现在就能定**，依据是专项01 §22 已给出的完整
+# 目录树。但**跨模块的「高风险公共文件」全局清单不在这里**——F-QUEUE-001 的
+# QUEUE-F008 原文写着「具体路径待 Stage10 真实 Repo 确定后填充」。那份清单
+# 归 QUEUE 管，不归 DQ；本文件只声明 DQ 已知会命中的类别，不替它做决定。
+# ══════════════════════════════════════════════════════════════════════
+
+version: 1
+module: F-DQ-001~013
+source:
+  - "专项01 §22 源码目录、模块和依赖关系（目录树 + 依赖方向铁律）"
+  - ".docx §4 Own / Reuse / Must Not Rebuild"
+  - ".docx §10 各功能施工面的 Protected 行"
+  - ".docx §11 自动返修策略：允许什么、禁止什么"
+  - "F-QUEUE-001 QUEUE-F008（高风险公共文件，路径待 Stage 10）"
+
+# ── 全模块通用：任何一个 F-DQ-00X 都不得越过 ──────────────────────
+module_wide:
+  allowed_root: "backend/modules/dev-quality/**"
+  frontend_root: "frontend/apps/ops-console/features/dev-quality/**"
+
+  # 依赖方向铁律（专项01 §22 原文）
+  dependency_rules:
+    - id: DEP-1
+      rule: "dev-quality/* 只允许依赖 shared-clients/* 和自己内部子模块"
+      forbid_import_from:
+        - "backend/modules/!(dev-quality)/**"      # 不得直接 import 别的业务模块
+    - id: DEP-2
+      rule: "不允许反向被 rc5-registry-client 等基础设施客户端依赖"
+      forbid_reverse_import_by:
+        - "backend/modules/shared-clients/**"
+    - id: DEP-3
+      rule: "adapters/* 之间禁止互相依赖——每个 Adapter 独立可插拔，移除任一个只影响 CheckSet 适用性矩阵，不影响其余 Adapter 运行"
+      forbid_cross_import_within:
+        - "backend/modules/dev-quality/adapters/*"
+
+  # 只读：这些是别的模块的事实源，DQ 只能调用，不能改
+  read_only:
+    - path: "backend/modules/shared-clients/rc5-registry-client/**"
+      owner: "RC5 Canonical Registry"
+    - path: "backend/modules/shared-clients/obs-client/**"
+      owner: "F-OBS-001"
+    - path: "backend/modules/shared-clients/release-client/**"
+      owner: "F-RELEASE-001"
+    - path: "backend/modules/shared-clients/cred-client/**"
+      owner: "F-CRED-001"
+    - path: "backend/modules/shared-clients/tenant-client/**"
+      owner: "F-TENANT-001"
+
+  # 改动需要走 Change Register，不能直接提交
+  frozen_contract:
+    - path: "backend/modules/dev-quality/shared/contracts/**"
+      why: "六个 Own 数据模型（QualityRun / ScannerRun / NormalizedFinding / GateDecision / RepairAttempt / SuppressionRef）的 DTO。.docx §7 明确：一旦施工开始不得随意改，改要走 Change Register"
+
+  # Must Not Rebuild —— 命中即判违规，不是「尽量别」
+  must_not_rebuild:
+    - "第二套 Quality / Evidence / Release / Registry / Queue / Tenant / RBAC / Secret / Provider 系统"
+    - "SAST / Secrets / Vulnerability DB / 通用 Code Quality 引擎 / Policy 语言本身（外部 A 类工具的活）"
+    - "AI Review 平台、SCM / Merge Queue 本身（只做 Adapter，禁止 Vendor schema 成为 Matbox SoT）"
+
+  # 自动返修默认禁止触碰的类别（.docx §11.2）——命中直接转人工，不自动修
+  auto_repair_forbidden:
+    - "认证 / 授权 / Tenant / RBAC / Secret / KMS / 加密策略"
+    - "破坏性 DB Migration"
+    - "核心 Schema / Contract"
+    - "生产网络 / Egress 配置"
+    - "Release / branch protection 配置"
+    - "GatePolicy 本身"
+
+# ── 每个功能自己的写入范围 ────────────────────────────────────────
+features:
+  F-DQ-001:
+    name: 质检调度器 Dev Quality Run Orchestrator
+    write: ["backend/modules/dev-quality/orchestrator/**"]
+  F-DQ-002:
+    name: 证据归一化 Evidence Normalizer / Finding Mapper
+    write: ["backend/modules/dev-quality/normalizer/**"]
+  F-DQ-003:
+    name: SonarQube 适配器
+    write: ["backend/modules/dev-quality/adapters/sonar/**"]
+  F-DQ-004:
+    name: OpenGrep 适配器 + Matbox 自有规则包
+    write:
+      - "backend/modules/dev-quality/adapters/opengrep/**"
+      - "backend/modules/dev-quality/adapters/opengrep/rulepacks/**"
+  F-DQ-005:
+    name: Betterleaks 密钥检测适配器
+    write:
+      - "backend/modules/dev-quality/adapters/secrets/**"
+      - "backend/modules/dev-quality/adapters/secrets/betterleaks/**"
+      - "backend/modules/dev-quality/adapters/secrets/gitleaks/**"   # 过渡期并行
+      - "backend/modules/dev-quality/adapters/secrets/merge/**"      # 并集判定
+  F-DQ-006:
+    name: Trivy 供应链适配器
+    write: ["backend/modules/dev-quality/adapters/trivy/**"]
+  F-DQ-007:
+    name: 架构 / 契约 / Schema 守卫
+    write: ["backend/modules/dev-quality/adapters/architecture-guard/**"]
+    note: "本功能是唯一有权读取 rc5-registry-client 全量快照的；但仍然只读"
+  F-DQ-008:
+    name: OPA 策略裁决
+    write:
+      - "backend/modules/dev-quality/adapters/opa/**"
+      - "backend/modules/dev-quality/adapters/opa/policies/**"       # Rego bundle
+    note: "策略每次改动必须先经 opa test 跑通 PolicyChallengeSet；新增/修改用例不得由改动策略的同一人或同一 AI 闭环拍板"
+  F-DQ-009:
+    name: 自动返修与重验
+    write: ["backend/modules/dev-quality/repair/**"]
+    note: "依赖 shared-clients 里的 agent-runtime-client（F-TASK-001），只调用不修改"
+  F-DQ-010:
+    name: 误报与豁免治理
+    write: ["backend/modules/dev-quality/suppression/**"]
+  F-DQ-011:
+    name: SCM / 合并 / 发布集成
+    write: ["backend/modules/dev-quality/scm-integration/**"]
+  F-DQ-012:
+    name: AI 代码审查补充证据（可选，独立可关闭）
+    write: ["backend/modules/dev-quality/adapters/ai-review/**"]
+    note: "发往外部 Provider 的代码范围必须受显式白名单约束（.docx §16 第6条）"
+  F-DQ-013:
+    name: 工具健康与回归台
+    write: ["backend/modules/dev-quality/ops/**"]
+    note: "依赖 shared-clients 里的 obs-client（F-OBS-001），只调用不修改"
+
+# ── 还没定的，老实标出来 ──────────────────────────────────────────
+open:
+  - id: SCOPE-OPEN-1
+    what: "跨模块「高风险公共文件」全局清单的具体路径"
+    why_not_now: "QUEUE-F008 原文：具体路径待 Stage10 真实 Repo 确定后填充。该清单归 F-QUEUE-001 维护，不归 DQ"
+    dq_side: "DQ 已知会命中的类别见 module_wide.auto_repair_forbidden；真实路径出来后需与那份全局清单对齐"
+  - id: SCOPE-OPEN-2
+    what: "上面所有路径都还是设计约定，尚未与真实 Repo 目录对照过"
+    why_not_now: "Matbox 真代码库还没有第一行代码。Stage 10 绑定 G-STAGE10-REPO-001 时必须逐条核对，对不上的以真实目录为准并回填本文件"
