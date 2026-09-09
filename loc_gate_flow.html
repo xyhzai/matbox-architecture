@@ -986,7 +986,7 @@
 <header>
   <div class="eyebrow"><span class="dot"></span>MATBOX · LOC</div>
   <h1>全球多语言 <span class="h1-accent">开发包标准判定</span></h1>
-  <p class="sub">按《Matbox 开发包标准 V1.0》逐条机检的结果，<b>数据由检查器算出，不是人填的</b>。改了材料重跑一次就跟着变。<br><b>已就绪 —— 可以送去给 opencode 试</b>　最终验收不在这张表上——标准 §0.5：这些只是<b>代理指标</b>，真正的验收是 <b>opencode 拿到材料能不能马上开发</b>。</p>
+  <p class="sub">按《Matbox 开发包标准 V1.0》逐条机检的结果，<b>数据由检查器算出，不是人填的</b>。改了材料重跑一次就跟着变。<br><b>未就绪 —— 差 1 条</b>　最终验收不在这张表上——标准 §0.5：这些只是<b>代理指标</b>，真正的验收是 <b>opencode 拿到材料能不能马上开发</b>。</p>
 </header>
 <!-- PHASE-HEAD:END -->
 
@@ -1012,76 +1012,24 @@
 </script>
 
 <!-- PHASE-PRE-A:BEGIN 由 _build_module_page.py 按模块替换，DQ 本身不动 -->
-<section class="devready phase-panel" data-phase="pre" aria-label="开发前">
-  <div class="readysum-head">
-    <span class="rs-eyebrow">开发前 · 能不能开工 —— 逐条摊开，不用点开也不用悬停</span>
-    <span class="rs-overall">31 项里 31 项已备齐 · 全部齐备</span>
-  </div>
-  <div class="readysum-grid">
-    <a class="rs-item ok" href="#P1"><span class="rs-badge">🟢 已备</span><span class="rs-label">P1 技术栈定死（含版本）</span></a>
-    <a class="rs-item ok" href="#P2"><span class="rs-badge">🟢 已备</span><span class="rs-label">P2 源码目录结构+依赖方向</span></a>
-    <a class="rs-item ok" href="#P3"><span class="rs-badge">🟢 已备</span><span class="rs-label">P3 API 端点清单</span></a>
-    <a class="rs-item ok" href="#P4"><span class="rs-badge">🟢 已备</span><span class="rs-label">P4 Request/Response Schema</span></a>
-    <a class="rs-item ok" href="#P5"><span class="rs-badge">🟢 已备</span><span class="rs-label">P5 OpenAPI 3.0 文档</span></a>
-    <a class="rs-item ok" href="#P6"><span class="rs-badge">🟢 已备</span><span class="rs-label">P6 鉴权/权限/多租户（含机制）</span></a>
-    <a class="rs-item ok" href="#P7"><span class="rs-badge">🟢 已备</span><span class="rs-label">P7 数据库 DDL + Migration</span></a>
-    <a class="rs-item ok" href="#P8"><span class="rs-badge">🟢 已备</span><span class="rs-label">P8 Provider Adapter 接口规范</span></a>
-    <a class="rs-item ok" href="#P9"><span class="rs-badge">🟢 已备</span><span class="rs-label">P9 Webhook/回调/异步任务规范</span></a>
-    <a class="rs-item ok" href="#P10"><span class="rs-badge">🟢 已备</span><span class="rs-label">P10 错误码（含码值）</span></a>
-    <a class="rs-item ok" href="#P11"><span class="rs-badge">🟢 已备</span><span class="rs-label">P11 测试集/Golden Set/验收脚本</span></a>
-    <a class="rs-item ok" href="#P12"><span class="rs-badge">🟢 已备</span><span class="rs-label">P12 前后端开发任务拆分（含编号）</span></a>
-    <a class="rs-item ok" href="#P13"><span class="rs-badge">🟢 已备</span><span class="rs-label">P13 成本/性能/并发（含数字指标）</span></a>
-    <a class="rs-item ok" href="#P14"><span class="rs-badge">🟢 已备</span><span class="rs-label">P14 工作量估算（含数字）</span></a>
-    <a class="rs-item ok" href="#P15"><span class="rs-badge">🟢 已备</span><span class="rs-label">P15 风险/阻塞项（成条目）</span></a>
-    <a class="rs-item ok" href="#P16"><span class="rs-badge">🟢 已备</span><span class="rs-label">P16 给未来 AI 的执行说明</span></a>
-    <a class="rs-item ok" href="#P17"><span class="rs-badge">🟢 已备</span><span class="rs-label">P17 七类施工面</span></a>
-    <a class="rs-item ok" href="#P18"><span class="rs-badge">🟢 已备</span><span class="rs-label">P18 验收标准 G-W-T + 稳定编号</span></a>
-    <a class="rs-item ok" href="#P19"><span class="rs-badge">🟢 已备</span><span class="rs-label">P19 允许/禁止修改路径（非空）</span></a>
-    <a class="rs-item ok" href="#P20"><span class="rs-badge">🟢 已备</span><span class="rs-label">P20 工具版本锁到 40 位哈希</span></a>
-    <a class="rs-item ok" href="#P21"><span class="rs-badge">🟢 已备</span><span class="rs-label">P21 验收标准↔功能对应表</span></a>
-    <a class="rs-item ok" href="#R1"><span class="rs-badge">🟢 已备</span><span class="rs-label">R1 真实代码仓库可访问</span></a>
-    <a class="rs-item ok" href="#R2"><span class="rs-badge">🟢 已备</span><span class="rs-label">R2 仓库里有可编译工程</span></a>
-    <a class="rs-item ok" href="#R3"><span class="rs-badge">🟢 已备</span><span class="rs-label">R3 有可用的 Base Commit</span></a>
-    <a class="rs-item ok" href="#R4"><span class="rs-badge">🟢 已备</span><span class="rs-label">R4 有 CI 配置</span></a>
-    <a class="rs-item ok" href="#R5"><span class="rs-badge">🟢 已备</span><span class="rs-label">R5 有数据库迁移目录</span></a>
-    <a class="rs-item ok" href="#R6"><span class="rs-badge">🟢 已备</span><span class="rs-label">R6 [LOC] 工作包已生成</span></a>
-    <a class="rs-item ok" href="#R7"><span class="rs-badge">🟢 已备</span><span class="rs-label">R7 [LOC] Implementer 已指派</span></a>
-    <a class="rs-item ok" href="#R8"><span class="rs-badge">🟢 已备</span><span class="rs-label">R8 [LOC] 多个功能共用的落脚目录都真实存在</span></a>
-    <a class="rs-item ok" href="#R11"><span class="rs-badge">🟢 已备</span><span class="rs-label">R11 代码仓库 CI 是绿的</span></a>
-    <a class="rs-item ok" href="#R10"><span class="rs-badge">🟢 已备</span><span class="rs-label">R10 公开站点没过期</span></a>
-  </div>
-  <p class="wp-desc" style="margin-top:14px">文档类由 <code>_check_standard.py</code> 判；<b>R 系列去问 git / CI</b>，不读我们自己写的文档。按《Matbox 开发包标准 V1.0》§0.5.1 第 3 条：<b>差一条就是没就绪</b>，不接受「大致齐了」。</p>
-</section>
-<!-- PHASE-PRE-A:END -->
-
-<!-- PHASE-BUILD:BEGIN 由 _build_module_page.py 按模块替换，DQ 本身不动 -->
-<section class="devready phase-panel phase-hidden" data-phase="build" aria-label="开发中">
-  <div class="readysum-head">
-    <span class="rs-eyebrow">开发中 · 在建时不许发生什么 —— 按 diff / CI 判，不看任何一方自述</span>
-    <span class="rs-overall">8 项里 6 项已建 · 2 项未建</span>
-  </div>
-  <div class="readysum-grid">
-    <a class="rs-item ok" href="#M0"><span class="rs-badge">🟢 已备</span><span class="rs-label">M0 测试引用的编号必须真实存在</span></a>
-    <a class="rs-item ok" href="#M1"><span class="rs-badge">🟢 已备</span><span class="rs-label">M1 测试方法名带 TestID</span></a>
-    <a class="rs-item ok" href="#M2"><span class="rs-badge">🟢 已备</span><span class="rs-label">M2 不许动不归自己的测试</span></a>
-    <a class="rs-item ok" href="#M3"><span class="rs-badge">🟢 已备</span><span class="rs-label">M3 不许删掉或禁用已有测试</span></a>
-    <a class="rs-item ok" href="#M4"><span class="rs-badge">🟢 已备</span><span class="rs-label">M4 不许把测试掏空留壳</span></a>
-    <a class="rs-item ok" href="#M5"><span class="rs-badge">🟢 已备</span><span class="rs-label">M5 改动不许越出允许范围</span></a>
-    <a class="rs-item partial" href="#M6"><span class="rs-badge">⚪ 未建</span><span class="rs-label">M6 测试必须是真的（变异测试）</span></a>
-    <a class="rs-item partial" href="#M7"><span class="rs-badge">⚪ 未建</span><span class="rs-label">M7 留一手：验收方独立写、Gate 时跑一次</span></a>
-  </div>
-  <p class="wp-desc" style="margin-top:14px">依据：实测编码模型有 <b>12%</b> 的情况会主动破坏用来发现它自己行为不端的代码；最强模型检测别的 agent 作弊，54 类手法只查得出 <b>63%</b>。所以确定性检查不能省。<br><b>⚪ 未建 ≠ 通过</b> —— 那表示这一条现在拦不住任何人（标准 §0.5.2）。</p>
-</section>
-<!-- PHASE-BUILD:END -->
-<!-- PHASE-PRE-B:BEGIN 由 _build_module_page.py 按模块替换，DQ 本身不动 -->
 <section class="wpindex phase-panel" data-phase="pre" aria-label="开发交接包存放处">
   <div class="wp-head">
     <div class="wp-ico">📁</div>
     <div class="wp-title">开发交接包存放处</div>
     <div class="wp-sub">真正派给某个 AI 去写代码时，那份只属于它自己的交接文件，存放在 <code>docs/工作包/LOC/</code>。</div>
-    <span class="wp-status wp-status-ok">工作包 20 份 · 点文件名可看，点下载可取走</span>
+    <span class="wp-status wp-status-ok">总账 2 份 + 工作包 20 份 · 点文件名可看，点下载可取走</span>
   </div>
   <div class="wp-files">
+      <div class="wp-file wp-ledger">
+        <a class="wp-fname" href="全球多语言/Matbox_全球多语言_交接包_V1.0/DEV.docx" target="_blank" rel="noopener">DEV.docx</a>
+        <span class="wp-fmeta">完整开发文档（总账）· 87.5 KB · 最后修改 2026-09-08 16:14</span>
+        <a class="wp-dl" href="全球多语言/Matbox_全球多语言_交接包_V1.0/DEV.docx" download="DEV.docx">下载</a>
+      </div>
+      <div class="wp-file wp-ledger">
+        <a class="wp-fname" href="全球多语言/Matbox_全球多语言_开发交接补全_V1.0.md" target="_blank" rel="noopener">Matbox_全球多语言_开发交接补全_V1.0.md</a>
+        <span class="wp-fmeta">完整开发文档（总账）· 35.1 KB · 最后修改 2026-09-09 16:49</span>
+        <a class="wp-dl" href="全球多语言/Matbox_全球多语言_开发交接补全_V1.0.md" download="Matbox_全球多语言_开发交接补全_V1.0.md">下载</a>
+      </div>
       <div class="wp-file">
         <a class="wp-fname" href="工作包/LOC/LOC-F001.md" target="_blank" rel="noopener">LOC-F001.md</a>
         <span class="wp-fmeta">16.3 KB · 最后修改 2026-09-09 18:59</span>
@@ -1203,6 +1151,68 @@
         <a class="wp-dl" href="工作包/LOC/LOC-F020.md" download="LOC-F020.md">下载</a>
       </div>
   </div>
+</section>
+<!-- PHASE-PRE-A:END -->
+
+<!-- PHASE-BUILD:BEGIN 由 _build_module_page.py 按模块替换，DQ 本身不动 -->
+<section class="devready phase-panel phase-hidden" data-phase="build" aria-label="开发中">
+  <div class="readysum-head">
+    <span class="rs-eyebrow">开发中 · 在建时不许发生什么 —— 按 diff / CI 判，不看任何一方自述</span>
+    <span class="rs-overall">8 项里 6 项已建 · 2 项未建</span>
+  </div>
+  <div class="readysum-grid">
+    <a class="rs-item ok" href="#M0"><span class="rs-badge">🟢 已备</span><span class="rs-label">M0 测试引用的编号必须真实存在</span></a>
+    <a class="rs-item ok" href="#M1"><span class="rs-badge">🟢 已备</span><span class="rs-label">M1 测试方法名带 TestID</span></a>
+    <a class="rs-item ok" href="#M2"><span class="rs-badge">🟢 已备</span><span class="rs-label">M2 不许动不归自己的测试</span></a>
+    <a class="rs-item ok" href="#M3"><span class="rs-badge">🟢 已备</span><span class="rs-label">M3 不许删掉或禁用已有测试</span></a>
+    <a class="rs-item ok" href="#M4"><span class="rs-badge">🟢 已备</span><span class="rs-label">M4 不许把测试掏空留壳</span></a>
+    <a class="rs-item ok" href="#M5"><span class="rs-badge">🟢 已备</span><span class="rs-label">M5 改动不许越出允许范围</span></a>
+    <a class="rs-item partial" href="#M6"><span class="rs-badge">⚪ 未建</span><span class="rs-label">M6 测试必须是真的（变异测试）</span></a>
+    <a class="rs-item partial" href="#M7"><span class="rs-badge">⚪ 未建</span><span class="rs-label">M7 留一手：验收方独立写、Gate 时跑一次</span></a>
+  </div>
+  <p class="wp-desc" style="margin-top:14px">依据：实测编码模型有 <b>12%</b> 的情况会主动破坏用来发现它自己行为不端的代码；最强模型检测别的 agent 作弊，54 类手法只查得出 <b>63%</b>。所以确定性检查不能省。<br><b>⚪ 未建 ≠ 通过</b> —— 那表示这一条现在拦不住任何人（标准 §0.5.2）。</p>
+</section>
+<!-- PHASE-BUILD:END -->
+<!-- PHASE-PRE-B:BEGIN 由 _build_module_page.py 按模块替换，DQ 本身不动 -->
+<section class="devready phase-panel" data-phase="pre" aria-label="开发前资料摘要">
+  <div class="readysum-head">
+    <span class="rs-eyebrow">开发前 · 能不能开工 —— 逐条摊开，不用点开也不用悬停</span>
+    <span class="rs-overall">31 项里 30 项已备齐 · 1 项未过</span>
+  </div>
+  <div class="readysum-grid">
+    <a class="rs-item ok" href="#P1"><span class="rs-badge">🟢 已备</span><span class="rs-label">P1 技术栈定死（含版本）</span></a>
+    <a class="rs-item ok" href="#P2"><span class="rs-badge">🟢 已备</span><span class="rs-label">P2 源码目录结构+依赖方向</span></a>
+    <a class="rs-item ok" href="#P3"><span class="rs-badge">🟢 已备</span><span class="rs-label">P3 API 端点清单</span></a>
+    <a class="rs-item ok" href="#P4"><span class="rs-badge">🟢 已备</span><span class="rs-label">P4 Request/Response Schema</span></a>
+    <a class="rs-item ok" href="#P5"><span class="rs-badge">🟢 已备</span><span class="rs-label">P5 OpenAPI 3.0 文档</span></a>
+    <a class="rs-item ok" href="#P6"><span class="rs-badge">🟢 已备</span><span class="rs-label">P6 鉴权/权限/多租户（含机制）</span></a>
+    <a class="rs-item ok" href="#P7"><span class="rs-badge">🟢 已备</span><span class="rs-label">P7 数据库 DDL + Migration</span></a>
+    <a class="rs-item ok" href="#P8"><span class="rs-badge">🟢 已备</span><span class="rs-label">P8 Provider Adapter 接口规范</span></a>
+    <a class="rs-item ok" href="#P9"><span class="rs-badge">🟢 已备</span><span class="rs-label">P9 Webhook/回调/异步任务规范</span></a>
+    <a class="rs-item ok" href="#P10"><span class="rs-badge">🟢 已备</span><span class="rs-label">P10 错误码（含码值）</span></a>
+    <a class="rs-item ok" href="#P11"><span class="rs-badge">🟢 已备</span><span class="rs-label">P11 测试集/Golden Set/验收脚本</span></a>
+    <a class="rs-item ok" href="#P12"><span class="rs-badge">🟢 已备</span><span class="rs-label">P12 前后端开发任务拆分（含编号）</span></a>
+    <a class="rs-item ok" href="#P13"><span class="rs-badge">🟢 已备</span><span class="rs-label">P13 成本/性能/并发（含数字指标）</span></a>
+    <a class="rs-item ok" href="#P14"><span class="rs-badge">🟢 已备</span><span class="rs-label">P14 工作量估算（含数字）</span></a>
+    <a class="rs-item ok" href="#P15"><span class="rs-badge">🟢 已备</span><span class="rs-label">P15 风险/阻塞项（成条目）</span></a>
+    <a class="rs-item ok" href="#P16"><span class="rs-badge">🟢 已备</span><span class="rs-label">P16 给未来 AI 的执行说明</span></a>
+    <a class="rs-item ok" href="#P17"><span class="rs-badge">🟢 已备</span><span class="rs-label">P17 七类施工面</span></a>
+    <a class="rs-item ok" href="#P18"><span class="rs-badge">🟢 已备</span><span class="rs-label">P18 验收标准 G-W-T + 稳定编号</span></a>
+    <a class="rs-item ok" href="#P19"><span class="rs-badge">🟢 已备</span><span class="rs-label">P19 允许/禁止修改路径（非空）</span></a>
+    <a class="rs-item ok" href="#P20"><span class="rs-badge">🟢 已备</span><span class="rs-label">P20 工具版本锁到 40 位哈希</span></a>
+    <a class="rs-item ok" href="#P21"><span class="rs-badge">🟢 已备</span><span class="rs-label">P21 验收标准↔功能对应表</span></a>
+    <a class="rs-item ok" href="#R1"><span class="rs-badge">🟢 已备</span><span class="rs-label">R1 真实代码仓库可访问</span></a>
+    <a class="rs-item ok" href="#R2"><span class="rs-badge">🟢 已备</span><span class="rs-label">R2 仓库里有可编译工程</span></a>
+    <a class="rs-item missing" href="#R3"><span class="rs-badge">🔴 缺</span><span class="rs-label">R3 有可用的 Base Commit</span></a>
+    <a class="rs-item ok" href="#R4"><span class="rs-badge">🟢 已备</span><span class="rs-label">R4 有 CI 配置</span></a>
+    <a class="rs-item ok" href="#R5"><span class="rs-badge">🟢 已备</span><span class="rs-label">R5 有数据库迁移目录</span></a>
+    <a class="rs-item ok" href="#R6"><span class="rs-badge">🟢 已备</span><span class="rs-label">R6 [LOC] 工作包已生成</span></a>
+    <a class="rs-item ok" href="#R7"><span class="rs-badge">🟢 已备</span><span class="rs-label">R7 [LOC] Implementer 已指派</span></a>
+    <a class="rs-item ok" href="#R8"><span class="rs-badge">🟢 已备</span><span class="rs-label">R8 [LOC] 多个功能共用的落脚目录都真实存在</span></a>
+    <a class="rs-item ok" href="#R11"><span class="rs-badge">🟢 已备</span><span class="rs-label">R11 代码仓库 CI 是绿的</span></a>
+    <a class="rs-item ok" href="#R10"><span class="rs-badge">🟢 已备</span><span class="rs-label">R10 公开站点没过期</span></a>
+  </div>
+  <p class="wp-desc" style="margin-top:14px">文档类由 <code>_check_standard.py</code> 判；<b>R 系列去问 git / CI</b>，不读我们自己写的文档。按《Matbox 开发包标准 V1.0》§0.5.1 第 3 条：<b>差一条就是没就绪</b>，不接受「大致齐了」。</p>
 </section>
 <section class="devready phase-panel" data-phase="pre" aria-label="施工面检查展开与开发资料">
   <div class="readysum-head" style="margin-top:22px;">

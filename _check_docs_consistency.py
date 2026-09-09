@@ -227,6 +227,64 @@ def check_workflows():
             fails.append("C11 %s 解析出来没有 jobs——GitHub 拿到这个文件不会跑任何东西" % fn)
 
 
+# ══ C12：模块页面的块顺序必须符合《开发包标准》§3.7.1 ═══════════════════
+# 2026-09-09。用户对比 DQ 与全球多语言两张截图后问：
+#   「我的开发交接包是放什么位置！！为什么这么提醒你还是出错。」
+#
+# 标准 §3.7.1 白纸黑字写着顺序是 A 存放处 → B 摘要 → B2 → C，
+# 而我把自己造的检查清单放进了 A 的位置，把存放处挤到第二——
+# **立完标准第一件事就是自己违反它**。
+#
+# 光写在文档里的顺序会被违反，所以钉成检查：取件的人打开这一页，
+# 第一眼必须是「东西在哪、怎么拿走」，不是我的自检结果。
+# 自检是给我用的，取件处是给他用的。
+ORDER = ["开发交接包存放处", "开发前资料摘要", "施工面检查展开"]
+
+
+def check_module_page_order():
+    for f in sorted(os.listdir(DOCS)):
+        if not f.endswith("_gate_flow.html") or f == "quality_gate_flow.html":
+            continue
+        body = read(os.path.join(DOCS, f))
+        labels = re.findall(r'<section[^>]*data-phase="pre"[^>]*aria-label="([^"]*)"', body)
+        if not labels:
+            fails.append("C12 %s 的开发前面板没有 aria-label，判不了顺序" % f)
+            continue
+        got = [l for l in labels]
+        for i, want in enumerate(ORDER):
+            if i >= len(got):
+                fails.append("C12 %s 少了第 %d 块「%s」（标准 §3.7.1）" % (f, i + 1, want))
+            elif want not in got[i]:
+                fails.append("C12 %s 第 %d 块应该是「%s」，实际是「%s」——"
+                             "**开发交接包存放处必须在最前**，取件的人先看到东西在哪，"
+                             "不是先看我的自检结果（标准 §3.7.1）"
+                             % (f, i + 1, want, got[i]))
+        else:
+            if len(got) >= len(ORDER):
+                notes.append("C12 %s 开发前三块顺序正确：%s"
+                             % (f, " → ".join(got[:len(ORDER)])))
+
+        # 存放处必须含**总账**（完整开发文档），不是只有工作包。
+        # 2026-09-09：用户问「开发文档下载去哪了」——DQ 存放处第一行就是
+        # 147 KB 的 FINAL 总账，而这一页只有工作包。我此前的检查查了
+        # 「存放处在不在、下载按钮几个」，**没查总账在不在**：
+        # 那些检查是照我自己的清单写的，不是照 DQ 那一块实际长什么样写的。
+        key = f[:-len("_gate_flow.html")].upper()
+        mp = os.path.join(DOCS, "modules.json")
+        want_ledger = []
+        if os.path.exists(mp):
+            want_ledger = (json.load(io.open(mp, encoding="utf-8"))["modules"]
+                           .get(key, {}).get("ledger", []))
+        if want_ledger:
+            n = len(re.findall(r"wp-ledger", body))
+            if n < len(want_ledger):
+                fails.append("C12 %s 存放处里总账只有 %d 行，登记的是 %d 份——"
+                             "**完整开发文档必须能下载**，不能只放工作包"
+                             % (f, n, len(want_ledger)))
+            else:
+                notes.append("C12 %s 存放处含总账 %d 份 + 工作包，可下载" % (f, n))
+
+
 # ══ C1：flow_embeds.js 是否过期 ════════════════════════════════════════
 # 这是 2026-09-08 引入 srcdoc 方案时"我自己新挖的坑"：改了 *_flow.html 但
 # 忘了重跑生成器，架构图里嵌的就是旧副本，症状正是用户最怕的那句
@@ -720,7 +778,7 @@ def main():
                check_module_names, check_gate_ids, check_feature_ids,
                check_handoff_packages, check_generated_docs,
                check_page_matches_state, check_workpackages_buildable,
-               check_workflows):
+               check_workflows, check_module_page_order):
         fn()
 
     print("=" * 72)
