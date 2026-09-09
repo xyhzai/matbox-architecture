@@ -1,4 +1,4 @@
-# Matbox 全球多语言与本地化 · 正式开发文档 V1.0-RC
+# Matbox 全球多语言 · 正式开发文档 V1.0-RC
 
 FeatureID：**F-LOC-001**
 建立日期：2026-09-08
@@ -18,8 +18,8 @@ FeatureID：**F-LOC-001**
 交接包本身作为不可变证据保留，**不修改**（其 MANIFEST 已冻结 SHA-256，改动会破坏完整性）。
 
 > **交接包在仓库里的位置**（2026-09-08 补）：
-> - 解压件：[docs/全球多语言与本地化/Matbox_全球多语言与本地化_交接包_V1.0/](全球多语言与本地化/Matbox_全球多语言与本地化_交接包_V1.0/)（9 个文件）
-> - 原始压缩包（字节级证据）：[语言包_原始交接包.zip](全球多语言与本地化/语言包_原始交接包.zip)，整包 SHA-256 `b8580c9bddd4bed4827d2953d7a0104d99a551f0694d08e2c2ba8d1e873802a0`
+> - 解压件：[docs/全球多语言/Matbox_全球多语言_交接包_V1.0/](全球多语言/Matbox_全球多语言_交接包_V1.0/)（9 个文件）
+> - 原始压缩包（字节级证据）：[语言包_原始交接包.zip](全球多语言/语言包_原始交接包.zip)，整包 SHA-256 `b8580c9bddd4bed4827d2953d7a0104d99a551f0694d08e2c2ba8d1e873802a0`
 > - 包自称：`Matbox_Localization_V3`，日期 2026-09-02
 > - ⚠️ 仓库根目录的 [.gitattributes](../.gitattributes) 已把这两个目录标为 `-text`：git 不得对它们做任何换行符转换。**这不是洁癖**——2026-09-08 实测过，不加这条，`git clone` 出来的副本里 `README.txt` / `evidence.json` / `features.json` 的 SHA-256 会全部对不上 MANIFEST，证据链当场断掉且毫无提示。另外 `poc.log` 曾被仓库 `.gitignore` 里的 `*.log` 挡掉、没能入库，已用 `git add -f` 强制补上。
 >
@@ -84,7 +84,7 @@ aliases = { "en-US": "en", "en-GB": "en", "en-IN": "en", ... }
 ### 1.3 ✅ 已补上真实 resolver 级测试（2026-09-08，关闭 G-LOC-MATBOX-004）
 
 交接包入库后，§1.1 指出的那两条同义反复终于有真代码可以对着写。新增
-[matbox_ac_loc_008_009_real_test.py](全球多语言与本地化/matbox_ac_loc_008_009_real_test.py)（放在包外，**交接包一个字节没动**，只 import 它的 `poc.py`）：
+[matbox_ac_loc_008_009_real_test.py](全球多语言/matbox_ac_loc_008_009_real_test.py)（放在包外，**交接包一个字节没动**，只 import 它的 `poc.py`）：
 
 ```
 PASS | AC-LOC-008 (a) 语言维度：en-IN 的界面语言归一为 en          ← 实得 'en'
@@ -280,7 +280,7 @@ canonicalize("en-IN")  →  "en"     # 别名表里 en-US / en-GB / en-IN 全部
 | G-LOC-MATBOX-002 | `Messaging/Conversation` Owner 建立 | **LOC-F020（P0）** |
 | ~~G-LOC-MATBOX-003~~ **已关闭 2026-09-08** | 补齐三组被淘汰候选对比（TMS / Web i18n / 翻译 Provider）→ 见 §2.4 | ~~全模块 Stage 10 物理绑定~~ 不再阻塞 |
 | ~~G-LOC-MATBOX-004~~ **已关闭 2026-09-08** | AC-LOC-008 / AC-LOC-009 补真实 resolver 级测试 → 见 §1.3，测试已写并跑通自证；AC-LOC-009 计入已验证，AC-LOC-008 留下可执行的失败证据 | ~~LOC-F013 / F014 关闭~~ 改由 -005 承接 |
-| G-LOC-MATBOX-005 | language 归一与 locale 归一拆成两个独立函数。**验收标准（2026-09-08 补）**：把 [matbox_ac_loc_008_009_real_test.py](全球多语言与本地化/matbox_ac_loc_008_009_real_test.py) 跑成 6/6 PASS 即为完成 | LOC-F001 / F013 实现 |
+| G-LOC-MATBOX-005 | language 归一与 locale 归一拆成两个独立函数。**验收标准（2026-09-08 补）**：把 [matbox_ac_loc_008_009_real_test.py](全球多语言/matbox_ac_loc_008_009_real_test.py) 跑成 6/6 PASS 即为完成 | LOC-F001 / F013 实现 |
 
 上游包原有 6 个 Gate（G-LOC-ST8-002~007）继续有效，不因本文调整而改变。
 

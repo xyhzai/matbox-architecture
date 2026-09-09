@@ -465,6 +465,26 @@
   @media (max-width:720px){
     header,.legend,main,.foot-list{ padding-left:18px; padding-right:18px; }
   }
+
+  /* ═══ 开发前 / 开发中 / 运营中 三段状态 ═══
+     数据来自 module_phases.js（由检查器算出，不是人填）。
+     ⚪ 未建必须单独显示，不许混进"已守"——开发包标准 §0.5.2。 */
+  .ph-wrap{margin:14px 0 4px;border:1px solid var(--border,#1f2937);border-radius:8px;overflow:hidden}
+  .ph-head{display:flex;align-items:center;gap:8px;padding:8px 11px;background:var(--panel-2,#182030);
+           border-bottom:1px solid var(--border,#1f2937);font-family:var(--mono,ui-monospace);font-size:11px}
+  .ph-head .ph-verdict{margin-left:auto;font-weight:700;letter-spacing:.04em}
+  .ph-ready{color:#34d399} .ph-notready{color:#f87171}
+  .ph-seg{padding:9px 11px;border-bottom:1px solid var(--border,#1f2937)}
+  .ph-seg:last-child{border-bottom:0}
+  .ph-t{display:flex;align-items:baseline;gap:9px;font-size:12px;font-weight:600;margin-bottom:6px}
+  .ph-t .ph-n{font-family:var(--mono,ui-monospace);font-size:10.5px;font-weight:400;color:var(--muted,#8492a8)}
+  .ph-items{display:flex;flex-wrap:wrap;gap:4px}
+  .ph-i{font-family:var(--mono,ui-monospace);font-size:10px;padding:2px 6px;border-radius:4px;
+        border:1px solid var(--border,#1f2937);color:var(--muted,#8492a8);white-space:nowrap}
+  .ph-i.ok{border-color:#14532d;color:#34d399}
+  .ph-i.no{border-color:#7f1d1d;color:#f87171}
+  .ph-i.na{border-color:#3f3f46;color:#a1a1aa;border-style:dashed}
+  .ph-note{margin-top:7px;font-size:10.5px;line-height:1.55;color:var(--muted,#8492a8)}
 </style>
 </head>
 <body>
@@ -550,6 +570,7 @@
     <h3 class="panel-title" id="modalTitle">—</h3>
     <div class="panel-route" id="modalRoute"></div>
     <p class="panel-desc" id="modalDesc"></p>
+    <div id="modalPhases"></div>
     <pre class="panel-payload" id="modalPayload"></pre>
     <div class="panel-meta" id="modalMeta"></div>
     <div id="modalP0Wrap"></div>
@@ -612,7 +633,8 @@
      只有 <script src="本地.js"> 还能加载。原来这里用的是 fetch，
      所以用户每次双击打开点进来都是一片红字报错。
      ═══════════════════════════════════════════════════════════════════════ -->
-<script src="flow_embeds.js?v=208c391c922f"></script>
+<script src="flow_embeds.js?v=058f5cc10352"></script>
+<script src="module_phases.js"></script>
 
 <script>
   /* ═══════════════════════════════════════════════════════════════
@@ -657,7 +679,7 @@
     { from:"page", to:"storage", label:"知识库原始数据落地" },
     // 架构底层 → 平台核心共享层
     { from:"knowledge-base", to:"storage", label:"原始数据落地(架构原则第7条)" },
-    // 全球多语言与本地化 → 各上游 Owner（只引用，不复制事实）
+    // 全球多语言 → 各上游 Owner（只引用，不复制事实）
     { from:"loc", to:"tenant", label:"读User/Tenant语言偏好，不建第二身份体系" },
     { from:"loc", to:"page", label:"直接复用SiteInstance/ContentBinding/LocalizedRoute" },
     { from:"loc", to:"provider-router", label:"翻译Provider可替换(Qwen/Google)" },
@@ -1013,12 +1035,12 @@
       link: "技术选型报告/Matbox_专项27_知识库记忆系统_技术选型与开发交接报告_2026-08-30.md", linkLabel: "打开专项27技术选型报告 →"
     },
     loc: {
-      title: "全球多语言与本地化", id: "F-LOC-001 · LOC-F001~F020 · 基础层公共能力", status: "🟢 DRAFT_RESEARCH_COMPLETE",
+      title: "全球多语言", id: "F-LOC-001 · LOC-F001~F020 · 基础层公共能力", status: "🟢 DRAFT_RESEARCH_COMPLETE",
       desc: "2026-09-08建立。来源：用户侧交接包语言包.zip（Stage 9 PASS，DEV.docx 2028段+4个JSON+可运行POC）。定位是基础层公共能力，不是AI员工下属模块——被平台/独立站/小程序/App/iPad/AI员工/在线聊天共同消费。本会话独立核验：MANIFEST SHA-256 8/8一致；实跑poc.py确认12/12 PASS；三个锁定commit经GitHub API核实真实。选型已调整升至上游latest：vue-i18n 9.1.9(2021-10发布·官方已EOL)→11.4.10、next-intl→4.14.2、Tolgee→v3.221.0；废止包中禁止升v11规则（核查uni-app各dist-tag依赖树，uni-app根本不依赖vue-i18n，自带@dcloudio/uni-i18n，其锁定理由不成立）。三条核心分离：UI Context/Content Context/AI Session Context不得互相覆盖；Language/Locale/Region/Timezone/Currency/Measurement分开建模；原文永远归原Domain Owner，翻译只是派生，source_hash变化即自动outdated。新增5个Matbox侧Gate，其中G-LOC-MATBOX-002阻塞P0的LOC-F020（在线聊天Messaging Owner在本图中不存在）。",
       own: "EffectiveLocaleContext解析、Localization Catalog契约、BusinessContentTranslation派生记录、LanguagePolicyProfile（术语/BrandVoice/市场规则版本引用）、Cross-End语言连续性",
       reuse: "F-TENANT-001(Tenant/User偏好)、F-PAGE-001(SiteInstance/ContentBinding/LocalizedRoute直接复用不重建)、F-PROVIDER-001+F-CRED-001(翻译Provider与密钥)、F-COST-001(每次付费翻译写usage/cost ref)、F-RELEASE-001(Catalog作为Release Artifact)、F-TASK-001+F-QUEUE-001(长批量翻译)、F-AIEMP-001+F-RUNTIME-001(AI会话语言上下文)、F-ACTION-001(语言工具经Action/Tool Gateway授权)",
       features: [["F001","Effective Locale 解析策略"],["F008","业务内容翻译库(⚠️依赖尚不存在的Product Master)"],["F009","翻译网关与Provider路由"],["F014","AI员工/会话语言桥接"],["F018","AI员工语言智能策略(P0)"],["F019","AI语言质量Gate(P0·Agent自评不算PASS)"],["F020","实时多语言聊天+手机指挥AI(P0·⚠️Messaging Owner缺失阻塞)"]],
-      link: "Matbox_全球多语言与本地化_正式开发文档_V1.0-RC.md", linkLabel: "打开正式开发文档 →"
+      link: "Matbox_全球多语言_正式开发文档_V1.0-RC.md", linkLabel: "打开正式开发文档 →"
     },
     "agent-runtime": {
       title: "Agent Runtime", id: "✅ 正式开发文档已建立 · 自研（Java + Temporal）", status: "🟢 DRAFT_RESEARCH_COMPLETE",
@@ -1358,6 +1380,47 @@
     document.getElementById("modalTitle").textContent = d.title;
     document.getElementById("modalRoute").innerHTML = `<span class="v">${d.id}</span>`;
     document.getElementById("modalDesc").textContent = d.desc;
+
+    // ═══ 开发前 / 开发中 / 运营中 —— 数据来自 module_phases.js ═══
+    // 由检查器算出来的，不是人填的。三档分开显示：
+    //   ok=已守  no=未过  na=未建（标准定了但检查还没建，**不算通过**）
+    // 开发包标准 §0.5.2：未建的检查不许显示成绿。
+    (function(){
+      const wrap = document.getElementById("modalPhases");
+      const all = window.__MODULE_PHASES__ || {};
+      const ph = all[(key||"").toUpperCase()] || all[key];
+      if(!ph){ wrap.innerHTML = ""; return; }
+      const seg = (title, no, rows, note) => {
+        const t = {ok:0,no:0,na:0};
+        rows.forEach(r => t[r[2]] = (t[r[2]]||0)+1);
+        const chips = rows.map(r =>
+          `<span class="ph-i ${r[2]}" title="${r[1].replace(/"/g,"&quot;")}">${r[0]}</span>`).join("");
+        const nums = [];
+        if(t.ok) nums.push(t.ok+" 已守");
+        if(t.no) nums.push(t.no+" 未过");
+        if(t.na) nums.push(t.na+" 未建");
+        return `<div class="ph-seg">
+          <div class="ph-t">${title}<span class="ph-n">${no} · ${nums.join(" / ")}</span></div>
+          <div class="ph-items">${chips}</div>
+          <div class="ph-note">${note}</div></div>`;
+      };
+      const ready = ph.ready;
+      wrap.innerHTML = `<div class="ph-wrap">
+        <div class="ph-head">开发包标准 V1.0 · 逐条判定
+          <span class="ph-verdict ${ready?"ph-ready":"ph-notready"}">${ready?"就绪":"未就绪"}</span></div>
+        ${seg("开发前", "能不能开工", ph.pre,
+              "文档类由 _check_standard.py 判；R 系列去问 git/CI，不读我们自己写的文档。<b>差一条就是没就绪。</b>")}
+        ${seg("开发中", "在建时不许发生什么", ph.build,
+              "按 diff/CI 判，不看任何一方自述。<b>⚪ 未建 = 这条现在拦不住任何人</b>，不是通过。")}
+        ${seg("运营中", "算不算做完 / 跑得怎么样", ph.done,
+              "「做完了」的唯一定义是这几条全绿，<b>任何一方说做完了都不作数</b>。")}
+        <div class="ph-seg"><div class="ph-note">
+          <b>最终验收不在这张表上。</b>标准 §0.5：这 37 条只是<b>代理指标</b>——
+          真正的验收是 <b>opencode 拿到材料能不能马上开发</b>。全绿只意味着「可以送去试」。
+          它每卡一次，就说明代理指标漏了一条，要补进来。
+        </div></div>
+      </div>`;
+    })();
 
     const payloadEl = document.getElementById("modalPayload");
     if(d.own){

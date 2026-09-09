@@ -2,7 +2,7 @@
 """
 AC-LOC-008 / AC-LOC-009 真实 resolver 级测试 —— 关闭 G-LOC-MATBOX-004。
 
-    python docs/全球多语言与本地化/matbox_ac_loc_008_009_real_test.py
+    python docs/全球多语言/matbox_ac_loc_008_009_real_test.py
 
 ═══ 为什么有这个文件 ═══
 
@@ -38,7 +38,7 @@ import sys
 import importlib.util
 
 HERE = os.path.dirname(os.path.abspath(__file__))
-POC = os.path.join(HERE, "Matbox_全球多语言与本地化_交接包_V1.0", "poc.py")
+POC = os.path.join(HERE, "Matbox_全球多语言_交接包_V1.0", "poc.py")
 
 
 def load_poc():

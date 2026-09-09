@@ -999,7 +999,7 @@ Sources：[Agentforce MuleSoft](https://www.mulesoft.com/platform/agentforce)、
 - **自动化测试的"全过"必须验其是否真的测到了代码。** 该包 POC 声称 12/12 PASS，实跑确认属实；但把其中 2 条抽到**零依赖空环境**（不 import 任何模块、不定义任何被测函数）后**仍然 PASS**——它们断言的是紧邻上一行自己写的字面量，未调用任何被测函数。**真实覆盖是 10 条。** 判断测试是否有效的可操作方法：**把被测代码全部拿掉，看它还过不过。**
 - **语言归一与 Locale 归一必须是两个独立函数。** 该包 POC 的 `canonicalize()` 把 `en-US`/`en-GB`/`en-IN` 全映射为 `en`——做语言归一正确，但若复用于 locale 会**静默抹平 en-IN**，而其自身 AC-LOC-022 恰恰要求 `Language=en + Locale=en-IN` 共存并遵守印度语境。
 
-**落地**：[Matbox_全球多语言与本地化_正式开发文档_V1.0-RC.md](Matbox_全球多语言与本地化_正式开发文档_V1.0-RC.md)（F-LOC-001）。三个组件升至上游 latest：vue-i18n **11.4.10**（`87510e2f9344e0734bfe9fbc7e0a2c509042e159`）、next-intl **4.14.2**（`3259beb76120614af8b48e814c56324ad71ccb61`）、Tolgee **v3.221.0**（`3bae7f3d4076b4f7de9073f7101c153b6e3c44f2`），三个 commit 均经 GitHub API 核实真实存在。
+**落地**：[Matbox_全球多语言_正式开发文档_V1.0-RC.md](Matbox_全球多语言_正式开发文档_V1.0-RC.md)（F-LOC-001）。三个组件升至上游 latest：vue-i18n **11.4.10**（`87510e2f9344e0734bfe9fbc7e0a2c509042e159`）、next-intl **4.14.2**（`3259beb76120614af8b48e814c56324ad71ccb61`）、Tolgee **v3.221.0**（`3bae7f3d4076b4f7de9073f7101c153b6e3c44f2`），三个 commit 均经 GitHub API 核实真实存在。
 
 Sources：[vue-i18n Maintenance Status](https://vue-i18n.intlify.dev/guide/maintenance)、[npm registry vue-i18n](https://registry.npmjs.org/vue-i18n)、[npm registry next-intl](https://registry.npmjs.org/next-intl)、[npm registry @dcloudio/uni-app](https://registry.npmjs.org/@dcloudio/uni-app)、[tolgee-platform releases](https://github.com/tolgee/tolgee-platform/releases)
 

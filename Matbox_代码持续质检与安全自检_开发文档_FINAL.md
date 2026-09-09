@@ -2,7 +2,7 @@
 
 **FeatureID**：F-DQ-001 ~ F-DQ-013（13 个功能，同一份文档统一定义）  
 **归属**：Platform Core Quality / DevCodeQuality  
-**生成于**：2026-09-09 15:23（仓库 a13b2d8）  
+**生成于**：2026-09-09 16:53（仓库 c914c97）  
 **生成方式**：`python docs/_build_dq_final_doc.py`，内容从源头逐条抽取，不重新表述  
 **来源指纹（两个源，任一改动本文档即过期）**  
 
