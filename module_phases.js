@@ -396,7 +396,17 @@ window.__MODULE_PHASES__ = {
    [
     "R6",
     "[LOC] 工作包已生成",
-    "no"
+    "ok"
+   ],
+   [
+    "R7",
+    "[LOC] Implementer 已指派",
+    "ok"
+   ],
+   [
+    "R8",
+    "[LOC] 多个功能共用的落脚目录都真实存在",
+    "ok"
    ],
    [
     "R10",
@@ -475,10 +485,10 @@ window.__MODULE_PHASES__ = {
   ],
   "sum": {
    "pre": {
-    "ok": 26,
-    "no": 2,
+    "ok": 29,
+    "no": 1,
     "na": 0,
-    "total": 28
+    "total": 30
    },
    "build": {
     "ok": 6,

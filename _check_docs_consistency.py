@@ -250,8 +250,14 @@ def check_flow_embeds():
             fails.append("C1 [%s] 改过但没重新生成内嵌副本——架构图里还是旧的。"
                          "跑：python docs/_build_flow_embeds.py" % name)
     for f in sorted({x for x in os.listdir(DOCS) if x.endswith("_flow.html")} - set(meta)):
-        warns.append("C1 [%s] 在磁盘上但没进 flow_embeds.js（新流程图要先在 "
-                     "_build_flow_embeds.py 的 FLOW_FILES 里登记）" % f)
+        # 2026-09-09 从 warns 升为 fails。
+        # 出事那次它是警告：同一次运行里既报了「loc_gate_flow.html 没进 flow_embeds.js」，
+        # 又打印了「✅ 硬性检查通过」——**发现了却没拦住**，正是本仓库要拆掉的假绿。
+        # 一张流程图没进内嵌副本，用户在架构图里点开就是空的，
+        # 这跟「改了没重新生成」后果完全一样，凭什么一个判 FAIL 一个判警告。
+        fails.append("C1 [%s] 在磁盘上但没进 flow_embeds.js——架构图里点开会是空的。"
+                     "跑：python docs/_build_flow_embeds.py"
+                     "（该脚本已改为扫目录自动发现，正常情况下不该出现这条）" % f)
 
 
 # ══ C2：退役写法残留（含 .docx） ═══════════════════════════════════════
