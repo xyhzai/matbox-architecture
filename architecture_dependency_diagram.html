@@ -634,7 +634,48 @@
      只有 <script src="本地.js"> 还能加载。原来这里用的是 fetch，
      所以用户每次双击打开点进来都是一片红字报错。
      ═══════════════════════════════════════════════════════════════════════ -->
-<script src="flow_embeds.js?v=15ec4df92b0f"></script>
+<script src="flow_embeds.js?v=1ba7910816e0"></script>
+<!-- ── 陈旧版本自检（2026-09-09）───────────────────────────────────────
+     用户连着两次打开看到的都是旧内容：网站上那份标题还写着几小时前就改掉的
+     旧模块名，本地那份报「找不到内嵌副本」——**都是浏览器在拿缓存**。
+
+     但这不是用户该自己去按 Ctrl+F5 解决的事。
+     「交付的东西正确与否，取决于对方会不会强制刷新」= 没做完。
+
+     所以页面自己查：http/https 下拿 no-store 抓一份 build.json，
+     跟自己内嵌的戳记比。不一样就横幅提示 + 一键真刷新（带时间戳绕过缓存）。
+     file:// 下不查（抓不了，也不需要——本地文件就是文件本身，
+     而 flow_embeds.js 的 URL 带内容哈希，改了自然换 URL）。
+     ──────────────────────────────────────────────────────────────── -->
+<script>
+(function(){
+  var SELF_STAMP = "ff58e9086691";
+  if(location.protocol !== "http:" && location.protocol !== "https:") return;
+  fetch("build.json?ts=" + Date.now(), {cache:"no-store"})
+    .then(function(r){ return r.ok ? r.json() : null; })
+    .then(function(j){
+      if(!j || !j.stamp || j.stamp === SELF_STAMP) return;
+      var bar = document.createElement("div");
+      bar.setAttribute("role","status");
+      bar.style.cssText = "position:fixed;left:0;right:0;top:0;z-index:99999;"
+        + "background:#b45309;color:#fff;padding:10px 16px;font:600 14px/1.5 system-ui,sans-serif;"
+        + "display:flex;gap:14px;align-items:center;justify-content:center;box-shadow:0 2px 12px rgba(0,0,0,.35)";
+      bar.innerHTML = '你现在看到的是**旧版本**（浏览器缓存）。站点上已经是新的了。'
+        .replace(/\*\*(.+?)\*\*/g, "<b>$1</b>");
+      var btn = document.createElement("button");
+      btn.textContent = "点这里加载最新";
+      btn.style.cssText = "background:#fff;color:#b45309;border:0;border-radius:6px;"
+        + "padding:6px 14px;font:600 14px system-ui,sans-serif;cursor:pointer";
+      btn.onclick = function(){
+        var u = location.href.split("#")[0].replace(/([?&])_r=\d+/, "");
+        location.href = u + (u.indexOf("?")<0 ? "?" : "&") + "_r=" + Date.now();
+      };
+      bar.appendChild(btn);
+      document.body.appendChild(bar);
+    })
+    .catch(function(){ /* 抓不到就不提示，不因为自检失败而干扰阅读 */ });
+})();
+</script>
 <script src="module_phases.js"></script>
 
 <script>
