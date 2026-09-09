@@ -159,9 +159,14 @@ window.__MODULE_PHASES__ = {
     "ok"
    ],
    [
+    "R11",
+    "代码仓库 CI 是绿的",
+    "ok"
+   ],
+   [
     "R10",
     "公开站点没过期",
-    "no"
+    "ok"
    ]
   ],
   "build": [
@@ -235,10 +240,10 @@ window.__MODULE_PHASES__ = {
   ],
   "sum": {
    "pre": {
-    "ok": 30,
-    "no": 1,
+    "ok": 32,
+    "no": 0,
     "na": 0,
-    "total": 31
+    "total": 32
    },
    "build": {
     "ok": 6,
@@ -253,7 +258,7 @@ window.__MODULE_PHASES__ = {
     "total": 5
    }
   },
-  "ready": false
+  "ready": true
  },
  "LOC": {
   "name": "全球多语言",
@@ -409,9 +414,14 @@ window.__MODULE_PHASES__ = {
     "ok"
    ],
    [
+    "R11",
+    "代码仓库 CI 是绿的",
+    "ok"
+   ],
+   [
     "R10",
     "公开站点没过期",
-    "no"
+    "ok"
    ]
   ],
   "build": [
@@ -485,10 +495,10 @@ window.__MODULE_PHASES__ = {
   ],
   "sum": {
    "pre": {
-    "ok": 29,
-    "no": 1,
+    "ok": 31,
+    "no": 0,
     "na": 0,
-    "total": 30
+    "total": 31
    },
    "build": {
     "ok": 6,
@@ -503,6 +513,6 @@ window.__MODULE_PHASES__ = {
     "total": 5
    }
   },
-  "ready": false
+  "ready": true
  }
 };
