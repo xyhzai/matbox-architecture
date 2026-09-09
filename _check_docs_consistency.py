@@ -227,6 +227,56 @@ def check_workflows():
             fails.append("C11 %s 解析出来没有 jobs——GitHub 拿到这个文件不会跑任何东西" % fn)
 
 
+# ══ C14：每个模块页面都必须在架构图里有入口 ═════════════════════════════
+# 2026-09-10 由**哨兵模块 ZZ** 第一次跑就撞出来的。
+#
+# 全球多语言那次：loc_gate_flow.html 生成好了，却没登记进 FULL_PAGE_EMBEDS，
+# 后果两条——架构图里点不开、站点按链接爬也爬不到（线上 HTTP 404）。
+# 我当时**只手工补了 LOC 那一条，根没除**：登记仍然是手工步骤，
+# 下一个模块照样会漏。哨兵一来就证明了这一点。
+#
+# 判据：凡是 public 的模块，只要生成了 <mod>_gate_flow.html，
+# 就必须能在架构图里点到（FULL_PAGE_EMBEDS 里有它 + 有对应的 host 容器）。
+# public=false 的（比如哨兵自己）豁免——那是**数据驱动的属性**，不是开小灶。
+def check_module_has_entry():
+    mp = os.path.join(DOCS, "modules.json")
+    diag = os.path.join(DOCS, "architecture_dependency_diagram.html")
+    if not (os.path.exists(mp) and os.path.exists(diag)):
+        return
+    mods = json.load(io.open(mp, encoding="utf-8"))["modules"]
+    body = read(diag)
+    m = re.search(r"const FULL_PAGE_EMBEDS = \{.*?\};", body, re.S)
+    reg = m.group(0) if m else ""
+    # ⚠️ 先把注释剥掉，再判。
+    # 2026-09-10 负向验证抓到的：FULL_PAGE_EMBEDS 里有一段注释写着
+    # 「此前 loc_gate_flow.html 生成好了却没有登记在这里」——
+    # 我用裸子串判「page in reg」，**注释里那个文件名就把检查蒙混过去了**：
+    # 把真正的 url 改掉，检查照样报绿。
+    # 判据必须落在**真的登记项**上（url: "xxx"），不是文本里出现过就算。
+    reg = re.sub(r"/\*.*?\*/", " ", reg, flags=re.S)
+    reg = re.sub(r"^\s*//.*$", " ", reg, flags=re.M)
+    registered = set(re.findall(r'url:\s*"([^"]+)"', reg))
+    for key, cfg in sorted(mods.items()):
+        page = "%s_gate_flow.html" % key.lower()
+        if not os.path.exists(os.path.join(DOCS, page)):
+            continue
+        if key == "DQ":
+            continue                     # DQ 就是样板本身，节点用的是它
+        if cfg.get("public") is False:
+            notes.append("C14 %s 是 public=false（%s），不要求架构图入口"
+                         % (key, cfg.get("name", "")))
+            continue
+        if page not in registered:
+            fails.append("C14 %s 生成了 %s，却**没登记进架构图的 FULL_PAGE_EMBEDS**——"
+                         "架构图里点不开它，站点按链接爬也爬不到（会是 HTTP 404）。"
+                         "全球多语言就是这么漏的。" % (key, page))
+        elif ('id="%sEmbedHost"' % key.lower()) not in body:
+            fails.append("C14 %s 登记了但缺 host 容器 <div id=\"%sEmbedHost\">，"
+                         "点开会是空白" % (key, key.lower()))
+        else:
+            notes.append("C14 %s 架构图入口齐全（登记 + host 容器）" % key)
+
+
 # ══ C13：架构图必须自包含 —— 一个外部依赖都不许有 ═══════════════════════
 # 2026-09-09 用户原话：
 #   「我不要内嵌副本，为什么是副本，为什么不直接写上去」
@@ -769,7 +819,12 @@ WP_MUST_HAVE = [
     ("要做什么（目标/Scope）", r"\*\*目标\*\*|## 1 · 你要做什么"),
     ("能改哪 / 不能碰哪", r"backend/modules/dev-quality"),
     ("七类施工面齐", r"### Tests/Observability"),
-    ("验收标准", r"\| DQ-T\d{3} \|"),
+    # 判据是「本模块的 TestID 出现，且是 G-W-T 句式」，**不是「必须排成表格」**。
+    # 2026-09-10：原来写死 `\| DQ-T\d{3} \|`——DQ 用表格，LOC 用
+    # `**AC-LOC-001**` + Given/When/Then 条目（其实更贴合标准 P18）。
+    # C10 推广到全模块后，20 份 LOC 工作包全被判「缺验收标准」——
+    # **拿 DQ 的排版当判据，把对的判成了错的**。判据必须落在要求上，不是形状上。
+    ("验收标准", r"\| DQ-T\d{3} \||\*\*DQ-T\d{3}\*\*"),
     # 2026-09-09：这是「开发前 ↔ 开发中」唯一的接缝。
     # 工作包一直给了 DQ-T 编号，却从没要求把编号写进测试方法名；
     # 少了这一步，CI 的 surefire XML 里没有编号，就没有任何东西能回答
@@ -794,22 +849,56 @@ WP_ADAPTERS = {"F-DQ-003", "F-DQ-004", "F-DQ-005", "F-DQ-006",
 
 
 def check_workpackages_buildable():
-    wp = os.path.join(DOCS, "工作包", "DQ")
+    """逐模块跑，**不是只跑 DQ**。
+
+    2026-09-10 第 9 遍自审抓到的大洞：这里原来写死 `工作包/DQ`，于是
+    全球多语言那 20 份、哨兵那 2 份**从来没被 C10 检查过**——
+    而 C10 正是「只看这一份就能动手」的那道检查。
+    也就是说：我给用户交付 20 份工作包，却从没让检查器看过它们一眼。
+
+    同一个病根：写死一个模块名。这次由哨兵 + 自审一起挖出来。
+    """
+    mp = os.path.join(DOCS, "modules.json")
+    mods = (json.load(io.open(mp, encoding="utf-8"))["modules"]
+            if os.path.exists(mp) else {"DQ": {"feature_prefix": "F-DQ-"}})
+    ran = 0
+    for key in sorted(mods):
+        ran += _check_one_module_wps(key, mods[key])
+    if not ran:
+        # 一个模块都没查到 ≠ 通过。此前这里是 warns「本项跳过」，
+        # 而整体仍然打印 ✅——那正是本仓库要拆的假绿。
+        fails.append("C10 一个模块的工作包都没查到 —— 「跳过」不等于「通过」")
+
+
+def _check_one_module_wps(key, cfg):
+    wp = os.path.join(DOCS, "工作包", key)
     if not os.path.isdir(wp):
-        warns.append("C10 找不到工作包目录，本项跳过")
-        return
-    files = sorted(f for f in os.listdir(wp) if re.match(r"^F-DQ-\d{3}\.md$", f))
+        return 0
+    pre = cfg.get("feature_prefix", "F-%s-" % key)
+    tpre = cfg.get("test_prefix", "%s-T" % key)
+    files = sorted(f for f in os.listdir(wp)
+                   if re.match(r"^%s\d{3}\.md$" % re.escape(pre), f))
     if not files:
-        warns.append("C10 工作包目录里没有 F-DQ-0NN.md，本项跳过")
-        return
+        fails.append("C10 [%s] 目录在但没有 %sNNN.md —— 工作包没生成，"
+                     "「跳过」不等于「通过」" % (key, pre))
+        return 1
     bad = 0
     for f in files:
         fid = f[:-3]
         body = read(os.path.join(wp, f))
-        missing = [name for name, pat in WP_MUST_HAVE if not re.search(pat, body)]
-        if fid in WP_ADAPTERS and "Provider Adapter 接口规范" not in body:
+        # 必备项里的模块专属片段按登记表替换，不写死 DQ 的包名与目录
+        missing = []
+        for name, pat in WP_MUST_HAVE:
+            p = (pat.replace("com\\.matbox\\.devquality",
+                             re.escape(cfg.get("java_package", "com.matbox")))
+                    .replace("backend/modules/dev-quality",
+                             cfg.get("module_dir", "backend/modules"))
+                    .replace("DQ-T", re.escape(tpre)))
+            if not re.search(p, body):
+                missing.append(name)
+        if key == "DQ" and fid in WP_ADAPTERS and "Provider Adapter 接口规范" not in body:
             missing.append("Adapter 接口规范（它没有自己的端点和表，只能照这个写）")
-        if fid not in WP_ADAPTERS:
+        if key == "DQ" and fid not in WP_ADAPTERS:
             if not re.search(r"\| (GET|POST|PUT|DELETE) \| `/dq", body):
                 missing.append("API 端点")
 
@@ -817,21 +906,26 @@ def check_workpackages_buildable():
         # 2026-09-09 差点埋进去的坑：13 份共用同一段模板，示例方法名一度写死成
         # F-DQ-001 的场景，别的功能照抄就是一个跟自己验收标准无关的名字，
         # 而 AI 是会照抄的。所以不只查「有没有这一节」，还要查「例子对不对得上」。
-        owned = set(re.findall(r"\| (DQ-T\d{3}) \|", body))
-        shown = set("DQ-T" + n for n in re.findall(r"\bdqT(\d{3})_", body))
+        # 示例编号必须是这一份自己认领的。方法名前缀按模块推：DQ→dqT，LOC→locT
+        camel = tpre.replace("-T", "").replace("-", "").lower() + "T"
+        owned = set(re.findall(r"\| (%s\d{3}) \|" % re.escape(tpre), body)) | \
+                set(re.findall(r"\*\*(%s\d{3})\*\*" % re.escape(tpre), body))
+        shown = set(tpre + n for n in
+                    re.findall(r"\b%s(\d{3})_" % re.escape(camel), body))
         stray = shown - owned
         if owned and stray:
             missing.append("§4.1 示例用了不属于自己的编号 %s（自己认领的是 %s）"
                            % ("、".join(sorted(stray)), "、".join(sorted(owned))))
         if missing:
             bad += 1
-            fails.append("C10 %s 只看这一份没法动手，缺：%s"
-                         % (fid, "、".join(missing)))
+            fails.append("C10 [%s] %s 只看这一份没法动手，缺：%s"
+                         % (key, fid, "、".join(missing)))
     if not bad:
-        notes.append("C10 %d 份工作包逐份自检通过——"
+        notes.append("C10 [%s] %d 份工作包逐份自检通过——"
                      "只看其中任意一份就能动手（要做什么/边界/施工面/验收/"
-                     "**测试要带TestID**/技术栈/鉴权/错误码/目录/接口或Adapter契约/"
-                     "禁令/交付/环境）" % len(files))
+                     "**测试要带TestID**/技术栈/鉴权/错误码/目录/契约/禁令/交付/环境）"
+                     % (key, len(files)))
+    return 1
 
 
 def main():
@@ -840,7 +934,7 @@ def main():
                check_handoff_packages, check_generated_docs,
                check_page_matches_state, check_workpackages_buildable,
                check_workflows, check_module_page_order,
-               check_diagram_selfcontained):
+               check_diagram_selfcontained, check_module_has_entry):
         fn()
 
     print("=" * 72)
