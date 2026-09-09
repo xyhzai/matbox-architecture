@@ -227,6 +227,67 @@ def check_workflows():
             fails.append("C11 %s 解析出来没有 jobs——GitHub 拿到这个文件不会跑任何东西" % fn)
 
 
+# ══ C13：架构图必须自包含 —— 一个外部依赖都不许有 ═══════════════════════
+# 2026-09-09 用户原话：
+#   「我不要内嵌副本，为什么是副本，为什么不直接写上去」
+#   「几十次了，关于打开打不开，为什么你不能彻底根治这个问题」
+#
+# 根因说白了：内容放在第二个文件里，靠 <script src> 加载。
+# **只要还有第二个文件，就永远存在「找不到它」**——缓存住了、没跟着拷过去、
+# 版本对不上，用户看到的就是那片红字。几十次都是这一个原因。
+#
+# 现在内容直接写进架构图本体。这条检查确保它不会退回去：
+#   ① 不许再出现真正的 <script src="…">（注释里的例子不算）
+#   ② 内联段里不许有裸 </script>——流程图原文自带 script 标签，
+#      不转义就会把外层提前关掉，浏览器报 SyntaxError，
+#      window.__FLOW_HTML__ 变成 0 个键，症状跟"文件没拷过来"一模一样。
+#      2026-09-09 第一版就是这么失败的。
+def check_diagram_selfcontained():
+    p = os.path.join(DOCS, "architecture_dependency_diagram.html")
+    if not os.path.exists(p):
+        return
+    body = read(p)
+    i, j = body.find("FLOW-INLINE:BEGIN"), body.find("FLOW-INLINE:END")
+    if i < 0 or j < 0:
+        fails.append("C13 架构图里没有 FLOW-INLINE 段 —— 流程图原文没有内联进来")
+        return
+    seg = body[i:j]
+
+    # ⚠️ 判定范围必须把内联段**排除在外**。
+    # 2026-09-09 第一版没排除，自己误报了两条：
+    #   · `<script src="本地.js">` 是内联内容**里的文字**（流程图原文的注释
+    #     在讲 file:// 调查），不是这张图的依赖；
+    #   · 那 1 处 </script> 是内联块自己的收尾标签，不是漏转义。
+    # 拿数据当标记判，就会把对的判成错的——比漏判更坏。
+    outside = body[:i] + body[j:]
+    # 三种注释都要剥：HTML 注释、JS 块注释、JS 行注释。
+    # 2026-09-09 第一版只剥了 HTML 注释，于是主脚本 /* … */ 里那句
+    # 「只有 <script src="本地.js"> 还能加载」被当成真依赖报了出来，
+    # 同一次运行既说「0 个外部依赖」又说「依赖 本地.js」——**自相矛盾**。
+    clean = re.sub(r"<!--.*?-->", " ", outside, flags=re.S)
+    clean = re.sub(r"/\*.*?\*/", " ", clean, flags=re.S)
+    clean = re.sub(r"^\s*//.*$", " ", clean, flags=re.M)
+    ext = [u for u in re.findall(r'<script src="([^"]+)"', clean)
+           if not u.startswith(("http:", "https:", "//"))]
+    # 内联段末尾必然有一个收尾 </script>，多出来的才是漏转义
+    bare = max(0, seg.count("</script>") - 1)
+
+    if ext:
+        fails.append("C13 架构图还依赖外部文件：%s —— **只要还有第二个文件，"
+                     "就永远会有「找不到它」**。内容必须直接写进本体"
+                     "（跑 python docs/_build_flow_embeds.py）" % "、".join(ext))
+    if bare:
+        fails.append("C13 内联段里有 %d 处裸 </script> —— 会把外层 script 提前关掉，"
+                     "浏览器报 SyntaxError、__FLOW_HTML__ 变空，"
+                     "症状跟「文件没拷过来」一模一样。必须转义成 <\\/script>" % bare)
+    # 两条都过才报绿。此前 note 只看 bare，于是外部依赖没过也照样打印
+    # 「0 个外部脚本依赖」——那正是本仓库要拆的假绿。
+    if not ext and not bare:
+        notes.append("C13 架构图自包含：0 个外部脚本依赖，内联段 %.2f MB，"
+                     "</script> 已全部转义 —— 单独拷走这一个文件也能完整打开"
+                     % (len(seg.encode("utf-8")) / 1048576))
+
+
 # ══ C12：模块页面的块顺序必须符合《开发包标准》§3.7.1 ═══════════════════
 # 2026-09-09。用户对比 DQ 与全球多语言两张截图后问：
 #   「我的开发交接包是放什么位置！！为什么这么提醒你还是出错。」
@@ -276,7 +337,7 @@ def check_module_page_order():
             want_ledger = (json.load(io.open(mp, encoding="utf-8"))["modules"]
                            .get(key, {}).get("ledger", []))
         if want_ledger:
-            n = len(re.findall(r"wp-ledger", body))
+            n = len(re.findall(r"wp-file-ledger", body))
             if n < len(want_ledger):
                 fails.append("C12 %s 存放处里总账只有 %d 行，登记的是 %d 份——"
                              "**完整开发文档必须能下载**，不能只放工作包"
@@ -778,7 +839,8 @@ def main():
                check_module_names, check_gate_ids, check_feature_ids,
                check_handoff_packages, check_generated_docs,
                check_page_matches_state, check_workpackages_buildable,
-               check_workflows, check_module_page_order):
+               check_workflows, check_module_page_order,
+               check_diagram_selfcontained):
         fn()
 
     print("=" * 72)
