@@ -590,6 +590,7 @@
       </button>
     </div>
     <div class="full-page-host" id="dqEmbedHost"></div>
+    <div class="full-page-host" id="locEmbedHost"></div>
     <div class="full-page-host" id="vizEmbedHost" style="display:none;"></div>
     <div class="full-page-host" id="releaseEmbedHost" style="display:none;"></div>
     <div class="full-page-host" id="costEmbedHost" style="display:none;"></div>
@@ -633,7 +634,7 @@
      只有 <script src="本地.js"> 还能加载。原来这里用的是 fetch，
      所以用户每次双击打开点进来都是一片红字报错。
      ═══════════════════════════════════════════════════════════════════════ -->
-<script src="flow_embeds.js?v=ad04ed926044"></script>
+<script src="flow_embeds.js?v=15ec4df92b0f"></script>
 <script src="module_phases.js"></script>
 
 <script>
@@ -1035,6 +1036,10 @@
       link: "技术选型报告/Matbox_专项27_知识库记忆系统_技术选型与开发交接报告_2026-08-30.md", linkLabel: "打开专项27技术选型报告 →"
     },
     loc: {
+      // 2026-09-09：加 fullPage 之后，点这个节点开的是 loc_gate_flow.html 原件，
+      // 跟点 DQ 开样板是同一种行为——原来它走的是卡片弹窗里那个代号方块小控件，
+      // 格式不是标准，而且把条目名藏在了 tooltip 里（违反"不许藏内容"那条铁律）。
+      fullPage: true,
       title: "全球多语言", id: "F-LOC-001 · LOC-F001~F020 · 基础层公共能力", status: "🟢 DRAFT_RESEARCH_COMPLETE",
       desc: "2026-09-08建立。来源：用户侧交接包语言包.zip（Stage 9 PASS，DEV.docx 2028段+4个JSON+可运行POC）。定位是基础层公共能力，不是AI员工下属模块——被平台/独立站/小程序/App/iPad/AI员工/在线聊天共同消费。本会话独立核验：MANIFEST SHA-256 8/8一致；实跑poc.py确认12/12 PASS；三个锁定commit经GitHub API核实真实。选型已调整升至上游latest：vue-i18n 9.1.9(2021-10发布·官方已EOL)→11.4.10、next-intl→4.14.2、Tolgee→v3.221.0；废止包中禁止升v11规则（核查uni-app各dist-tag依赖树，uni-app根本不依赖vue-i18n，自带@dcloudio/uni-i18n，其锁定理由不成立）。三条核心分离：UI Context/Content Context/AI Session Context不得互相覆盖；Language/Locale/Region/Timezone/Currency/Measurement分开建模；原文永远归原Domain Owner，翻译只是派生，source_hash变化即自动outdated。新增5个Matbox侧Gate，其中G-LOC-MATBOX-002阻塞P0的LOC-F020（在线聊天Messaging Owner在本图中不存在）。",
       own: "EffectiveLocaleContext解析、Localization Catalog契约、BusinessContentTranslation派生记录、LanguagePolicyProfile（术语/BrandVoice/市场规则版本引用）、Cross-End语言连续性",
@@ -1381,46 +1386,14 @@
     document.getElementById("modalRoute").innerHTML = `<span class="v">${d.id}</span>`;
     document.getElementById("modalDesc").textContent = d.desc;
 
-    // ═══ 开发前 / 开发中 / 运营中 —— 数据来自 module_phases.js ═══
-    // 由检查器算出来的，不是人填的。三档分开显示：
-    //   ok=已守  no=未过  na=未建（标准定了但检查还没建，**不算通过**）
-    // 开发包标准 §0.5.2：未建的检查不许显示成绿。
-    (function(){
-      const wrap = document.getElementById("modalPhases");
-      const all = window.__MODULE_PHASES__ || {};
-      const ph = all[(key||"").toUpperCase()] || all[key];
-      if(!ph){ wrap.innerHTML = ""; return; }
-      const seg = (title, no, rows, note) => {
-        const t = {ok:0,no:0,na:0};
-        rows.forEach(r => t[r[2]] = (t[r[2]]||0)+1);
-        const chips = rows.map(r =>
-          `<span class="ph-i ${r[2]}" title="${r[1].replace(/"/g,"&quot;")}">${r[0]}</span>`).join("");
-        const nums = [];
-        if(t.ok) nums.push(t.ok+" 已守");
-        if(t.no) nums.push(t.no+" 未过");
-        if(t.na) nums.push(t.na+" 未建");
-        return `<div class="ph-seg">
-          <div class="ph-t">${title}<span class="ph-n">${no} · ${nums.join(" / ")}</span></div>
-          <div class="ph-items">${chips}</div>
-          <div class="ph-note">${note}</div></div>`;
-      };
-      const ready = ph.ready;
-      wrap.innerHTML = `<div class="ph-wrap">
-        <div class="ph-head">开发包标准 V1.0 · 逐条判定
-          <span class="ph-verdict ${ready?"ph-ready":"ph-notready"}">${ready?"就绪":"未就绪"}</span></div>
-        ${seg("开发前", "能不能开工", ph.pre,
-              "文档类由 _check_standard.py 判；R 系列去问 git/CI，不读我们自己写的文档。<b>差一条就是没就绪。</b>")}
-        ${seg("开发中", "在建时不许发生什么", ph.build,
-              "按 diff/CI 判，不看任何一方自述。<b>⚪ 未建 = 这条现在拦不住任何人</b>，不是通过。")}
-        ${seg("运营中", "算不算做完 / 跑得怎么样", ph.done,
-              "「做完了」的唯一定义是这几条全绿，<b>任何一方说做完了都不作数</b>。")}
-        <div class="ph-seg"><div class="ph-note">
-          <b>最终验收不在这张表上。</b>标准 §0.5：这 37 条只是<b>代理指标</b>——
-          真正的验收是 <b>opencode 拿到材料能不能马上开发</b>。全绿只意味着「可以送去试」。
-          它每卡一次，就说明代理指标漏了一条，要补进来。
-        </div></div>
-      </div>`;
-    })();
+    // 「开发前 / 开发中 / 运营中」不在这里渲染了。
+    // 2026-09-09：这里原来有个小控件，把三段状态画成一排代号方块（P1 P2 P3…），
+    // 条目名塞在 title 悬停提示里。用户指出两处错：格式不是标准（标准是样板那套
+    // 卡片排版），以及**把内容藏进了 tooltip**——违反「任何功能都不许藏在
+    // 点击/悬停后面」那条铁律。
+    // 现在每个模块都有自己的完整页面（fullPage: true），点节点直接开原件，
+    // 三段就在那一页里按样板排版摊开。这段控件因此是死代码，删掉不留。
+    // 数据文件 module_phases.js 仍然要——_build_module_page.py 靠它生成页面。
 
     const payloadEl = document.getElementById("modalPayload");
     if(d.own){
@@ -1502,7 +1475,11 @@
     task:       { hostId: "taskEmbedHost",       url: "task_self_correction_flow.html",       built: false },
     storage:    { hostId: "storageEmbedHost",    url: "storage_asset_lifecycle_flow.html",    built: false },
     providerRouter: { hostId: "providerRouterEmbedHost", url: "provider_failover_flow.html",  built: false },
-    aiemp:      { hostId: "aiempEmbedHost",      url: "aiemp_lifecycle_killswitch_flow.html", built: false }
+    aiemp:      { hostId: "aiempEmbedHost",      url: "aiemp_lifecycle_killswitch_flow.html", built: false },
+    // 2026-09-09 补。此前 loc_gate_flow.html 生成好了却**没有登记在这里**，
+    // 于是：架构图里点不开它，站点导出按链接爬也爬不到它（HTTP 404）。
+    // 同一个根因两处后果——"产出物存在"不等于"它接上了"。
+    loc:        { hostId: "locEmbedHost",        url: "loc_gate_flow.html",                   built: false }
   };
   /* ═══════════════════════════════════════════════════════════════════════
      2026-09-08 重写。旧写法（fetch + 把 HTML 拆成 css/html/js 三段 + 改写
@@ -1524,10 +1501,52 @@
      脚本自己跑，不需要任何改写，摊开的样子跟单独打开那个文件一模一样。
      不再有"每次点开都不一样"的加工环节。
      ═══════════════════════════════════════════════════════════════════════ */
+  /* ── 2026-09-09：能用原件就绝不用副本 ────────────────────────────────
+     用户原话：「我选择永不过期」。
+
+     副本会过期，这是它的本性——改了原件忘了重新打包，点开看到的就是旧的。
+     但**副本是为 file:// 一种情况存在的**：双击打开时浏览器不许这个文件
+     读那个文件，只能提前把内容抄一份进来。
+
+     而在网站上（http/https）这条限制根本不存在，<iframe src> 直接就能
+     加载原件。原来两条路都用副本，等于让最重要的那条路（网站——用户定的
+     "统一取件处"，opencode 也从那里取）白白背上过期风险。
+
+     所以按协议分开：
+       http/https → <iframe src="xxx.html">  直接嵌**原件**，永不过期
+       file://    → 才退回 flow_embeds.js 里的副本
+
+     顺带：网站上这样就不必再等 1.2 MB 的 flow_embeds.js 才能点开。
+     ──────────────────────────────────────────────────────────────── */
+  const CAN_LOAD_ORIGINAL = location.protocol === "http:" || location.protocol === "https:";
+
   function ensureEmbedBuilt(key){
     const cfg = FULL_PAGE_EMBEDS[key];
     if(!cfg || cfg.built) return;
     const host = document.getElementById(cfg.hostId);
+
+    if(CAN_LOAD_ORIGINAL){
+      /* 原件直挂。隐藏它自己的主题/全屏按钮：网站上父子同源，load 之后
+         往 iframe 文档里注入一条样式即可——**不必去改那 14 个文件**。
+         注入失败（同源判断出乎意料）也只是按钮还在，内容照常显示，不降级成空白。 */
+      const frame = document.createElement("iframe");
+      frame.className = "full-page-frame";
+      frame.setAttribute("title", cfg.url);
+      frame.addEventListener("load", () => {
+        try{
+          const d = frame.contentDocument;
+          if(!d) return;
+          const st = d.createElement("style");
+          st.textContent = ".theme-toggle,.fullscreen-toggle{display:none !important;}";
+          d.head.appendChild(st);
+        }catch(e){ /* 跨源时读不到，按钮留着就留着，不影响看内容 */ }
+      });
+      frame.src = cfg.url;
+      host.appendChild(frame);
+      cfg.built = true;
+      return;
+    }
+
     const text = (window.__FLOW_HTML__ || {})[cfg.url];
     if(typeof text !== "string"){
       host.innerHTML = '<div style="padding:40px;font-family:monospace;color:#c0392b;line-height:1.8;">'
