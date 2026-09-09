@@ -642,6 +642,12 @@ WP_MUST_HAVE = [
     ("能改哪 / 不能碰哪", r"backend/modules/dev-quality"),
     ("七类施工面齐", r"### Tests/Observability"),
     ("验收标准", r"\| DQ-T\d{3} \|"),
+    # 2026-09-09：这是「开发前 ↔ 开发中」唯一的接缝。
+    # 工作包一直给了 DQ-T 编号，却从没要求把编号写进测试方法名；
+    # 少了这一步，CI 的 surefire XML 里没有编号，就没有任何东西能回答
+    # 「13 个功能哪几个做完了」。事后靠人去对 24 条 × 13 个功能，
+    # 就是业界公认「手工追溯矩阵 90 天内必死」的那条路。
+    ("测试方法名要带 TestID（追溯的接缝）", r"### 4\.1 测试方法名必须带 TestID"),
     ("技术栈写死", r"PostgreSQL"),
     ("鉴权与多租户", r"### 5\.6"),
     ("错误码与重试", r"### 5\.7"),
@@ -675,14 +681,26 @@ def check_workpackages_buildable():
         if fid not in WP_ADAPTERS:
             if not re.search(r"\| (GET|POST|PUT|DELETE) \| `/dq", body):
                 missing.append("API 端点")
+
+        # §4.1 的示例必须用**这一份自己认领的**编号。
+        # 2026-09-09 差点埋进去的坑：13 份共用同一段模板，示例方法名一度写死成
+        # F-DQ-001 的场景，别的功能照抄就是一个跟自己验收标准无关的名字，
+        # 而 AI 是会照抄的。所以不只查「有没有这一节」，还要查「例子对不对得上」。
+        owned = set(re.findall(r"\| (DQ-T\d{3}) \|", body))
+        shown = set("DQ-T" + n for n in re.findall(r"\bdqT(\d{3})_", body))
+        stray = shown - owned
+        if owned and stray:
+            missing.append("§4.1 示例用了不属于自己的编号 %s（自己认领的是 %s）"
+                           % ("、".join(sorted(stray)), "、".join(sorted(owned))))
         if missing:
             bad += 1
             fails.append("C10 %s 只看这一份没法动手，缺：%s"
                          % (fid, "、".join(missing)))
     if not bad:
         notes.append("C10 %d 份工作包逐份自检通过——"
-                     "只看其中任意一份就能动手（要做什么/边界/施工面/验收/技术栈/"
-                     "鉴权/错误码/目录/接口或Adapter契约/禁令/交付/环境）" % len(files))
+                     "只看其中任意一份就能动手（要做什么/边界/施工面/验收/"
+                     "**测试要带TestID**/技术栈/鉴权/错误码/目录/接口或Adapter契约/"
+                     "禁令/交付/环境）" % len(files))
 
 
 def main():
