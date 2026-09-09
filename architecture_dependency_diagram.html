@@ -634,7 +634,7 @@
      只有 <script src="本地.js"> 还能加载。原来这里用的是 fetch，
      所以用户每次双击打开点进来都是一片红字报错。
      ═══════════════════════════════════════════════════════════════════════ -->
-<script src="flow_embeds.js?v=1ba7910816e0"></script>
+<script src="flow_embeds.js?v=67f7bbb15ff6"></script>
 <!-- ── 陈旧版本自检（2026-09-09）───────────────────────────────────────
      用户连着两次打开看到的都是旧内容：网站上那份标题还写着几小时前就改掉的
      旧模块名，本地那份报「找不到内嵌副本」——**都是浏览器在拿缓存**。
@@ -649,7 +649,7 @@
      ──────────────────────────────────────────────────────────────── -->
 <script>
 (function(){
-  var SELF_STAMP = "ff58e9086691";
+  var SELF_STAMP = "ef485aa16fd7";
   if(location.protocol !== "http:" && location.protocol !== "https:") return;
   fetch("build.json?ts=" + Date.now(), {cache:"no-store"})
     .then(function(r){ return r.ok ? r.json() : null; })

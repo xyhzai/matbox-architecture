@@ -166,7 +166,7 @@ window.__MODULE_PHASES__ = {
    [
     "R10",
     "公开站点没过期",
-    "ok"
+    "no"
    ]
   ],
   "build": [
@@ -240,8 +240,8 @@ window.__MODULE_PHASES__ = {
   ],
   "sum": {
    "pre": {
-    "ok": 32,
-    "no": 0,
+    "ok": 31,
+    "no": 1,
     "na": 0,
     "total": 32
    },
@@ -258,7 +258,7 @@ window.__MODULE_PHASES__ = {
     "total": 5
    }
   },
-  "ready": true
+  "ready": false
  },
  "LOC": {
   "name": "全球多语言",
@@ -421,7 +421,7 @@ window.__MODULE_PHASES__ = {
    [
     "R10",
     "公开站点没过期",
-    "ok"
+    "no"
    ]
   ],
   "build": [
@@ -495,8 +495,8 @@ window.__MODULE_PHASES__ = {
   ],
   "sum": {
    "pre": {
-    "ok": 31,
-    "no": 0,
+    "ok": 30,
+    "no": 1,
     "na": 0,
     "total": 31
    },
@@ -513,6 +513,6 @@ window.__MODULE_PHASES__ = {
     "total": 5
    }
   },
-  "ready": true
+  "ready": false
  }
 };
