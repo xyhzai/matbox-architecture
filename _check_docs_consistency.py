@@ -965,8 +965,14 @@ def check_page_matches_state():
         # 2026-09-10 加 ⚖️：把标准挂进存放处之后，C9 立刻报「目录 14 个、
         # 存放处 15 个」。**它报得对**——判据是"存放处列的应该正好是工作包"，
         # 我加了一行非工作包的东西，就该由我来说清楚它算哪一类。
+        # 2026-09-11 加 🚧 与 🎯：删掉 modules/*.md 那套第二入口之后，
+        # 「能改哪不能碰哪」和「验收标准归属」这两份从取件页搬进了存放处。
+        # C9 立刻报「目录 14 个、存放处 16 个」——**它报得对**：
+        # 判据是"存放处列的应该正好是工作包"，我加了两行非工作包的东西，
+        # 就该由我来说清楚它们算哪一类，而不是把判据放松。
+        #   📘 本模块总账 · ⚖️ 全局文档 · 🚧 边界 · 🎯 验收标准归属
         listed = [x for x in re.findall(r'class="wp-fname"[^>]*>([^<]+)</a>', page)
-                  if not x.startswith(("📘", "⚖️"))]
+                  if not x.startswith(("📘", "⚖️", "🚧", "🎯"))]
         if sorted(listed) != on_disk:
             fails.append("C9 工作包目录里有 %d 个文件 %s，但存放处列出的是 %d 个 %s"
                          "——跑：python docs/_build_workpackage_index.py（或 _build_all.py）"
