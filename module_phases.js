@@ -912,7 +912,7 @@ window.__MODULE_PHASES__ = {
    [
     "R2",
     "仓库里有可编译工程",
-    "no"
+    "ok"
    ],
    [
     "R3",
@@ -922,12 +922,12 @@ window.__MODULE_PHASES__ = {
    [
     "R4",
     "有 CI 配置",
-    "no"
+    "ok"
    ],
    [
     "R5",
     "有数据库迁移目录",
-    "no"
+    "ok"
    ],
    [
     "R6",
@@ -1036,8 +1036,8 @@ window.__MODULE_PHASES__ = {
   ],
   "sum": {
    "pre": {
-    "ok": 9,
-    "no": 19,
+    "ok": 12,
+    "no": 16,
     "na": 5,
     "total": 33
    },
