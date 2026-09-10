@@ -8,7 +8,7 @@
 
 | 状态 | 含义 |
 |---|---|
-| ✅ READY_FOR_STAGE10_BINDING | 设计文档已完成，等待绑定真实 Repo 施工（真实 Repo 已就绪：`xyhzai/matbox`） |
+| ✅ READY_FOR_STAGE10_BINDING | 设计文档已完成，等待绑定真实 Repo 施工（真实 Repo 已就绪：`felixapex/matbox`） |
 | ❌ MISSING | 被其他模块依赖，但目前找不到对应开发文档，需要重新做 |
 | 🔵 CONFIRMED | 前端页面，设计中，已同步进本仓库 |
 | ⚪ NOT_STARTED | 尚未开始 |

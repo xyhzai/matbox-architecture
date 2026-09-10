@@ -19,7 +19,7 @@
 ## 0.5 · 开工五步（照这个做就行，不用再问）
 
 ```bash
-git clone https://github.com/xyhzai/matbox.git
+git clone https://github.com/felixapex/matbox.git
 cd matbox
 git checkout -b wp/cred-f008
 cd backend/modules/credential
@@ -32,7 +32,7 @@ Java 包名：`com.matbox.credential`。代码只放在 `backend/modules/credent
 
 | | |
 |---|---|
-| 仓库 | `https://github.com/xyhzai/matbox.git` |
+| 仓库 | `https://github.com/felixapex/matbox.git` |
 | 落脚目录 | `backend/modules/credential/` —— **只在这里面改**，越界会被 `_check_scope.py` 逐个文件列出来 |
 | 分支 | `wp/cred-f008`，从下面那个基线切 |
 | 并行 | 一个功能一个分支、各自一份克隆，几十个 AI 同时开工互不干扰 |
