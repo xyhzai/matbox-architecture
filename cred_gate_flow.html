@@ -823,6 +823,11 @@
   .rs-item.partial .rs-badge{ background: rgba(255,196,77,.14); color: var(--c-embed); }
   .rs-item.notstarted .rs-badge{ background: rgba(132,146,168,.14); color: var(--dim); }
   .rs-item .rs-label{ font-size:12.5px; color: var(--text); line-height:1.4; }
+  /* note 以前只写在 title 里 —— 那段话只有悬停才看得见，
+     违反「任何功能都不许藏在点击/悬停后面」。2026-09-11 用户定：
+     保留 tooltip，另加一行可见文字，不删不挪，只是同时可见。 */
+  .rs-item .rs-text{ display:flex; flex-direction:column; gap:3px; min-width:0; }
+  .rs-item .rs-note{ font-size:11px; color: var(--muted); line-height:1.55; }
   html{ scroll-behavior: smooth; }
 
   /* 13个子功能核验清单 — 卡片6专用，每项一个真实事实，不是笼统打勾 */
@@ -983,22 +988,6 @@
 <body>
 
 <!-- PHASE-HEAD:BEGIN 由 _build_module_page.py 按模块替换 -->
-<a class="back-to-map" id="backToMap" href="architecture_dependency_diagram.html">← 回架构总图</a>
-<style>
-  .back-to-map{ display:inline-flex; align-items:center; gap:6px;
-    margin:0 0 14px; padding:6px 12px; border-radius:999px;
-    font-family:var(--mono); font-size:11.5px; letter-spacing:.04em;
-    color:var(--brand-mint); text-decoration:none;
-    border:1px solid var(--border-2); background:var(--panel); }
-  .back-to-map:hover{ border-color:var(--brand-mint); }
-</style>
-<script>
-  /* 被架构图内嵌时摘掉：那时人已经在图里，点它只会在 iframe 里再套一层。 */
-  try{ if(window.top !== window.self){
-    var _b = document.getElementById("backToMap");
-    if(_b) _b.remove();
-  } }catch(e){}
-</script>
 <header>
   <div class="eyebrow"><span class="dot"></span>MATBOX · CRED</div>
   <h1>密钥与凭据管理 <span class="h1-accent">开发包标准判定</span></h1>
@@ -1042,7 +1031,7 @@
   <div class="wp-files">
       <div class="wp-file wp-file-ledger">
         <a class="wp-fname" href="Matbox_开发包标准_V2.0.md" target="_blank" rel="noopener">⚖️ Matbox_开发包标准_V2.0.md</a>
-        <span class="wp-fmeta">开发包标准（全局 · 所有包通用）—— 材料齐到什么程度能开工、在建时不许发生什么、做完了的唯一定义 · 52 KB · 最后修改 2026-09-10 23:08</span>
+        <span class="wp-fmeta">开发包标准（全局 · 所有包通用）—— 材料齐到什么程度能开工、在建时不许发生什么、做完了的唯一定义 · 52 KB · 最后修改 2026-09-11 00:16</span>
         <a class="wp-dl wp-dl-word" href="导出_Word/Matbox_开发包标准_V2.0.docx" download="Matbox_开发包标准_V2.0.docx">Word</a>
         <a class="wp-dl" href="Matbox_开发包标准_V2.0.md" download="Matbox_开发包标准_V2.0.md">下载</a>
       </div>

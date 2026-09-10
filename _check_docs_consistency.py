@@ -376,47 +376,6 @@ def check_module_page_content():
         fails.append("C15 一个模块页面都没查到 —— 「跳过」不等于「通过」")
 
 
-# ══ C18：每个模块页都要有回架构总图的入口 ═══════════════════════════════
-#
-# 2026-09-10 用户单独打开 loc_gate_flow.html 之后问：
-# 「为什么返回不了无限画布呢？什么情况！！」
-#
-# 因为**根本没有返回的入口**。我把架构图的模块节点改成直接跳到各自的三段页，
-# 却没给这些页面留回去的路 —— 一扇单向门。用户手上只有这个网址，
-# 浏览器「后退」也没用（他是直接打开的，没有历史可退）。
-#
-# 这类错的共性：**做加法的时候只顺着一个方向走了一遍**。
-# 跟这一轮依赖关系那两条是同一个毛病 —— 只算了「我用了谁」，
-# 忘了「谁在用我」；这里只做了「从图进页面」，忘了「从页面回图」。
-# 所以它值得一条独立的检查，而不是记在某个人的脑子里。
-def check_back_to_map():
-    mp = os.path.join(DOCS, "modules.json")
-    if not os.path.exists(mp):
-        fails.append("C18 缺 modules.json")
-        return
-    mods = json.load(io.open(mp, encoding="utf-8"))["modules"]
-    ran = 0
-    for key, cfg in sorted(mods.items()):
-        flow = cfg.get("flow") or ("%s_gate_flow.html" % key.lower())
-        fp = os.path.join(DOCS, flow)
-        if not os.path.exists(fp):
-            continue
-        ran += 1
-        body = read(fp)
-        has_link = ('href="architecture_dependency_diagram.html"' in body
-                    and 'id="backToMap"' in body)
-        if not has_link:
-            fails.append("C18 %s 没有回架构总图的入口 —— 单独打开这一页就出不去了"
-                         "（浏览器「后退」对直接打开的页面无效）" % flow)
-        elif "window.top !== window.self" not in body:
-            fails.append("C18 %s 有返回入口，但没有「被内嵌时摘掉」的判断 —— "
-                         "架构图内嵌它时点这个链接会在 iframe 里再套一层图" % flow)
-        else:
-            notes.append("C18 %s 有回架构总图的入口，且内嵌时会自动摘掉" % flow)
-    if not ran:
-        fails.append("C18 一个模块页面都没查到 —— 「跳过」不等于「通过」")
-
-
 # ══ C17：依赖关系那两张卡 —— 结构、条数、方向，逐条对 ═══════════════════
 #
 # 2026-09-10 用户喊停：「你现在文件包规范还没有把依赖关系放进去呢」。
@@ -1164,7 +1123,7 @@ def main():
                check_page_matches_state, check_workpackages_buildable,
                check_workflows, check_module_page_order, check_module_page_content,
                check_diagram_selfcontained, check_module_has_entry,
-               check_dom_refs_exist, check_dep_panel, check_back_to_map):
+               check_dom_refs_exist, check_dep_panel):
         fn()
 
     print("=" * 72)

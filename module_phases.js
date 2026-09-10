@@ -654,7 +654,7 @@ window.__MODULE_PHASES__ = {
    [
     "R3",
     "有可用的 Base Commit",
-    "ok"
+    "no"
    ],
    [
     "R4",
@@ -773,8 +773,8 @@ window.__MODULE_PHASES__ = {
   ],
   "sum": {
    "pre": {
-    "ok": 30,
-    "no": 2,
+    "ok": 29,
+    "no": 3,
     "na": 1,
     "total": 33
    },

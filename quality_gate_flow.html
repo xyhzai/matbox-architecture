@@ -823,6 +823,11 @@
   .rs-item.partial .rs-badge{ background: rgba(255,196,77,.14); color: var(--c-embed); }
   .rs-item.notstarted .rs-badge{ background: rgba(132,146,168,.14); color: var(--dim); }
   .rs-item .rs-label{ font-size:12.5px; color: var(--text); line-height:1.4; }
+  /* note 以前只写在 title 里 —— 那段话只有悬停才看得见，
+     违反「任何功能都不许藏在点击/悬停后面」。2026-09-11 用户定：
+     保留 tooltip，另加一行可见文字，不删不挪，只是同时可见。 */
+  .rs-item .rs-text{ display:flex; flex-direction:column; gap:3px; min-width:0; }
+  .rs-item .rs-note{ font-size:11px; color: var(--muted); line-height:1.55; }
   html{ scroll-behavior: smooth; }
 
   /* 13个子功能核验清单 — 卡片6专用，每项一个真实事实，不是笼统打勾 */
@@ -983,25 +988,6 @@
 <body>
 
 <!-- PHASE-HEAD:BEGIN 由 _build_module_page.py 按模块替换 -->
-<!-- 回架构总图的入口。2026-09-10 用户单独打开模块页后问「为什么返回不了
-     无限画布呢？什么情况！！」——因为根本没有返回的路，做成了单向门。
-     这一段在别的模块页由 _build_module_page.py 生成同款；DQ 是样板本身，
-     所以直接写在这里。被架构图内嵌时由下面那段脚本摘掉（人已经在图里了）。 -->
-<a class="back-to-map" id="backToMap" href="architecture_dependency_diagram.html">← 回架构总图</a>
-<style>
-  .back-to-map{ display:inline-flex; align-items:center; gap:6px;
-    margin:0 0 14px; padding:6px 12px; border-radius:999px;
-    font-family:var(--mono); font-size:11.5px; letter-spacing:.04em;
-    color:var(--brand-mint); text-decoration:none;
-    border:1px solid var(--border-2); background:var(--panel); }
-  .back-to-map:hover{ border-color:var(--brand-mint); }
-</style>
-<script>
-  try{ if(window.top !== window.self){
-    var _b = document.getElementById("backToMap");
-    if(_b) _b.remove();
-  } }catch(e){}
-</script>
 <header>
   <!-- 1. Top-of-page text. Change SYSTEM_NAME, the accented words, and the subtitle. -->
   <span class="eyebrow"><span class="dot"></span> MATBOX · DEVCODEQUALITY GATE</span>
@@ -1049,13 +1035,13 @@
   <div class="wp-files">
       <div class="wp-file wp-file-ledger">
         <a class="wp-fname" href="Matbox_开发包标准_V2.0.md" target="_blank" rel="noopener">⚖️ Matbox_开发包标准_V2.0.md</a>
-        <span class="wp-fmeta">开发包标准（全局 · 所有包通用）—— 材料齐到什么程度能开工、在建时不许发生什么、做完了的唯一定义 · 52 KB · 最后修改 2026-09-10 23:08</span>
+        <span class="wp-fmeta">开发包标准（全局 · 所有包通用）—— 材料齐到什么程度能开工、在建时不许发生什么、做完了的唯一定义 · 52 KB · 最后修改 2026-09-11 00:16</span>
         <a class="wp-dl wp-dl-word" href="导出_Word/Matbox_开发包标准_V2.0.docx" download="Matbox_开发包标准_V2.0.docx">Word</a>
         <a class="wp-dl" href="Matbox_开发包标准_V2.0.md" download="Matbox_开发包标准_V2.0.md">下载</a>
       </div>
       <div class="wp-file wp-file-ledger">
         <a class="wp-fname" href="Matbox_代码持续质检与安全自检_开发文档_FINAL.md" target="_blank" rel="noopener">📘 Matbox_代码持续质检与安全自检_开发文档_FINAL.md</a>
-        <span class="wp-fmeta">完整开发文档（总账）· 147.1 KB · 最后修改 2026-09-10 23:08</span>
+        <span class="wp-fmeta">完整开发文档（总账）· 147.1 KB · 最后修改 2026-09-10 23:48</span>
         <a class="wp-dl wp-dl-word" href="导出_Word/Matbox_代码持续质检与安全自检_开发文档_FINAL.docx" download="Matbox_代码持续质检与安全自检_开发文档_FINAL.docx">Word</a>
         <a class="wp-dl" href="Matbox_代码持续质检与安全自检_开发文档_FINAL.md" download="Matbox_代码持续质检与安全自检_开发文档_FINAL.md">下载</a>
       </div>
@@ -1152,18 +1138,18 @@
     <span class="rs-overall">12 项里 12 项已备齐 · 全部齐备</span>
   </div>
   <div class="readysum-grid">
-    <a class="rs-item ready" href="#dr-1" title="DocID/版本/状态/FeatureID 齐全"><span class="rs-badge">✅ 已备齐</span><span class="rs-label">① 身份与状态</span></a>
-    <a class="rs-item ready" href="#dr-2" title="13 个子功能各有 In/Out"><span class="rs-badge">✅ 已备齐</span><span class="rs-label">② Scope In/Out</span></a>
-    <a class="rs-item ready" href="#dr-3" title="Own / Reuse / Must Not Rebuild 三类冻结"><span class="rs-badge">✅ 已备齐</span><span class="rs-label">③ Own/Reuse</span></a>
-    <a class="rs-item ready" href="#dr-4" title="六个 Own 数据模型字段冻结"><span class="rs-badge">✅ 已备齐</span><span class="rs-label">④ 依赖&amp;Contract</span></a>
-    <a class="rs-item ready" href="#dr-5" title="2026-09-08 补齐为机器可读：13 个功能写入范围 + 3 条依赖铁律 + 5 个只读客户端 + 禁改类别"><span class="rs-badge">✅ 已备齐</span><span class="rs-label">⑤ 允许/禁止改动范围</span></a>
-    <a class="rs-item ready" href="#dr-6" title="13 × 7 = 91 条，一条不落"><span class="rs-badge">✅ 已备齐</span><span class="rs-label">⑥ 施工面检查</span></a>
-    <a class="rs-item ready" href="#dr-7" title="24 条 Given-When-Then"><span class="rs-badge">✅ 已备齐</span><span class="rs-label">⑦ 验收标准G-W-T（24/24全转完）</span></a>
-    <a class="rs-item ready" href="#dr-8" title="7 道 Gate + ParallelReadiness 未派生 + 环境空白等，全部显式标注"><span class="rs-badge">✅ 已备齐</span><span class="rs-label">⑧ 存疑事项（已如实列出）</span></a>
-    <a class="rs-item ready" href="#dr-9" title="STRIDE-lite 六类 + 2026-03 Trivy 供应链攻击真实案例"><span class="rs-badge">✅ 已备齐</span><span class="rs-label">⑨ 安全威胁检查</span></a>
-    <a class="rs-item ready" href="#dr-10" title="Feature Owner / Source Reviewer / Acceptance Owner 已填；Implementer 于 2026-09-09 由用户指定为 **opencode**，13 个功能全部有人负责，满足 RC5 第19条硬条件。监管与看板对接方式见「AI 开发执行规划」。"><span class="rs-badge">✅ 已备齐</span><span class="rs-label">⑩ 责任角色</span></a>
-    <a class="rs-item ready" href="#dr-11" title="WP-DQ-01~10 分批 + 自认领机制归 F-QUEUE-001"><span class="rs-badge">✅ 已备齐</span><span class="rs-label">⑪ 并行调度（独立协调角色，已确认）</span></a>
-    <a class="rs-item ready" href="#dr-12" title="通过时必须交出的 6 类产物"><span class="rs-badge">✅ 已备齐</span><span class="rs-label">⑫ 验收交付清单（新补）</span></a>
+    <a class="rs-item ready" href="#dr-1" title="DocID/版本/状态/FeatureID 齐全"><span class="rs-badge">✅ 已备齐</span><span class="rs-text"><span class="rs-label">① 身份与状态</span><span class="rs-note">DocID/版本/状态/FeatureID 齐全</span></span></a>
+    <a class="rs-item ready" href="#dr-2" title="13 个子功能各有 In/Out"><span class="rs-badge">✅ 已备齐</span><span class="rs-text"><span class="rs-label">② Scope In/Out</span><span class="rs-note">13 个子功能各有 In/Out</span></span></a>
+    <a class="rs-item ready" href="#dr-3" title="Own / Reuse / Must Not Rebuild 三类冻结"><span class="rs-badge">✅ 已备齐</span><span class="rs-text"><span class="rs-label">③ Own/Reuse</span><span class="rs-note">Own / Reuse / Must Not Rebuild 三类冻结</span></span></a>
+    <a class="rs-item ready" href="#dr-4" title="六个 Own 数据模型字段冻结"><span class="rs-badge">✅ 已备齐</span><span class="rs-text"><span class="rs-label">④ 依赖&amp;Contract</span><span class="rs-note">六个 Own 数据模型字段冻结</span></span></a>
+    <a class="rs-item ready" href="#dr-5" title="2026-09-08 补齐为机器可读：13 个功能写入范围 + 3 条依赖铁律 + 5 个只读客户端 + 禁改类别"><span class="rs-badge">✅ 已备齐</span><span class="rs-text"><span class="rs-label">⑤ 允许/禁止改动范围</span><span class="rs-note">2026-09-08 补齐为机器可读：13 个功能写入范围 + 3 条依赖铁律 + 5 个只读客户端 + 禁改类别</span></span></a>
+    <a class="rs-item ready" href="#dr-6" title="13 × 7 = 91 条，一条不落"><span class="rs-badge">✅ 已备齐</span><span class="rs-text"><span class="rs-label">⑥ 施工面检查</span><span class="rs-note">13 × 7 = 91 条，一条不落</span></span></a>
+    <a class="rs-item ready" href="#dr-7" title="24 条 Given-When-Then"><span class="rs-badge">✅ 已备齐</span><span class="rs-text"><span class="rs-label">⑦ 验收标准G-W-T（24/24全转完）</span><span class="rs-note">24 条 Given-When-Then</span></span></a>
+    <a class="rs-item ready" href="#dr-8" title="7 道 Gate + ParallelReadiness 未派生 + 环境空白等，全部显式标注"><span class="rs-badge">✅ 已备齐</span><span class="rs-text"><span class="rs-label">⑧ 存疑事项（已如实列出）</span><span class="rs-note">7 道 Gate + ParallelReadiness 未派生 + 环境空白等，全部显式标注</span></span></a>
+    <a class="rs-item ready" href="#dr-9" title="STRIDE-lite 六类 + 2026-03 Trivy 供应链攻击真实案例"><span class="rs-badge">✅ 已备齐</span><span class="rs-text"><span class="rs-label">⑨ 安全威胁检查</span><span class="rs-note">STRIDE-lite 六类 + 2026-03 Trivy 供应链攻击真实案例</span></span></a>
+    <a class="rs-item ready" href="#dr-10" title="Feature Owner / Source Reviewer / Acceptance Owner 已填；Implementer 于 2026-09-09 由用户指定为 **opencode**，13 个功能全部有人负责，满足 RC5 第19条硬条件。监管与看板对接方式见「AI 开发执行规划」。"><span class="rs-badge">✅ 已备齐</span><span class="rs-text"><span class="rs-label">⑩ 责任角色</span><span class="rs-note">Feature Owner / Source Reviewer / Acceptance Owner 已填；Implementer 于 2026-09-09 由用户指定为 **opencode**，13 个功能全部有人负责，满足 RC5 第19条硬条件。监管与看板对接方式见「AI 开发执行规划」。</span></span></a>
+    <a class="rs-item ready" href="#dr-11" title="WP-DQ-01~10 分批 + 自认领机制归 F-QUEUE-001"><span class="rs-badge">✅ 已备齐</span><span class="rs-text"><span class="rs-label">⑪ 并行调度（独立协调角色，已确认）</span><span class="rs-note">WP-DQ-01~10 分批 + 自认领机制归 F-QUEUE-001</span></span></a>
+    <a class="rs-item ready" href="#dr-12" title="通过时必须交出的 6 类产物"><span class="rs-badge">✅ 已备齐</span><span class="rs-text"><span class="rs-label">⑫ 验收交付清单（新补）</span><span class="rs-note">通过时必须交出的 6 类产物</span></span></a>
   </div>
   <!-- READY-SUMMARY:END -->
 
