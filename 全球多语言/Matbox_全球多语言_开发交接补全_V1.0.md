@@ -1,7 +1,7 @@
 # Matbox 全球多语言 · 开发交接补全 V1.0
 
 **模块**：F-LOC-001 全球多语言　　**Feature**：LOC-F001 ~ LOC-F020
-**生成于**：2026-09-09 16:49，由 `python docs/_build_loc_supplement.py` 生成，不要手改
+**生成于**：2026-09-10 23:36，由 `python docs/_build_loc_supplement.py` 生成，不要手改
 
 > ## 这份文件是什么
 > 
