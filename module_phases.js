@@ -166,7 +166,7 @@ window.__MODULE_PHASES__ = {
    [
     "R11",
     "代码仓库 CI 是绿的",
-    "no"
+    "ok"
    ],
    [
     "R10",
@@ -245,8 +245,8 @@ window.__MODULE_PHASES__ = {
   ],
   "sum": {
    "pre": {
-    "ok": 28,
-    "no": 5,
+    "ok": 29,
+    "no": 4,
     "na": 0,
     "total": 33
    },
@@ -429,7 +429,7 @@ window.__MODULE_PHASES__ = {
    [
     "R11",
     "代码仓库 CI 是绿的",
-    "no"
+    "ok"
    ],
    [
     "R10",
@@ -508,8 +508,8 @@ window.__MODULE_PHASES__ = {
   ],
   "sum": {
    "pre": {
-    "ok": 29,
-    "no": 4,
+    "ok": 30,
+    "no": 3,
     "na": 0,
     "total": 33
    },
@@ -694,7 +694,7 @@ window.__MODULE_PHASES__ = {
    [
     "R11",
     "代码仓库 CI 是绿的",
-    "no"
+    "ok"
    ],
    [
     "R10",
@@ -773,8 +773,8 @@ window.__MODULE_PHASES__ = {
   ],
   "sum": {
    "pre": {
-    "ok": 29,
-    "no": 3,
+    "ok": 30,
+    "no": 2,
     "na": 1,
     "total": 33
    },
@@ -957,7 +957,7 @@ window.__MODULE_PHASES__ = {
    [
     "R11",
     "代码仓库 CI 是绿的",
-    "no"
+    "ok"
    ],
    [
     "R10",
@@ -1036,8 +1036,8 @@ window.__MODULE_PHASES__ = {
   ],
   "sum": {
    "pre": {
-    "ok": 11,
-    "no": 17,
+    "ok": 12,
+    "no": 16,
     "na": 5,
     "total": 33
    },
