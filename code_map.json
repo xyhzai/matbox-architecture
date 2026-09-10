@@ -10,14 +10,14 @@
     "状态字段是**算出来的**（看仓库里真有什么），不是人填的。"
   ],
   "生成自": {
-    "文档仓库提交": "8f9755aec9c5cae885f5683b6de21f23cfc8c554",
-    "生成时刻": "2026-09-09T21:11:20Z"
+    "文档仓库提交": "85f6911445baa7e997b615a5e3a3b9a8abfdffac",
+    "生成时刻": "2026-09-10T20:04:07Z"
   },
   "源码基线": {
-    "仓库": "xyhzai/matbox",
+    "仓库": "felixapex/matbox",
     "分支": "main",
-    "base_commit": "0fb8f1dac5e776b0dea315927eeaef0bb68e23e5",
-    "提交时间": "2026-09-09T21:11:20Z",
+    "base_commit": "116a9ca25242bebd384298c273ccd65e6a916423",
+    "提交时间": "2026-09-10T20:04:07Z",
     "怎么核对": "git rev-parse HEAD 必须等于上面这个 SHA；不等于说明你不是在这一版上改的，先对齐再动手"
   },
   "测试报告": {
@@ -32,8 +32,8 @@
       "public": true,
       "sentinel": false,
       "工作区": {
-        "仓库": "xyhzai/matbox",
-        "克隆地址": "https://github.com/xyhzai/matbox.git",
+        "仓库": "felixapex/matbox",
+        "克隆地址": "https://github.com/felixapex/matbox.git",
         "落脚目录": "backend/modules/credential",
         "java_package": "com.matbox.credential",
         "分支": "wp/<小写FeatureID>",
@@ -113,8 +113,8 @@
       "public": true,
       "sentinel": false,
       "工作区": {
-        "仓库": "xyhzai/matbox",
-        "克隆地址": "https://github.com/xyhzai/matbox.git",
+        "仓库": "felixapex/matbox",
+        "克隆地址": "https://github.com/felixapex/matbox.git",
         "落脚目录": "backend/modules/dev-quality",
         "java_package": "com.matbox.devquality",
         "分支": "wp/<小写FeatureID>",
@@ -202,28 +202,18 @@
         "backend/modules/dev-quality/pom.xml",
         "backend/modules/dev-quality/src/main/java/com/matbox/devquality/DevQualityApplication.java",
         "backend/modules/dev-quality/src/main/java/com/matbox/devquality/adapters/package-info.java",
-        "backend/modules/dev-quality/src/main/java/com/matbox/devquality/shared/contracts/ChallengeRun.java",
-        "backend/modules/dev-quality/src/main/java/com/matbox/devquality/shared/contracts/GateDecision.java",
-        "backend/modules/dev-quality/src/main/java/com/matbox/devquality/shared/contracts/NormalizedFinding.java",
-        "backend/modules/dev-quality/src/main/java/com/matbox/devquality/shared/contracts/QualityRun.java",
-        "backend/modules/dev-quality/src/main/java/com/matbox/devquality/shared/contracts/RepairAttempt.java",
-        "backend/modules/dev-quality/src/main/java/com/matbox/devquality/shared/contracts/ScannerRun.java",
-        "backend/modules/dev-quality/src/main/java/com/matbox/devquality/shared/contracts/SuppressionRef.java",
-        "backend/modules/dev-quality/src/main/java/com/matbox/devquality/shared/contracts/ToolHealthCheck.java",
         "backend/modules/dev-quality/src/main/resources/application.yml",
-        "backend/modules/dev-quality/src/main/resources/db/migration/V1__dq_core_tables.sql",
-        "backend/modules/dev-quality/src/test/java/com/matbox/devquality/ContractMatchesSchemaTest.java",
-        "backend/modules/dev-quality/src/test/java/com/matbox/devquality/SchemaMigrationTest.java"
+        "backend/modules/dev-quality/src/main/resources/db/migration/V1__dq_core_tables.sql"
       ],
-      "状态": "业务实现进行中：src/main 下已有 8 个源文件"
+      "状态": "工程骨架已就位，业务实现 0 个源文件 —— 可以开工"
     },
     "LOC": {
       "name": "全球多语言",
       "public": true,
       "sentinel": false,
       "工作区": {
-        "仓库": "xyhzai/matbox",
-        "克隆地址": "https://github.com/xyhzai/matbox.git",
+        "仓库": "felixapex/matbox",
+        "克隆地址": "https://github.com/felixapex/matbox.git",
         "落脚目录": "backend/modules/localization",
         "java_package": "com.matbox.localization",
         "分支": "wp/<小写FeatureID>",
@@ -413,8 +403,8 @@
       "public": false,
       "sentinel": true,
       "工作区": {
-        "仓库": "xyhzai/matbox",
-        "克隆地址": "https://github.com/xyhzai/matbox.git",
+        "仓库": "felixapex/matbox",
+        "克隆地址": "https://github.com/felixapex/matbox.git",
         "落脚目录": "backend/modules/sentinel",
         "java_package": "com.matbox.sentinel",
         "分支": "wp/<小写FeatureID>",

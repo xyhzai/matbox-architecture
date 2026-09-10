@@ -20,7 +20,7 @@
 ## 0.5 · 开工五步（照这个做就行，不用再问）
 
 ```bash
-git clone https://github.com/xyhzai/matbox.git
+git clone https://github.com/felixapex/matbox.git
 cd matbox
 git checkout -b wp/loc-f018
 mvn -B verify            # 编译 + 跑测试
@@ -42,7 +42,7 @@ Java 包名固定为 `com.matbox.localization`；代码写在 `backend/modules/l
 
 | | |
 |---|---|
-| 仓库 | `xyhzai/matbox` |
+| 仓库 | `felixapex/matbox` |
 | 落脚目录 | `backend/modules/localization/` —— **只在这里面改**，越界会被 `_check_scope.py` 逐个文件列出来 |
 | 分支 | `wp/loc-f018`，从下面那个基线切 |
 | 并行 | 一个功能一个分支、各自一份克隆，几十个 AI 同时开工互不干扰 |
@@ -50,7 +50,7 @@ Java 包名固定为 `com.matbox.localization`；代码写在 `backend/modules/l
 ### 0.7 · 源码基线（照着核对，不等于就先对齐再动手）
 
 ```
-base_commit: 0fb8f1dac5e776b0dea315927eeaef0bb68e23e5
+base_commit: 116a9ca25242bebd384298c273ccd65e6a916423
 分支：      main
 ```
 
