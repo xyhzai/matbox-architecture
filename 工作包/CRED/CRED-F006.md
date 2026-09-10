@@ -56,7 +56,7 @@ Java 包名：`com.matbox.credential`。代码只放在 `backend/modules/credent
 ### 0.7 · 源码基线（照着核对，不等于就先对齐再动手）
 
 ```
-base_commit: 116a9ca25242bebd384298c273ccd65e6a916423
+base_commit: 2d280073b1da99dbb18a929b438563ab97c53a39
 分支：      main
 ```
 

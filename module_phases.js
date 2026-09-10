@@ -414,7 +414,7 @@ window.__MODULE_PHASES__ = {
    [
     "R8",
     "[DQ] 多个功能共用的落脚目录都真实存在",
-    "no"
+    "ok"
    ],
    [
     "R12",
@@ -508,8 +508,8 @@ window.__MODULE_PHASES__ = {
   ],
   "sum": {
    "pre": {
-    "ok": 30,
-    "no": 3,
+    "ok": 31,
+    "no": 2,
     "na": 0,
     "total": 33
    },
