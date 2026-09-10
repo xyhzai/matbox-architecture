@@ -34,6 +34,20 @@ source:
 # ── 全模块通用：任何一个 F-DQ-00X 都不得越过 ──────────────────────
 module_wide:
   allowed_root: "backend/modules/dev-quality/src/main/java/com/matbox/devquality/**"
+
+  # 2026-09-11 补。opencode 报的第四条：allowed_root 只有 src/main，
+  # 而契约测试必然写在 src/test 下 —— **按字面读，写测试就是越界**。
+  # 它判断这是清单没写全（LOC 那两个测试就在 src/test 下），判断对了：
+  # 承载验收标准的测试是交付物的一部分（标准 M1），不可能不许写。
+  # 漏的原因跟 SCOPE-OPEN-2 那条 remaining 是同一个：
+  # 当初只按「源码目录树」列，测试目录和 resources 都没进来。
+  test_root: "backend/modules/dev-quality/src/test/java/com/matbox/devquality/**"
+
+  # resources 类产物（迁移 SQL / Rego bundle / 规则包）：
+  # **读不受限**，任何人任何时候都可以读；这里管的只是「改」。
+  # 迁移 SQL 归 F-DQ-007 的 Schema 守卫管，不在 wp/dq-contracts 这条前置分支内 ——
+  # 契约类是照着已有的 DDL 建，不是反过来改 DDL。要改 DDL 得走 Change Register。
+  resources_root: "backend/modules/dev-quality/src/main/resources/**"
   frontend_root: "frontend/apps/ops-console/features/dev-quality/**"
 
   # 依赖方向铁律（专项01 §22 原文）
