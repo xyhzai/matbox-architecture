@@ -19,12 +19,21 @@
 ## 0.5 · 开工五步（照这个做就行，不用再问）
 
 ```bash
+# ⓪ 先自检环境 —— 这一步不通过，后面四步一步都动不了
+#    别硬跑：缺 java/mvn/库时 mvn 的报错跟「你代码写错了」长得一样
+curl -O https://xyhzai.github.io/matbox-architecture/_check_toolchain.py   # 或从网站上下载
+python _check_toolchain.py
+
 git clone https://github.com/felixapex/matbox.git
 cd matbox
 git checkout -b wp/cred-f009
 cd backend/modules/credential
 mvn -B verify
 ```
+
+> **第 ⓪ 步是 2026-09-11 补的。** 在此之前，全部 33 条判据都只查**材料这一侧**（材料齐不齐、仓库有没有、CI 绿不绿），没有一条查**你那一侧能不能执行第一步** —— 于是出现过「材料齐备、基线 MATCH、CI 全绿，而实现方在第 ④ 步动不了」。
+>
+> 契约/Schema 测试是 `@SpringBootTest`，启动时就要连真库，**没有库不会跳过，是直接失败**。所以库要么真起一个，要么这一趟就明确改成「本地只编译、真库测试交给 CI」——**后者要由用户拍板，不是你自己决定**，因为它会改变整趟的节奏。
 
 Java 包名：`com.matbox.credential`。代码只放在 `backend/modules/credential/` 下面。
 

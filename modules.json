@@ -74,7 +74,39 @@
         "为什么不属于任何一个功能": "13 份工作包**全部**声明要用 shared/contracts/，它不归任何单个 F-DQ-NNN；总账 §7 写着这几个契约「一旦施工开始不得随意改，改要走 Change Register」，所以它必须在施工开始之前就存在并冻结。dq_protected_scope.yml 把它单列为 frozen_contract，正是为了不让它混进任何功能的正常 diff —— 混进去 _check_scope.py 会判越界。",
         "谁做": "opencode（2026-09-11 与它确认走 A 方案：前置分支）",
         "测试怎么写": "这批测试**不带 TestID**，也不计入任何验收标准。依据：M0/T0 只扫匹配 <mod>T\\d{3}_ 的方法，不匹配的不在判定范围内；旧仓库那两个契约测试就是无 TestID 的，CI 一直绿着，T0 一次没报过。它们验的是「契约字段跟 DDL 一致」这个不变量，不是某条验收标准。",
-        "缺口来源": "2026-09-11 opencode 在开工前问「shared/contracts 谁来建」时撞出来的。材料里原本只写了「施工开始后不得改」，**没写谁在施工开始前建**。"
+        "缺口来源": "2026-09-11 opencode 在开工前问「shared/contracts 谁来建」时撞出来的。材料里原本只写了「施工开始后不得改」，**没写谁在施工开始前建**。",
+        "约定": {
+          "_为什么有这一段": "2026-09-11 opencode 读完材料、准备建那 8 个契约类时停住，报了三条 0 命中的缺口：SQL→Java 类型怎么映射、可空性怎么表达、用 record 还是 class。三条都落在 shared/contracts 上，而它是 frozen_contract、13 个功能包全踩在上面。它按承诺停在这里没有发明 —— 停得对。查证之后发现：这三条**不需要我发明**，仓库里已经有先例 —— LOC 模块的 shared/contracts/ 下有三个契约类，它们不是 DQ 那 8 个，不碰比对基线。所以下面每一条都标了依据，以及依据的**等级**。",
+          "_依据等级的意思": "「仓库先例」= 抄的，不是判的（标准 §5.4 第 ① 档），传错的可能性最低；「材料侧定」= 我定的，没有先例可抄，我必须写清理由，你可以质疑。",
+          "条目": [
+            {
+              "条": "1 · 用 record，不用 class",
+              "定成什么": "8 个契约类全部是 `public record`，包名 com.matbox.devquality.shared.contracts",
+              "依据": "仓库先例：LOC 的 CatalogRelease / LanguagePolicyProfile / BusinessContentTranslation 三个全是 record；而且 LOC 的 ContractMatchesSchemaTest 用的是 getRecordComponents() 取字段 —— 写成 class 那个测试就取不到",
+              "依据等级": "仓库先例（抄的）"
+            },
+            {
+              "条": "2 · SQL → Java 类型对应",
+              "定成什么": "uuid→java.util.UUID；varchar(n)/text→String（**不带任何长度注解**）；timestamptz→java.time.OffsetDateTime；integer→Integer（**包装类型，不是 int**）；bigint→Long；numeric(p,s)→BigDecimal；boolean→Boolean",
+              "依据": "仓库先例：LOC 契约类逐字段对着 V1__loc_core_tables.sql —— id uuid→UUID、catalog_version varchar(64)→String（无 @Size）、published_at timestamptz→OffsetDateTime、version_no integer→Integer",
+              "依据等级": "仓库先例（抄的）"
+            },
+            {
+              "条": "2b · jsonb 怎么映射",
+              "定成什么": "jsonb → String（原样存取，不在契约层解析）",
+              "依据": "**LOC 三张表里没有 jsonb 列，无先例可抄，这一条是我定的。**理由两条：① 契约是冻结的数据形状，映射成 Map<String,Object> 会让它依赖一个序列化语义，而冻结的东西不该有这种依赖；② DQ 那列是 `result JSONB NOT NULL`，材料里**没有给出这个 JSON 内部的结构**，映射成 Map 也只能是无类型的，不比 String 多提供任何保证。有异议就提，这条我改得动。",
+              "依据等级": "材料侧定（我定的，可质疑）"
+            },
+            {
+              "条": "3 · 可空性怎么表达（答案是：不表达）",
+              "定成什么": "契约字段一律裸类型，**不加 @Nullable / @NotNull，也不用 Optional<T> 做字段**。可空性这一维不进契约、不进契约测试。",
+              "依据": "仓库先例，而且是个反直觉的先例，所以写清楚：loc_catalog_release 里 release_ref 和 published_at **是可空列**（DDL 里没写 NOT NULL），而 CatalogRelease 里对应的 releaseRef / publishedAt 就是裸的 String / OffsetDateTime，没有任何标记。也就是说房内约定是「契约只表达有哪些字段、什么 Java 类型」。这跟 ContractMatchesSchemaTest 只比列名是自洽的。",
+              "依据等级": "仓库先例（抄的）",
+              "但是": "**这一维没人守着，必须在测试里点名说出来**（假绿 F21 的对策）：你写的契约测试，名字和注释要写清它比的是**列名**这一维，**类型、可空性、枚举取值它不比** —— 不许让名字替它兜底。可空性要不要单独立一条守，是后面的事，不在这一趟里发明。"
+            }
+          ],
+          "这三条对独立性的影响": "照 opencode 自己的分维度声明：这三条落地之后，「用 record 还是 class」「类型怎么映射」这两维**不再是独立的第二意见**（它是照材料抄的）；「每个类有哪些字段、字段名对不对、DDL 里那 6 处注释式枚举取值抄没抄错」这几维**仍然独立** —— 而后者本来就是会传错的地方。这笔账要明着记，不许含糊过去。"
+        }
       }
     },
     "LOC": {
