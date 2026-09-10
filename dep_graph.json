@@ -4,10 +4,16 @@
     "由 docs/_build_dep_graph.py 从 Matbox_Feature_Register.md 的",
     "「依赖」列抽出来，**不要手改**。",
     "",
-    "只存正向边（我依赖谁）。「谁依赖我」由页面反着算，不存第二份——",
+    "只存正向边（我用了谁）。「谁在用我」由页面反着算，不存第二份——",
     "存两份早晚分叉，而且分叉没有提示（架构原则第76条）。",
     "",
-    "加一个新模块：它自己写清楚依赖谁就行，前面的模块一个字不用动。"
+    "**方向的归属（用户 2026-09-10 定）**：",
+    "  · 「我用了谁」——本包自己声明，连同「怎么接」「解决什么问题」。",
+    "    只有用的人知道自己用了哪一段（消费者驱动契约，同 Pact）。",
+    "  · 「谁在用我」——**一律由别人的声明汇总而来，本包不许自己填**。",
+    "    本包替别人写「他怎么接我」，写出来的是猜的。",
+    "",
+    "加一个新模块：它自己写清楚用了谁就行，前面的模块一个字不用动。"
   ],
   "来源": "Matbox_Feature_Register.md 各功能行的「依赖」列（用户自己写的，非推导）",
   "nodes": {
@@ -228,6 +234,13 @@
       "layer": "地基层",
       "section": "地基模块（被大量依赖）"
     },
+    "F-LOC-001": {
+      "id": "F-LOC-001",
+      "name": "全球多语言 / Global Localization",
+      "status": "🟢 DRAFT_RESEARCH_COMPLETE",
+      "layer": "地基层",
+      "section": "地基模块（被大量依赖）"
+    },
     "F-EGRESS-001": {
       "id": "F-EGRESS-001",
       "name": "出站请求安全 / SSRF Policy",
@@ -312,50 +325,110 @@
       "layer": "多端层",
       "section": "多端渲染与内容分发体系（源自《Matbox_多端平台_CURRENT_正式开发文档_V3.0》，2026-08-30正式加入）"
     },
+    "F-PLAT-001": {
+      "id": "F-PLAT-001",
+      "name": "",
+      "status": "外部上游 / 补录（本登记表没有功能行）",
+      "layer": "多端层",
+      "section": "多端渲染与内容分发体系（源自《Matbox_多端平台_CURRENT_正式开发文档_V3.0》，2026-08-30正式加入）",
+      "登记形态": "补录表",
+      "实况": "**不是 Matbox 自己的模块**——它定义在上游《Matbox_多端平台_CURRENT_正式开发文档_V3.0》里；2026-08-30 已与 F-TENANT-001 做过分工确认（见租户与权限体系文档开头）。F-NOTIFY-001 把它列为「依赖方（已知阻塞）：人类登录会话」"
+    },
+    "F-MEM-001": {
+      "id": "F-MEM-001",
+      "name": "",
+      "status": "外部上游 / 补录（本登记表没有功能行）",
+      "layer": "多端层",
+      "section": "多端渲染与内容分发体系（源自《Matbox_多端平台_CURRENT_正式开发文档_V3.0》，2026-08-30正式加入）",
+      "登记形态": "补录表",
+      "实况": "知识库/记忆系统。[专项27](技术选型报告/Matbox_专项27_知识库记忆系统_技术选型与开发交接报告_2026-08-30.md) 已完成技术选型调研；[架构原则第438条](Matbox_架构设计原则.md)明确决定「保持部分设计现状，**不现在锁定向量库方案**」。F-RUNTIME-001 用它来划边界（\"跨会话长期记忆是 F-MEM-001 的职责，不是我的\"）"
+    },
     "F-RUNTIME-001": {
       "id": "F-RUNTIME-001",
-      "name": "3 份",
-      "status": "**已在册**，只是登记行把编号和名字写在同一个单元格（`F-RUNTIME-001 Agent Runtime`），与其余行的格式不一致，机器扫不到",
-      "layer": "多端层",
-      "section": "多端渲染与内容分发体系（源自《Matbox_多端平台_CURRENT_正式开发文档_V3.0》，2026-08-30正式加入）"
+      "name": "Agent Runtime",
+      "status": "🟢 DRAFT_RESEARCH_COMPLETE",
+      "layer": "地基层",
+      "section": "架构底层（技术选型审查已完成，见专项27/28）",
+      "登记形态": "模块表"
     },
     "F-ASSET-001": {
       "id": "F-ASSET-001",
-      "name": "4 份",
-      "status": "见本文件既有说明：并入其他模块",
+      "name": "",
+      "status": "外部上游 / 补录（本登记表没有功能行）",
       "layer": "多端层",
-      "section": "多端渲染与内容分发体系（源自《Matbox_多端平台_CURRENT_正式开发文档_V3.0》，2026-08-30正式加入）"
+      "section": "多端渲染与内容分发体系（源自《Matbox_多端平台_CURRENT_正式开发文档_V3.0》，2026-08-30正式加入）",
+      "登记形态": "补录表",
+      "实况": "见本文件既有说明：并入其他模块"
     },
     "F-COLLAB-001": {
       "id": "F-COLLAB-001",
-      "name": "1 份",
-      "status": "见本文件既有说明：仍是提案",
+      "name": "",
+      "status": "外部上游 / 补录（本登记表没有功能行）",
       "layer": "多端层",
-      "section": "多端渲染与内容分发体系（源自《Matbox_多端平台_CURRENT_正式开发文档_V3.0》，2026-08-30正式加入）"
+      "section": "多端渲染与内容分发体系（源自《Matbox_多端平台_CURRENT_正式开发文档_V3.0》，2026-08-30正式加入）",
+      "登记形态": "补录表",
+      "实况": "见本文件既有说明：仍是提案"
     },
     "F-INTERVIEW-001": {
       "id": "F-INTERVIEW-001",
-      "name": "1 份",
-      "status": "等待用户后续提供的外部包",
+      "name": "",
+      "status": "外部上游 / 补录（本登记表没有功能行）",
       "layer": "多端层",
-      "section": "多端渲染与内容分发体系（源自《Matbox_多端平台_CURRENT_正式开发文档_V3.0》，2026-08-30正式加入）"
+      "section": "多端渲染与内容分发体系（源自《Matbox_多端平台_CURRENT_正式开发文档_V3.0》，2026-08-30正式加入）",
+      "登记形态": "补录表",
+      "实况": "等待用户后续提供的外部包"
     },
     "F-EXTERNALVIEW-001": {
       "id": "F-EXTERNALVIEW-001",
-      "name": "1 份",
-      "status": "等待用户后续提供的外部包",
+      "name": "",
+      "status": "外部上游 / 补录（本登记表没有功能行）",
       "layer": "多端层",
-      "section": "多端渲染与内容分发体系（源自《Matbox_多端平台_CURRENT_正式开发文档_V3.0》，2026-08-30正式加入）"
+      "section": "多端渲染与内容分发体系（源自《Matbox_多端平台_CURRENT_正式开发文档_V3.0》，2026-08-30正式加入）",
+      "登记形态": "补录表",
+      "实况": "等待用户后续提供的外部包"
     },
     "F-SYNDICATION-001": {
       "id": "F-SYNDICATION-001",
-      "name": "1 份",
-      "status": "等待用户后续提供的外部包",
+      "name": "",
+      "status": "外部上游 / 补录（本登记表没有功能行）",
       "layer": "多端层",
-      "section": "多端渲染与内容分发体系（源自《Matbox_多端平台_CURRENT_正式开发文档_V3.0》，2026-08-30正式加入）"
+      "section": "多端渲染与内容分发体系（源自《Matbox_多端平台_CURRENT_正式开发文档_V3.0》，2026-08-30正式加入）",
+      "登记形态": "补录表",
+      "实况": "等待用户后续提供的外部包"
     }
   },
   "子功能": {
+    "CRED-F001": "Infisical 集成适配器",
+    "CRED-F002": "人类用户访问控制",
+    "CRED-F003": "AI 员工身份签发",
+    "CRED-F004": "运行时代理注入",
+    "CRED-F005": "Token 生命周期与轮换",
+    "CRED-F006": "访问审计日志",
+    "CRED-F007": "企业第三方集成凭证（Integration Credential Vault）",
+    "CRED-F008": "AgentIdentity 持久身份层",
+    "CRED-F009": "匿名访客会话身份（Anonymous Visitor Session）",
+    "LOC-F001": "Effective Locale Resolution Policy",
+    "LOC-F002": "User/Tenant Language & Region Preferences",
+    "LOC-F003": "Localization Catalog & Key Governance",
+    "LOC-F004": "Next.js / next-intl Web Adapter",
+    "LOC-F005": "uni-app / Vue I18n Adapter",
+    "LOC-F006": "Tolgee Community TMS Bridge",
+    "LOC-F007": "Site/Page Locale Integration",
+    "LOC-F008": "Business Content Translation Store",
+    "LOC-F009": "Translation Gateway & Provider Router",
+    "LOC-F010": "Qwen-MT Provider Adapter",
+    "LOC-F011": "Google Translation Provider Adapter",
+    "LOC-F012": "Glossary / Terminology / Placeholder Integri",
+    "LOC-F013": "Locale Formatting / ICU-CLDR",
+    "LOC-F014": "AI Employee / Conversation Locale Bridge",
+    "LOC-F015": "Catalog Release / Cache / Fallback / Outage",
+    "LOC-F016": "Observability / Cost / Audit / Secret Integr",
+    "LOC-F017": "Localization Regression & Acceptance Gate",
+    "LOC-F018": "AI Employee Language Intelligence Policy",
+    "LOC-F019": "AI Language Quality Gate / Agent Language To",
+    "LOC-F020": "Realtime Multilingual Chat & Mobile AI Comma",
+    "ZZ-F001": "哨兵功能 1",
+    "ZZ-F002": "哨兵功能 2",
     "ACTION-F001": "ActionGateway核心",
     "ACTION-F002": "Tool/MCP注册与Adapter层（复用MCP Gateway生态，2026-08-",
     "ACTION-F003": "Action预览与确认",
@@ -438,15 +511,6 @@
     "MULTIEND-F002": "移动端Renderer",
     "MULTIEND-F003": "Client Capability Registry",
     "MULTIEND-F004": "Publish Guard",
-    "CRED-F001": "Infisical 集成适配器",
-    "CRED-F002": "人类用户访问控制",
-    "CRED-F003": "AI 员工身份签发",
-    "CRED-F004": "运行时代理注入",
-    "CRED-F005": "Token 生命周期与轮换",
-    "CRED-F006": "访问审计日志",
-    "CRED-F007": "企业第三方集成凭证（Integration Credential Vault，2026-",
-    "CRED-F008": "AgentIdentity 持久身份层（2026-08-30从AI员工底层包并入）",
-    "CRED-F009": "匿名访客会话身份（2026-08-30从调研清单#9并入）",
     "STORAGE-F001": "SeaweedFS 集成",
     "STORAGE-F002": "知识库原始数据落地",
     "STORAGE-F003": "租户隔离的文件归属",
@@ -1167,7 +1231,7 @@
       "依据全部": [
         "2026-08-30与《多端平台V3.0》F-PLAT-001分工确认：F-TENANT-001管AI员工鉴权(OPA)+数据隔离，F-PLAT-001管人类登录/会话安全(MFA/SSO/设备)——查证2026年AuthN/AuthZ分离最佳实践后确认两个都保留、不合并（详见架构原则第31条）。"
       ],
-      "断头": true,
+      "断头": false,
       "to名字": ""
     },
     {
@@ -1213,7 +1277,7 @@
         "2026-08-30新增STORAGE-F004~F006：签名上传下载/病毒扫描隔离/资产生命周期状态机，从《多端平台V3.0》F-ASSET-001并入，不单独立项。"
       ],
       "断头": false,
-      "to名字": "4 份"
+      "to名字": ""
     },
     {
       "from": "F-CRED-001",
@@ -1587,7 +1651,7 @@
       "依据全部": [
         "依赖F-PLAT-001、F-OBS-001（已建成）。"
       ],
-      "断头": true,
+      "断头": false,
       "to名字": ""
     },
     {
@@ -1906,14 +1970,28 @@
       "to名字": "AI员工管理控制台（Hiring/Training/QC/Cost/Control Tower）"
     }
   ],
-  "指向不存在的编号": [
+  "指向不存在的编号": [],
+  "被依赖但没有登记行的包": [
+    "F-REL-001"
+  ],
+  "反向声明": [
     {
-      "from": "F-NOTIFY-001",
-      "指向": "F-PLAT-001"
+      "模块": "F-RELEASE-001",
+      "原文": "被 F-DQ-001/006/011 依赖",
+      "点名的": "F-DQ-001/006/011",
+      "出处": "Feature Register · F-RELEASE-001 那一行"
     },
     {
-      "from": "F-TENANT-001",
-      "指向": "F-PLAT-001"
+      "模块": "F-LOC-001",
+      "原文": "被平台/独立站/小程序/App/iPad/AI员工/在线聊天共同消费",
+      "点名的": "平台/独立站/小程序/App/iPad/AI员工/在线聊天",
+      "出处": "Feature Register · F-LOC-001 那一行"
+    },
+    {
+      "模块": "F-EGRESS-001",
+      "原文": "被F-ACTION-001依赖",
+      "点名的": "F-ACTION-001",
+      "出处": "Feature Register · F-EGRESS-001 那一行"
     }
   ]
 }

@@ -1,4 +1,4 @@
 {
   "_why": "页面用它判断自己是不是旧的。由 docs/_build_stamp.py 写，不要手改。",
-  "stamp": "b32b7ffd1163"
+  "stamp": "2e3f0ff70e43"
 }

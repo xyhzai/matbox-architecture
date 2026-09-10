@@ -154,6 +154,16 @@ window.__MODULE_PHASES__ = {
     "ok"
    ],
    [
+    "R12",
+    "[CRED] 我用了谁 · 说到段",
+    "no"
+   ],
+   [
+    "R13",
+    "[CRED] 谁在用我 · 有人声明",
+    "ok"
+   ],
+   [
     "R11",
     "代码仓库 CI 是绿的",
     "ok"
@@ -235,10 +245,10 @@ window.__MODULE_PHASES__ = {
   ],
   "sum": {
    "pre": {
-    "ok": 28,
-    "no": 3,
+    "ok": 29,
+    "no": 4,
     "na": 0,
-    "total": 31
+    "total": 33
    },
    "build": {
     "ok": 6,
@@ -407,6 +417,16 @@ window.__MODULE_PHASES__ = {
     "ok"
    ],
    [
+    "R12",
+    "[DQ] 我用了谁 · 说到段",
+    "no"
+   ],
+   [
+    "R13",
+    "[DQ] 谁在用我 · 有人声明",
+    "ok"
+   ],
+   [
     "R11",
     "代码仓库 CI 是绿的",
     "ok"
@@ -488,10 +508,10 @@ window.__MODULE_PHASES__ = {
   ],
   "sum": {
    "pre": {
-    "ok": 30,
-    "no": 1,
+    "ok": 31,
+    "no": 2,
     "na": 0,
-    "total": 31
+    "total": 33
    },
    "build": {
     "ok": 6,
@@ -662,6 +682,16 @@ window.__MODULE_PHASES__ = {
     "ok"
    ],
    [
+    "R12",
+    "[LOC] 我用了谁 · 说到段",
+    "na"
+   ],
+   [
+    "R13",
+    "[LOC] 谁在用我 · 有人声明",
+    "no"
+   ],
+   [
     "R11",
     "代码仓库 CI 是绿的",
     "ok"
@@ -744,9 +774,9 @@ window.__MODULE_PHASES__ = {
   "sum": {
    "pre": {
     "ok": 30,
-    "no": 1,
-    "na": 0,
-    "total": 31
+    "no": 2,
+    "na": 1,
+    "total": 33
    },
    "build": {
     "ok": 6,
@@ -915,6 +945,16 @@ window.__MODULE_PHASES__ = {
     "na"
    ],
    [
+    "R12",
+    "[ZZ] 我用了谁 · 说到段",
+    "na"
+   ],
+   [
+    "R13",
+    "[ZZ] 谁在用我 · 有人声明",
+    "na"
+   ],
+   [
     "R11",
     "代码仓库 CI 是绿的",
     "ok"
@@ -998,8 +1038,8 @@ window.__MODULE_PHASES__ = {
    "pre": {
     "ok": 12,
     "no": 16,
-    "na": 3,
-    "total": 31
+    "na": 5,
+    "total": 33
    },
    "build": {
     "ok": 6,

@@ -376,6 +376,52 @@ def check_module_page_content():
         fails.append("C15 一个模块页面都没查到 —— 「跳过」不等于「通过」")
 
 
+# ══ C16：脚本里取的元素，页面上必须真的有 ═══════════════════════════════
+# 2026-09-10 用户要我「自己点击测试 2 遍」。点开密钥管理那张卡，控制台里躺着：
+#
+#     Uncaught TypeError: Cannot read properties of null (reading 'addEventListener')
+#
+# 样板里 data-phase="build" 那一段**本身就是流程演示图**。模块页要把「开发中」
+# 换成 M0~M7 清单，于是那段 DOM 被整段替掉了 —— 而驱动它的 900 行脚本
+# 被原样抄了过去。getElementById("btnTheme") 返回 null，下一行就抛，
+# **那一行之后整块脚本一行都不再执行**。CRED / LOC / ZZ 三页全是这样。
+#
+# 三件事让它躲过了之前所有检查：
+#   ① 页面照样渲染 —— 标签能点（那部分监听在更早的 script 块里，逃过一劫），
+#      肉眼看不出坏；坏的是「架构图弹窗本该是白底」这种要对比才发现的事。
+#   ② 我第一次写这个检查时，把页面里**转义过的内嵌副本**（id=&quot;x&quot;）
+#      也算成了「页面上有这个元素」—— 副本是字符串不是 DOM，
+#      于是缺的 id 被自己的副本"补上"了（假绿 F15 自己的东西成了自己的证据）。
+#   ③ 从来没人真的打开控制台看一眼。
+#
+# 所以这条检查只认**真引号**：真引号的 getElementById 是真代码，
+# 真引号的 id= 是真 DOM。转义的一律不算。
+def check_dom_refs_exist():
+    ran = 0
+    for f in sorted(os.listdir(DOCS)):
+        if not f.endswith(".html"):
+            continue
+        body = read(os.path.join(DOCS, f))
+        used = set(re.findall(r'getElementById\(\s*"([A-Za-z0-9_-]+)"\s*\)', body))
+        if not used:
+            # 零引用也要说出来。**看不见的跳过就是假绿**：模块页正是因为
+            # 「一个都没查到」而躲了三天，谁也没注意到它们根本没被查。
+            notes.append("C16 %s 没有 getElementById —— 没有引用就不会取到 null" % f)
+            continue
+        ran += 1
+        have = set(re.findall(r'\bid="([A-Za-z0-9_-]+)"', body))
+        miss = sorted(used - have)
+        if miss:
+            fails.append("C16 %s 的脚本取了 %d 个页面上不存在的元素：%s —— "
+                         "第一个取到 null 的地方就会抛异常，**那之后整块脚本全不执行**。"
+                         "别加判空糊过去：这一页没有那个东西，那段代码就不该在这一页上。"
+                         % (f, len(miss), "、".join(miss[:8])))
+        else:
+            notes.append("C16 %s 脚本取的 %d 个元素页面上都有" % (f, len(used)))
+    if not ran:
+        fails.append("C16 一个带 getElementById 的页面都没查到 —— 「跳过」不等于「通过」")
+
+
 # ══ C12：模块页面的块顺序必须符合《开发包标准》§3.7.1 ═══════════════════
 # 2026-09-09。用户对比 DQ 与全球多语言两张截图后问：
 #   「我的开发交接包是放什么位置！！为什么这么提醒你还是出错。」
@@ -986,7 +1032,8 @@ def main():
                check_handoff_packages, check_generated_docs,
                check_page_matches_state, check_workpackages_buildable,
                check_workflows, check_module_page_order, check_module_page_content,
-               check_diagram_selfcontained, check_module_has_entry):
+               check_diagram_selfcontained, check_module_has_entry,
+               check_dom_refs_exist):
         fn()
 
     print("=" * 72)
