@@ -40,6 +40,7 @@ git push -u origin HEAD
 > 契约/Schema 测试是 `@SpringBootTest`，启动就要连真库（没有库不是跳过，是直接失败），所以本地跑 `mvn -B -DskipTests verify`，只保证**编得过**；推上分支之后由 GitHub Actions 真起 `postgres:16` 跑完整的 `mvn -B verify`。
 >
 > ⚠️ **本地绿 ≠ 交付绿。** 交付一律以 CI 的红绿为准 —— 本地那两遍连库都没连，它证明不了 Schema 对不对。
+> ⚠️ **跑这些检查器时别用管道接 tail/head 再读 `$?`。** 管道里 `$?` 拿到的是**最后一个命令**（tail）的退出码，永远是 0，红绿就这么被吃掉了。要么 `set -o pipefail`，要么先把输出存成文件再看。
 
 Java 包名：`com.matbox.credential`。代码只放在 `backend/modules/credential/` 下面。
 
