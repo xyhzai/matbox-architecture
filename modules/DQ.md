@@ -8,7 +8,7 @@
 
 ## 先核对新鲜度（重要）
 
-本页生成自主仓库提交 **`481544bfb06f`**（2026-09-11 00:33）。
+本页生成自主仓库提交 **`9bbde56dcff4`**（2026-09-11 01:26）。
 
 开工前请确认这个 commit 与主仓库最新一致；不一致说明网站没跟上，**先让它更新再开工**，不要拿旧材料动手。
 
@@ -54,10 +54,9 @@
 - 能改哪、禁止碰哪：[dq_protected_scope.yml](../dq_protected_scope.yml)
 - 资料准备度：[dq_ready_state.json](../dq_ready_state.json)
 
-## 4 · 流程演示图
+## 4 · 这个模块的三段页面
 
-- [quality_gate_flow.html](../quality_gate_flow.html)
-- 也可以从[架构地图](../architecture_dependency_diagram.html)点开
+- 从[架构地图](../architecture_dependency_diagram.html)点这个模块的节点，会弹出它的开发前 / 开发中 / 依赖关系 / 运行中四段；点 × 回到图上。
 
 ---
 
