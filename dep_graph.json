@@ -887,21 +887,6 @@
     },
     {
       "from": "F-OBS-001",
-      "to": "OBS-F001",
-      "from模块": "F-OBS-001",
-      "to模块": "F-OBS-001",
-      "粒度": "子功能",
-      "怎么接": "",
-      "解决什么问题": "",
-      "出处": "Feature Register · F-OBS-001 那一行的「依赖」列",
-      "依据全部": [
-        "正式开发文档已完成：\u0001（OpenTelemetry采集 + SigNoz看板 + immudb防篡改，拆出 OBS-F001~F006）。"
-      ],
-      "断头": false,
-      "to名字": "OpenTelemetry 采集层"
-    },
-    {
-      "from": "F-OBS-001",
       "to": "F-DQ-001",
       "from模块": "F-OBS-001",
       "to模块": "F-DQ-001",
@@ -932,51 +917,6 @@
     },
     {
       "from": "F-OBS-001",
-      "to": "OBS-F006",
-      "from模块": "F-OBS-001",
-      "to模块": "F-OBS-001",
-      "粒度": "子功能",
-      "怎么接": "",
-      "解决什么问题": "",
-      "出处": "Feature Register · F-OBS-001 那一行的「依赖」列",
-      "依据全部": [
-        "2026-08-30新增OBS-F006 AI Evaluation（评测框架）：从《多端平台V3.0》并入，推翻了架构原则第6/28条\"评测框架现在不启动设计\"的原判断，评测框架现在跟着OBS一起设计（详见架构原则第31条），架构依赖图的独立占位模块已标记已并入。"
-      ],
-      "断头": false,
-      "to名字": "AI Evaluation（评测框架，2026-08-30新增，架构变更）"
-    },
-    {
-      "from": "F-OBS-001",
-      "to": "OBS-F007",
-      "from模块": "F-OBS-001",
-      "to模块": "F-OBS-001",
-      "粒度": "子功能",
-      "怎么接": "",
-      "解决什么问题": "",
-      "出处": "Feature Register · F-OBS-001 那一行的「依赖」列",
-      "依据全部": [
-        "2026-08-30新增OBS-F007(生产环境持续质量漂移监测)+OBS-F008(证据日志分层存储)（调研清单#5#11）。"
-      ],
-      "断头": false,
-      "to名字": "生产环境持续质量漂移监测（2026-08-30从\"AI员工能力缺口调研清单\"#5并入）"
-    },
-    {
-      "from": "F-OBS-001",
-      "to": "OBS-F008",
-      "from模块": "F-OBS-001",
-      "to模块": "F-OBS-001",
-      "粒度": "子功能",
-      "怎么接": "",
-      "解决什么问题": "",
-      "出处": "Feature Register · F-OBS-001 那一行的「依赖」列",
-      "依据全部": [
-        "2026-08-30新增OBS-F007(生产环境持续质量漂移监测)+OBS-F008(证据日志分层存储)（调研清单#5#11）。"
-      ],
-      "断头": false,
-      "to名字": "证据/审计日志分层存储（2026-08-30从\"AI员工能力缺口调研清单\"#11并入）"
-    },
-    {
-      "from": "F-OBS-001",
       "to": "REL-F007",
       "from模块": "F-OBS-001",
       "to模块": "F-REL-001",
@@ -989,21 +929,6 @@
       ],
       "断头": false,
       "to名字": "灰度发布 + 自动回滚（2026-09-04补，纠正此前遗漏）"
-    },
-    {
-      "from": "F-OBS-001",
-      "to": "OBS-F004",
-      "from模块": "F-OBS-001",
-      "to模块": "F-OBS-001",
-      "粒度": "子功能",
-      "怎么接": "负责评估REL-F007灰度发布的RolloutThreshold阈值并在突破时调用REL-F007的自动回滚接口——此前REL-F007\"自动回滚\"里\"自动\"这部分没有指定执行者",
-      "解决什么问题": "",
-      "出处": "Feature Register · F-OBS-001 那一行的「依赖」列",
-      "依据全部": [
-        "2026-09-04场景模拟REL-F007发现并补上：OBS-F004新增职责，负责评估REL-F007灰度发布的RolloutThreshold阈值并在突破时调用REL-F007的自动回滚接口——此前REL-F007\"自动回滚\"里\"自动\"这部分没有指定执行者。"
-      ],
-      "断头": false,
-      "to名字": "高信号告警规则"
     },
     {
       "from": "F-OBS-001",
@@ -1187,21 +1112,6 @@
     },
     {
       "from": "F-COST-001",
-      "to": "COST-F001",
-      "from模块": "F-COST-001",
-      "to模块": "F-COST-001",
-      "粒度": "子功能",
-      "怎么接": "",
-      "解决什么问题": "",
-      "出处": "Feature Register · F-COST-001 那一行的「依赖」列",
-      "依据全部": [
-        "正式开发文档已完成：\u0001（2026-09-02更正：Langfuse此前记录的\"REUSE\"结论已推翻，改为Matbox自研聚合层消费F-OBS-001/F-PROVIDER-001数据，Langfuse降级为可选调试工具，详见专项21e，独立于Provider Router，拆出 COST-F001~F005）。"
-      ],
-      "断头": false,
-      "to名字": "Langfuse 成本追踪接入"
-    },
-    {
-      "from": "F-COST-001",
       "to": "F-DQ-012",
       "from模块": "F-COST-001",
       "to模块": "F-DQ-012",
@@ -1214,36 +1124,6 @@
       ],
       "断头": false,
       "to名字": "AI Code Review Supplemental Evidence Adapter"
-    },
-    {
-      "from": "F-COST-001",
-      "to": "COST-F005",
-      "from模块": "F-COST-001",
-      "to模块": "F-COST-001",
-      "粒度": "子功能",
-      "怎么接": "",
-      "解决什么问题": "",
-      "出处": "Feature Register · F-COST-001 那一行的「依赖」列",
-      "依据全部": [
-        "2026-08-30新增COST-F005企业套餐用量账本/预算/权益：从《多端平台V3.0》并入，reserve→execute→commit/release模式。"
-      ],
-      "断头": false,
-      "to名字": "企业套餐用量账本/预算/权益（Usage Ledger/Budget/Entitleme"
-    },
-    {
-      "from": "F-TENANT-001",
-      "to": "TENANT-F001",
-      "from模块": "F-TENANT-001",
-      "to模块": "F-TENANT-001",
-      "粒度": "子功能",
-      "怎么接": "正式开发文档已完成：\u0001（复用OPA + 简单RBAC + 数据隔离",
-      "解决什么问题": "",
-      "出处": "Feature Register · F-TENANT-001 那一行的「依赖」列",
-      "依据全部": [
-        "正式开发文档已完成：\u0001（复用OPA + 简单RBAC + 数据隔离，拆出 TENANT-F001~F005）。"
-      ],
-      "断头": false,
-      "to名字": "租户身份与会话模型"
     },
     {
       "from": "F-TENANT-001",
@@ -1291,21 +1171,6 @@
       "to名字": ""
     },
     {
-      "from": "F-TENANT-001",
-      "to": "TENANT-F006",
-      "from模块": "F-TENANT-001",
-      "to模块": "F-TENANT-001",
-      "粒度": "子功能",
-      "怎么接": "",
-      "解决什么问题": "",
-      "出处": "Feature Register · F-TENANT-001 那一行的「依赖」列",
-      "依据全部": [
-        "2026-08-30新增TENANT-F006匿名访客身份（调研清单#9，仅身份/权限层）：新增AnonymousVisitor principalType，会话级+默认零信任+只读allowlist，参照Auth0 2026年Anonymous Sessions模式；"
-      ],
-      "断头": false,
-      "to名字": "匿名访客身份与权限（2026-08-30从调研清单#9并入，仅身份/权限层）"
-    },
-    {
       "from": "F-QUEUE-001",
       "to": "F-TASK-001",
       "from模块": "F-QUEUE-001",
@@ -1319,51 +1184,6 @@
       ],
       "断头": false,
       "to名字": "AI 任务运行时 / Durable AI Task Runtime"
-    },
-    {
-      "from": "F-QUEUE-001",
-      "to": "QUEUE-F001",
-      "from模块": "F-QUEUE-001",
-      "to模块": "F-QUEUE-001",
-      "粒度": "子功能",
-      "怎么接": "且跟F-TASK-001共用同一套Temporal",
-      "解决什么问题": "",
-      "出处": "Feature Register · F-QUEUE-001 那一行的「依赖」列",
-      "依据全部": [
-        "正式开发文档已完成：\u0001（2026-08-30引擎从Hatchet改为Temporal——Hatchet无官方Java SDK跟多端平台文档定的Java/RuoYi技术栈不契合，且跟F-TASK-001共用同一套Temporal，拆出 QUEUE-F001~F004；"
-      ],
-      "断头": false,
-      "to名字": "Temporal 集成（2026-08-30从Hatchet改为Temporal）"
-    },
-    {
-      "from": "F-QUEUE-001",
-      "to": "QUEUE-F005",
-      "from模块": "F-QUEUE-001",
-      "to模块": "F-QUEUE-001",
-      "粒度": "子功能",
-      "怎么接": "",
-      "解决什么问题": "2026-09-04新增QUEUE-F005~F010——自认领机制/Worktree隔离派工/运行时资源队列/高风险公共文件强制转人工/派发附带架构决定摘要/施工期间实时动作拦截",
-      "出处": "Feature Register · F-QUEUE-001 那一行的「依赖」列",
-      "依据全部": [
-        "2026-09-04新增QUEUE-F005~F010——自认领机制/Worktree隔离派工/运行时资源队列/高风险公共文件强制转人工/派发附带架构决定摘要/施工期间实时动作拦截，源自架构原则第58/59/61/62条查证，原计划另立\"调度器\"模块，核查后发现与本模块重叠，改为并入本模块而非新建；"
-      ],
-      "断头": false,
-      "to名字": "任务自认领机制（2026-09-04补）"
-    },
-    {
-      "from": "F-QUEUE-001",
-      "to": "QUEUE-F010",
-      "from模块": "F-QUEUE-001",
-      "to模块": "F-QUEUE-001",
-      "粒度": "子功能",
-      "怎么接": "",
-      "解决什么问题": "",
-      "出处": "Feature Register · F-QUEUE-001 那一行的「依赖」列",
-      "依据全部": [
-        "QUEUE-F010是核对\"开发中是否做完\"时发现的真实空白——此前误以为DQ的Gate已覆盖实时拦截，核查后确认没有；"
-      ],
-      "断头": false,
-      "to名字": "施工期间实时动作拦截（2026-09-04补，纠正此前对DQ的误判）"
     },
     {
       "from": "F-QUEUE-001",
@@ -1381,81 +1201,6 @@
       "to名字": "AI 动作审批 + Transactional Outbox"
     },
     {
-      "from": "F-QUEUE-001",
-      "to": "QUEUE-F008",
-      "from模块": "F-QUEUE-001",
-      "to模块": "F-QUEUE-001",
-      "粒度": "子功能",
-      "怎么接": "",
-      "解决什么问题": "FILE_WRITE命中QUEUE-F008高风险清单时提前打willRequireManualReview标记而非等合并前才发现",
-      "出处": "Feature Register · F-QUEUE-001 那一行的「依赖」列",
-      "依据全部": [
-        "FILE_WRITE命中QUEUE-F008高风险清单时提前打willRequireManualReview标记而非等合并前才发现；"
-      ],
-      "断头": false,
-      "to名字": "高风险公共文件强制转人工（2026-09-04补）"
-    },
-    {
-      "from": "F-QUEUE-001",
-      "to": "QUEUE-F007",
-      "from模块": "F-QUEUE-001",
-      "to模块": "F-QUEUE-001",
-      "粒度": "子功能",
-      "怎么接": "",
-      "解决什么问题": "",
-      "出处": "Feature Register · F-QUEUE-001 那一行的「依赖」列",
-      "依据全部": [
-        "换场景模拟QUEUE-F007运行时资源锁又发现1处更严重的断点：原设计的锁没有租约/过期时间，持有方一旦崩溃锁会被永久占住导致真实死锁，已补leaseExpiresAt租约机制+AWAITING_RESOURCE专属状态）。"
-      ],
-      "断头": false,
-      "to名字": "运行时资源队列（2026-09-04补）"
-    },
-    {
-      "from": "F-QUEUE-001",
-      "to": "QUEUE-F004",
-      "from模块": "F-QUEUE-001",
-      "to模块": "F-QUEUE-001",
-      "粒度": "子功能",
-      "怎么接": "",
-      "解决什么问题": "",
-      "出处": "Feature Register · F-QUEUE-001 那一行的「依赖」列",
-      "依据全部": [
-        "流程图检查结论（架构原则第26条验收标准）：✅有真实顺序流程（QUEUE-F004\"失败恢复与重试策略\"：中断→从断点恢复→按RepairPolicy重试→超限转NEEDS_MANUAL_INTERVENTION；"
-      ],
-      "断头": false,
-      "to名字": "失败恢复与重试策略"
-    },
-    {
-      "from": "F-STORAGE-001",
-      "to": "STORAGE-F001",
-      "from模块": "F-STORAGE-001",
-      "to模块": "F-STORAGE-001",
-      "粒度": "子功能",
-      "怎么接": "",
-      "解决什么问题": "",
-      "出处": "Feature Register · F-STORAGE-001 那一行的「依赖」列",
-      "依据全部": [
-        "正式开发文档已完成：\u0001（SeaweedFS，拆出 STORAGE-F001~F006）。"
-      ],
-      "断头": false,
-      "to名字": "SeaweedFS 集成"
-    },
-    {
-      "from": "F-STORAGE-001",
-      "to": "STORAGE-F004",
-      "from模块": "F-STORAGE-001",
-      "to模块": "F-STORAGE-001",
-      "粒度": "子功能",
-      "怎么接": "",
-      "解决什么问题": "",
-      "出处": "Feature Register · F-STORAGE-001 那一行的「依赖」列",
-      "依据全部": [
-        "2026-08-30新增STORAGE-F004~F006：签名上传下载/病毒扫描隔离/资产生命周期状态机，从《多端平台V3.0》F-ASSET-001并入，不单独立项。"
-      ],
-      "断头": false,
-      "to名字": "签名上传/下载（2026-08-30新增）"
-    },
-    {
       "from": "F-STORAGE-001",
       "to": "F-ASSET-001",
       "from模块": "F-STORAGE-001",
@@ -1469,111 +1214,6 @@
       ],
       "断头": false,
       "to名字": "4 份"
-    },
-    {
-      "from": "F-STORAGE-001",
-      "to": "STORAGE-F006",
-      "from模块": "F-STORAGE-001",
-      "to模块": "F-STORAGE-001",
-      "粒度": "子功能",
-      "怎么接": "",
-      "解决什么问题": "",
-      "出处": "Feature Register · F-STORAGE-001 那一行的「依赖」列",
-      "依据全部": [
-        "流程图检查结论（2026-09-02重新核实修正）：STORAGE-F006是真实状态机（UPLOADING→QUARANTINED→SCANNING→READY/REJECTED→DELETED_SOFT→PURGED），此前\"无真实顺序流程\"的判断过期，✅已补建专属流程演示图：\u0001，已嵌入架构依赖图弹窗。"
-      ],
-      "断头": false,
-      "to名字": "资产生命周期状态机（2026-08-30新增，原样保留自多端平台文档；2026-09-0"
-    },
-    {
-      "from": "F-PROVIDER-001",
-      "to": "PROVIDER-F001",
-      "from模块": "F-PROVIDER-001",
-      "to模块": "F-PROVIDER-001",
-      "粒度": "子功能",
-      "怎么接": "按租户限流方案（架构原则第28条）正式写入PROVIDER-F004（详见架构原则第31条）",
-      "解决什么问题": "",
-      "出处": "Feature Register · F-PROVIDER-001 那一行的「依赖」列",
-      "依据全部": [
-        "2026-08-30新建正式开发文档：\u0001——原架构底层⚪NOT_STARTED占位模块，核对《多端平台V3.0》F-PROVIDER-001章节后确认就是本模块的正式设计，拆出PROVIDER-F001~F005，按租户限流方案（架构原则第28条）正式写入PROVIDER-F004（详见架构原则第31条）。"
-      ],
-      "断头": false,
-      "to名字": "Provider能力注册表"
-    },
-    {
-      "from": "F-PROVIDER-001",
-      "to": "PROVIDER-F004",
-      "from模块": "F-PROVIDER-001",
-      "to模块": "F-PROVIDER-001",
-      "粒度": "子功能",
-      "怎么接": "按租户限流方案（架构原则第28条）正式写入PROVIDER-F004（详见架构原则第31条）",
-      "解决什么问题": "",
-      "出处": "Feature Register · F-PROVIDER-001 那一行的「依赖」列",
-      "依据全部": [
-        "2026-08-30新建正式开发文档：\u0001——原架构底层⚪NOT_STARTED占位模块，核对《多端平台V3.0》F-PROVIDER-001章节后确认就是本模块的正式设计，拆出PROVIDER-F001~F005，按租户限流方案（架构原则第28条）正式写入PROVIDER-F004（详见架构原则第31条）。"
-      ],
-      "断头": false,
-      "to名字": "按租户限流（架构原则第28条落地，2026-08-30补强）"
-    },
-    {
-      "from": "F-PROVIDER-001",
-      "to": "PROVIDER-F006",
-      "from模块": "F-PROVIDER-001",
-      "to模块": "F-PROVIDER-001",
-      "粒度": "子功能",
-      "怎么接": "2026-08-30核对AI员工底层包（架构原则第33条）：边界确认为\"只处理AI模型调用\"（对应底层包Model Gateway/WP-006）",
-      "解决什么问题": "",
-      "出处": "Feature Register · F-PROVIDER-001 那一行的「依赖」列",
-      "依据全部": [
-        "2026-08-30核对AI员工底层包（架构原则第33条）：边界确认为\"只处理AI模型调用\"（对应底层包Model Gateway/WP-006），新增PROVIDER-F006 Provider Adapter标准接口。"
-      ],
-      "断头": false,
-      "to名字": "Provider Adapter标准接口（2026-08-30从AI员工底层包`prov"
-    },
-    {
-      "from": "F-PROVIDER-001",
-      "to": "PROVIDER-F002",
-      "from模块": "F-PROVIDER-001",
-      "to模块": "F-PROVIDER-001",
-      "粒度": "子功能",
-      "怎么接": "2026-08-30细化PROVIDER-F002 PIPL跨境传输触发点（调研清单#6）：MCP/API调用海外LLM可能构成PIPL跨境传输",
-      "解决什么问题": "",
-      "出处": "Feature Register · F-PROVIDER-001 那一行的「依赖」列",
-      "依据全部": [
-        "2026-08-30细化PROVIDER-F002 PIPL跨境传输触发点（调研清单#6）：MCP/API调用海外LLM可能构成PIPL跨境传输，ModelInvocation新增piplCrossBorderTriggered字段留痕。"
-      ],
-      "断头": false,
-      "to名字": "区域策略"
-    },
-    {
-      "from": "F-PROVIDER-001",
-      "to": "PROVIDER-F003",
-      "from模块": "F-PROVIDER-001",
-      "to模块": "F-PROVIDER-001",
-      "粒度": "子功能",
-      "怎么接": "",
-      "解决什么问题": "",
-      "出处": "Feature Register · F-PROVIDER-001 那一行的「依赖」列",
-      "依据全部": [
-        "流程图检查结论（2026-09-02重新核实修正）：PROVIDER-F003健康检查/熔断/故障转移此前从未配流程图，✅已补建：\u0001，已嵌入架构依赖图弹窗"
-      ],
-      "断头": false,
-      "to名字": "健康检查/熔断/故障转移"
-    },
-    {
-      "from": "F-CRED-001",
-      "to": "CRED-F001",
-      "from模块": "F-CRED-001",
-      "to模块": "F-CRED-001",
-      "粒度": "子功能",
-      "怎么接": "",
-      "解决什么问题": "",
-      "出处": "Feature Register · F-CRED-001 那一行的「依赖」列",
-      "依据全部": [
-        "正式开发文档已完成：\u0001（工具选型 Infisical，拆出 CRED-F001~F007）。"
-      ],
-      "断头": false,
-      "to名字": "Infisical 集成适配器"
     },
     {
       "from": "F-CRED-001",
@@ -1607,66 +1247,6 @@
     },
     {
       "from": "F-CRED-001",
-      "to": "CRED-F003",
-      "from模块": "F-CRED-001",
-      "to模块": "F-CRED-001",
-      "粒度": "子功能",
-      "怎么接": "",
-      "解决什么问题": "",
-      "出处": "Feature Register · F-CRED-001 那一行的「依赖」列",
-      "依据全部": [
-        "流程图检查结论（架构原则第26条验收标准）：✅有真实顺序流程，与F-TENANT-001共享同一条（CRED-F003签发端 + TENANT 2.4节鉴权/收回端），专属流程演示图已制作：\u0001，原样嵌入架构依赖图弹窗（cred/tenant两个节点共享同一张图）。"
-      ],
-      "断头": false,
-      "to名字": "AI 员工身份签发"
-    },
-    {
-      "from": "F-CRED-001",
-      "to": "CRED-F007",
-      "from模块": "F-CRED-001",
-      "to模块": "F-CRED-001",
-      "粒度": "子功能",
-      "怎么接": "",
-      "解决什么问题": "",
-      "出处": "Feature Register · F-CRED-001 那一行的「依赖」列",
-      "依据全部": [
-        "2026-08-30新增CRED-F007企业第三方集成凭证：从《多端平台V3.0》并入，跟原CRED-F001~F006（AI员工临时Token）是两类不同的密钥使用场景。"
-      ],
-      "断头": false,
-      "to名字": "企业第三方集成凭证（Integration Credential Vault，2026-"
-    },
-    {
-      "from": "F-CRED-001",
-      "to": "CRED-F008",
-      "from模块": "F-CRED-001",
-      "to模块": "F-CRED-001",
-      "粒度": "子功能",
-      "怎么接": "",
-      "解决什么问题": "",
-      "出处": "Feature Register · F-CRED-001 那一行的「依赖」列",
-      "依据全部": [
-        "2026-08-30新增CRED-F008 AgentIdentity持久身份层（架构原则第33条）：从AI员工底层包并入，明确\"员工级持久身份\"（CRED-F008）与\"任务级临时Grant\"（CRED-F003）是两层不同粒度，不合并。"
-      ],
-      "断头": false,
-      "to名字": "AgentIdentity 持久身份层（2026-08-30从AI员工底层包并入）"
-    },
-    {
-      "from": "F-CRED-001",
-      "to": "CRED-F009",
-      "from模块": "F-CRED-001",
-      "to模块": "F-CRED-001",
-      "粒度": "子功能",
-      "怎么接": "",
-      "解决什么问题": "",
-      "出处": "Feature Register · F-CRED-001 那一行的「依赖」列",
-      "依据全部": [
-        "2026-08-30新增CRED-F009匿名访客会话身份（调研清单#9）：与F-TENANT-001 TENANT-F006配套，AnonymousVisitorSession可升级关联正式Contact身份"
-      ],
-      "断头": false,
-      "to名字": "匿名访客会话身份（2026-08-30从调研清单#9并入）"
-    },
-    {
-      "from": "F-CRED-001",
       "to": "TENANT-F006",
       "from模块": "F-CRED-001",
       "to模块": "F-TENANT-001",
@@ -1679,21 +1259,6 @@
       ],
       "断头": false,
       "to名字": "匿名访客身份与权限（2026-08-30从调研清单#9并入，仅身份/权限层）"
-    },
-    {
-      "from": "F-SUPERVISOR-001",
-      "to": "SUPERVISOR-F001",
-      "from模块": "F-SUPERVISOR-001",
-      "to模块": "F-SUPERVISOR-001",
-      "粒度": "子功能",
-      "怎么接": "",
-      "解决什么问题": "",
-      "出处": "Feature Register · F-SUPERVISOR-001 那一行的「依赖」列",
-      "依据全部": [
-        "Sierra双层架构参照(Supervisor实时+Monitor异步)，拆出SUPERVISOR-F001~F004，Supervisor子层现在设计完整，Monitor子层判断阈值留到Stage 10真实数据精调。"
-      ],
-      "断头": false,
-      "to名字": "实时Supervisor检查"
     },
     {
       "from": "F-SUPERVISOR-001",
@@ -1741,21 +1306,6 @@
       "to名字": "出站请求安全 / SSRF Policy"
     },
     {
-      "from": "F-SUPERVISOR-001",
-      "to": "SUPERVISOR-F005",
-      "from模块": "F-SUPERVISOR-001",
-      "to模块": "F-SUPERVISOR-001",
-      "粒度": "子功能",
-      "怎么接": "",
-      "解决什么问题": "与Annex III高风险系统完整合规义务（已推迟至2027-12-02",
-      "出处": "Feature Register · F-SUPERVISOR-001 那一行的「依赖」列",
-      "依据全部": [
-        "2026-08-30新增SUPERVISOR-F005 AI身份披露检查（调研清单#25，用户确认欧盟是目标市场后执行）：EU AI Act Article 50透明度义务2026-08-02已生效未被Digital Omnibus推迟，与Annex III高风险系统完整合规义务（已推迟至2027-12-02，且留待法务正式分类）是两件不同的事，更正了#25原\"截止日已过\"的判断"
-      ],
-      "断头": false,
-      "to名字": "AI身份披露检查（2026-08-30从调研清单#25并入，EU AI Act Arti"
-    },
-    {
       "from": "F-ORCHESTRATOR-001",
       "to": "F-AIEMP-001",
       "from模块": "F-ORCHESTRATOR-001",
@@ -1786,21 +1336,6 @@
       "to名字": "AI 员工委派 / Delegation Service"
     },
     {
-      "from": "F-ORCHESTRATOR-001",
-      "to": "ORCHESTRATOR-F001",
-      "from模块": "F-ORCHESTRATOR-001",
-      "to模块": "F-ORCHESTRATOR-001",
-      "粒度": "子功能",
-      "怎么接": "Registry(接F-AIEMP-001)+Classifier(混合路由)+Coordinator(接F-DELEGATION-001)三组件",
-      "解决什么问题": "",
-      "出处": "Feature Register · F-ORCHESTRATOR-001 那一行的「依赖」列",
-      "依据全部": [
-        "Registry(接F-AIEMP-001)+Classifier(混合路由)+Coordinator(接F-DELEGATION-001)三组件，拆出ORCHESTRATOR-F001~F005，显式防住5类真实生产失败模式(单点故障/吞吐瓶颈/成本失控/上下文溢出/8条根因清单)"
-      ],
-      "断头": false,
-      "to名字": "Registry接入"
-    },
-    {
       "from": "F-TASK-001",
       "to": "F-QUEUE-001",
       "from模块": "F-TASK-001",
@@ -1814,81 +1349,6 @@
       ],
       "断头": false,
       "to名字": "任务队列"
-    },
-    {
-      "from": "F-TASK-001",
-      "to": "TASK-F001",
-      "from模块": "F-TASK-001",
-      "to模块": "F-TASK-001",
-      "粒度": "子功能",
-      "怎么接": "此前与F-QUEUE-001的Temporal/Hatchet引擎冲突已解决（共用同一套Temporal实例",
-      "解决什么问题": "此前与F-QUEUE-001的Temporal/Hatchet引擎冲突已解决（共用同一套Temporal实例",
-      "出处": "Feature Register · F-TASK-001 那一行的「依赖」列",
-      "依据全部": [
-        "2026-08-30新建正式开发文档：\u0001——核查《多端平台V3.0》F-TASK-001章节后确认，此前与F-QUEUE-001的Temporal/Hatchet引擎冲突已解决（共用同一套Temporal实例，业务逻辑分开），拆出TASK-F001~F004（详见架构原则第31条）。"
-      ],
-      "断头": false,
-      "to名字": "Task状态机（2026-08-30状态枚举升级，见2.3节）"
-    },
-    {
-      "from": "F-TASK-001",
-      "to": "TASK-F005",
-      "from模块": "F-TASK-001",
-      "to模块": "F-TASK-001",
-      "粒度": "子功能",
-      "怎么接": "",
-      "解决什么问题": "新增TASK-F005 Kill/Checkpoint/Resume（解决架构原则第28条Kill Switch挂账项）",
-      "出处": "Feature Register · F-TASK-001 那一行的「依赖」列",
-      "依据全部": [
-        "2026-08-30核对AI员工底层包（架构原则第33条）：状态机升级为CREATED→VALIDATED→QUEUED→RUNNING→WAITING_APPROVAL/WAITING_DEPENDENCY→SUCCEEDED/FAILED/CANCELLED，新增TASK-F005 Kill/Checkpoint/Resume（解决架构原则第28条Kill Switch挂账项），确认不引入NA"
-      ],
-      "断头": false,
-      "to名字": "Kill/Checkpoint/Resume（2026-08-30从AI员工底层包并入，"
-    },
-    {
-      "from": "F-TASK-001",
-      "to": "TASK-F006",
-      "from模块": "F-TASK-001",
-      "to模块": "F-TASK-001",
-      "粒度": "子功能",
-      "怎么接": "",
-      "解决什么问题": "",
-      "出处": "Feature Register · F-TASK-001 那一行的「依赖」列",
-      "依据全部": [
-        "2026-08-30新增TASK-F006(中途漂移检测)+TASK-F007(Continue-As-New，Temporal官方推荐做法防Event History溢出)（调研清单#4#8）。"
-      ],
-      "断头": false,
-      "to名字": "中途漂移检测（2026-08-30从调研清单#4并入）"
-    },
-    {
-      "from": "F-TASK-001",
-      "to": "TASK-F007",
-      "from模块": "F-TASK-001",
-      "to模块": "F-TASK-001",
-      "粒度": "子功能",
-      "怎么接": "",
-      "解决什么问题": "",
-      "出处": "Feature Register · F-TASK-001 那一行的「依赖」列",
-      "依据全部": [
-        "2026-08-30新增TASK-F006(中途漂移检测)+TASK-F007(Continue-As-New，Temporal官方推荐做法防Event History溢出)（调研清单#4#8）。"
-      ],
-      "断头": false,
-      "to名字": "Continue-As-New（2026-08-30从调研清单#8并入，Temporal"
-    },
-    {
-      "from": "F-TASK-001",
-      "to": "TASK-F008",
-      "from模块": "F-TASK-001",
-      "to模块": "F-TASK-001",
-      "粒度": "子功能",
-      "怎么接": "硬上限复用DELEGATION-F005同一原则",
-      "解决什么问题": "",
-      "出处": "Feature Register · F-TASK-001 那一行的「依赖」列",
-      "依据全部": [
-        "2026-08-30新增TASK-F008任务内自我纠错（Reflexion式）（调研清单#12，仅单次任务内部分）：生成→自我批判→修正闭环，硬上限复用DELEGATION-F005同一原则；"
-      ],
-      "断头": false,
-      "to名字": "任务内自我纠错（Reflexion式，2026-08-30从调研清单#12并入，仅\"单次"
     },
     {
       "from": "F-TASK-001",
@@ -1937,21 +1397,6 @@
     },
     {
       "from": "F-EGRESS-001",
-      "to": "EGRESS-F001",
-      "from模块": "F-EGRESS-001",
-      "to模块": "F-EGRESS-001",
-      "粒度": "子功能",
-      "怎么接": "",
-      "解决什么问题": "",
-      "出处": "Feature Register · F-EGRESS-001 那一行的「依赖」列",
-      "依据全部": [
-        "正式开发文档：\u0001（无阻塞，可独立先行），拆出 EGRESS-F001~F003。"
-      ],
-      "断头": false,
-      "to名字": "URL安全校验服务"
-    },
-    {
-      "from": "F-EGRESS-001",
       "to": "F-ACTION-001",
       "from模块": "F-EGRESS-001",
       "to模块": "F-ACTION-001",
@@ -1979,21 +1424,6 @@
       ],
       "断头": false,
       "to名字": "成本控制系统"
-    },
-    {
-      "from": "F-AIEMP-001",
-      "to": "AIEMP-F001",
-      "from模块": "F-AIEMP-001",
-      "to模块": "F-AIEMP-001",
-      "粒度": "子功能",
-      "怎么接": "复用Provider Router/F-COST-001）",
-      "解决什么问题": "",
-      "出处": "Feature Register · F-AIEMP-001 那一行的「依赖」列",
-      "依据全部": [
-        "正式开发文档：\u0001（纯业务schema，复用Provider Router/F-COST-001），拆出 AIEMP-F001~F004。"
-      ],
-      "断头": false,
-      "to名字": "EmployeeTemplate管理（2026-08-30从AI员工底层包并入三层模型；"
     },
     {
       "from": "F-AIEMP-001",
@@ -2041,51 +1471,6 @@
       "to名字": "中央编排层(\"大脑\")"
     },
     {
-      "from": "F-AIEMP-001",
-      "to": "AIEMP-F005",
-      "from模块": "F-AIEMP-001",
-      "to模块": "F-AIEMP-001",
-      "粒度": "子功能",
-      "怎么接": "",
-      "解决什么问题": "",
-      "出处": "Feature Register · F-AIEMP-001 那一行的「依赖」列",
-      "依据全部": [
-        "AIEMP-F005补充辞退流程对租户管理员完整可见。"
-      ],
-      "断头": false,
-      "to名字": "生命周期与Kill Switch（2026-08-30从AI员工底层包并入，解决架构原则"
-    },
-    {
-      "from": "F-AIEMP-001",
-      "to": "AIEMP-F006",
-      "from模块": "F-AIEMP-001",
-      "to模块": "F-AIEMP-001",
-      "粒度": "子功能",
-      "怎么接": "",
-      "解决什么问题": "",
-      "出处": "Feature Register · F-AIEMP-001 那一行的「依赖」列",
-      "依据全部": [
-        "2026-09-04深度调研ServiceNow/Salesforce/UiPath三家真实做法后新增AIEMP-F006 Subagent分工层：原有Skill实体只是\"能力清单\"，不是\"独立推理子单元\"，参照ServiceNow T2 SOC/Salesforce Sales Account Management真实拆法，在EmployeeTemplate与Skill之间插入Subagent层"
-      ],
-      "断头": false,
-      "to名字": "Subagent 分工层（2026-09-04新增，见2.4节查证结论）"
-    },
-    {
-      "from": "F-ACTION-001",
-      "to": "ACTION-F001",
-      "from模块": "F-ACTION-001",
-      "to模块": "F-ACTION-001",
-      "粒度": "子功能",
-      "怎么接": "",
-      "解决什么问题": "",
-      "出处": "Feature Register · F-ACTION-001 那一行的「依赖」列",
-      "依据全部": [
-        "正式开发文档：\u0001（Tool/MCP Adapter层基于MCP Gateway生态），拆出 ACTION-F001~F004。"
-      ],
-      "断头": false,
-      "to名字": "ActionGateway核心"
-    },
-    {
       "from": "F-ACTION-001",
       "to": "F-CRED-001",
       "from模块": "F-ACTION-001",
@@ -2129,81 +1514,6 @@
       ],
       "断头": false,
       "to名字": "Provider Router / 模型接入层"
-    },
-    {
-      "from": "F-ACTION-001",
-      "to": "ACTION-F005",
-      "from模块": "F-ACTION-001",
-      "to模块": "F-ACTION-001",
-      "粒度": "子功能",
-      "怎么接": "本模块收窄为只处理工具/动作调用",
-      "解决什么问题": "",
-      "出处": "Feature Register · F-ACTION-001 那一行的「依赖」列",
-      "依据全部": [
-        "2026-08-30结构性修正（架构原则第33条）：核对AI员工底层包后确认应拆成Model Gateway(F-PROVIDER-001)+Tool Gateway(本模块)两个平级网关，本模块收窄为只处理工具/动作调用，采纳底层包10步enforcement顺序，新增ACTION-F005。"
-      ],
-      "断头": false,
-      "to名字": "10步Enforcement Pipeline（2026-08-30从AI员工底层包并入"
-    },
-    {
-      "from": "F-ACTION-001",
-      "to": "ACTION-F006",
-      "from模块": "F-ACTION-001",
-      "to模块": "F-ACTION-001",
-      "粒度": "子功能",
-      "怎么接": "2026-09-04深度调研ServiceNow/Salesforce/UiPath三家真实做法后新增ACTION-F006 Workflow Registry：原有ACTION-F001~F005管的都是单个动作",
-      "解决什么问题": "",
-      "出处": "Feature Register · F-ACTION-001 那一行的「依赖」列",
-      "依据全部": [
-        "2026-09-04深度调研ServiceNow/Salesforce/UiPath三家真实做法后新增ACTION-F006 Workflow Registry：原有ACTION-F001~F005管的都是单个动作，没有\"预先把几步串成一条测试过的确定性流程、AI一次调用整条流程\"这一层，参照UiPath Maestro真实做法采用BPMN定顺序+DMN定决策规则（公开国际标准，非私有格式），Wo"
-      ],
-      "断头": false,
-      "to名字": "Workflow Registry（确定性多步流程，2026-09-04新增，见2.1节"
-    },
-    {
-      "from": "F-ACTION-001",
-      "to": "ACTION-F007",
-      "from模块": "F-ACTION-001",
-      "to模块": "F-ACTION-001",
-      "粒度": "子功能",
-      "怎么接": "深度复核Salesforce(MuleSoft)/ServiceNow(Spoke)/UiPath(Marketplace)三家真实商业与技术架构后新增ACTION-F007 Connector Registry：ACTION-F002的T",
-      "解决什么问题": "",
-      "出处": "Feature Register · F-ACTION-001 那一行的「依赖」列",
-      "依据全部": [
-        "2026-09-05用户指出底层架构没考虑Connector生态，深度复核Salesforce(MuleSoft)/ServiceNow(Spoke)/UiPath(Marketplace)三家真实商业与技术架构后新增ACTION-F007 Connector Registry：ACTION-F002的ToolRegistration只到单个工具粒度，缺一层按业务平台分组的具名Connector目"
-      ],
-      "断头": false,
-      "to名字": "Connector Registry（具名业务连接器目录，2026-09-05新增，见2"
-    },
-    {
-      "from": "F-ACTION-001",
-      "to": "ACTION-F002",
-      "from模块": "F-ACTION-001",
-      "to模块": "F-ACTION-001",
-      "粒度": "子功能",
-      "怎么接": "深度复核Salesforce(MuleSoft)/ServiceNow(Spoke)/UiPath(Marketplace)三家真实商业与技术架构后新增ACTION-F007 Connector Registry：ACTION-F002的T",
-      "解决什么问题": "",
-      "出处": "Feature Register · F-ACTION-001 那一行的「依赖」列",
-      "依据全部": [
-        "2026-09-05用户指出底层架构没考虑Connector生态，深度复核Salesforce(MuleSoft)/ServiceNow(Spoke)/UiPath(Marketplace)三家真实商业与技术架构后新增ACTION-F007 Connector Registry：ACTION-F002的ToolRegistration只到单个工具粒度，缺一层按业务平台分组的具名Connector目"
-      ],
-      "断头": false,
-      "to名字": "Tool/MCP注册与Adapter层（复用MCP Gateway生态，2026-08-"
-    },
-    {
-      "from": "F-APPROVAL-001",
-      "to": "APPROVAL-F001",
-      "from模块": "F-APPROVAL-001",
-      "to模块": "F-APPROVAL-001",
-      "粒度": "子功能",
-      "怎么接": "正式开发文档：\u0001（复用RuoYi Flowable BPM+Temporal signal）",
-      "解决什么问题": "",
-      "出处": "Feature Register · F-APPROVAL-001 那一行的「依赖」列",
-      "依据全部": [
-        "正式开发文档：\u0001（复用RuoYi Flowable BPM+Temporal signal），拆出 APPROVAL-F001~F004。"
-      ],
-      "断头": false,
-      "to名字": "ai_approval映射"
     },
     {
       "from": "F-APPROVAL-001",
@@ -2267,21 +1577,6 @@
     },
     {
       "from": "F-NOTIFY-001",
-      "to": "NOTIFY-F001",
-      "from模块": "F-NOTIFY-001",
-      "to模块": "F-NOTIFY-001",
-      "粒度": "子功能",
-      "怎么接": "",
-      "解决什么问题": "",
-      "出处": "Feature Register · F-NOTIFY-001 那一行的「依赖」列",
-      "依据全部": [
-        "正式开发文档：\u0001（Novu核心+自建微信Adapter，Novu无原生微信支持），拆出 NOTIFY-F001~F004。"
-      ],
-      "断头": false,
-      "to名字": "Novu集成"
-    },
-    {
-      "from": "F-NOTIFY-001",
       "to": "F-PLAT-001",
       "from模块": "F-NOTIFY-001",
       "to模块": "F-PLAT-001",
@@ -2309,21 +1604,6 @@
       ],
       "断头": false,
       "to名字": "Evidence / Audit / Trace 共享事实系统"
-    },
-    {
-      "from": "F-DELEGATION-001",
-      "to": "DELEGATION-F001",
-      "from模块": "F-DELEGATION-001",
-      "to模块": "F-DELEGATION-001",
-      "粒度": "子功能",
-      "怎么接": "",
-      "解决什么问题": "",
-      "出处": "Feature Register · F-DELEGATION-001 那一行的「依赖」列",
-      "依据全部": [
-        "2026-08-30新建正式开发文档：\u0001——从AI员工底层包核对后确认的全新模块，之前任何文档都没有对应设计，拆出DELEGATION-F001~F004。"
-      ],
-      "断头": false,
-      "to名字": "委派发起与权限收窄"
     },
     {
       "from": "F-DELEGATION-001",
@@ -2369,21 +1649,6 @@
       ],
       "断头": false,
       "to名字": "AI 任务运行时 / Durable AI Task Runtime"
-    },
-    {
-      "from": "F-DELEGATION-001",
-      "to": "DELEGATION-F005",
-      "from模块": "F-DELEGATION-001",
-      "to模块": "F-DELEGATION-001",
-      "粒度": "子功能",
-      "怎么接": "源自2025年7月真实生产事故（84.7万次API调用死循环",
-      "解决什么问题": "",
-      "出处": "Feature Register · F-DELEGATION-001 那一行的「依赖」列",
-      "依据全部": [
-        "2026-08-30新增DELEGATION-F005失败模式防护（调研清单#2）：委派深度硬上限+数学可判定循环检测+上游产出可信度标记，防重试风暴/循环委派/幻觉级联，源自2025年7月真实生产事故（84.7万次API调用死循环，6.3万美元账单）"
-      ],
-      "断头": false,
-      "to名字": "失败模式防护（2026-08-30从\"AI员工能力缺口调研清单\"#2并入）"
     },
     {
       "from": "F-CONSOLE-001",
@@ -2462,21 +1727,6 @@
     },
     {
       "from": "F-CONSOLE-001",
-      "to": "CONSOLE-F001",
-      "from模块": "F-CONSOLE-001",
-      "to模块": "F-CONSOLE-001",
-      "粒度": "子功能",
-      "怎么接": "",
-      "解决什么问题": "2026-08-30新建正式开发文档：\u0001——\"AI员工能力缺口调研清单\"#13/#14/#15/#16/#18定性为🟠(现在就该做)后的正式设计",
-      "出处": "Feature Register · F-CONSOLE-001 那一行的「依赖」列",
-      "依据全部": [
-        "2026-08-30新建正式开发文档：\u0001——\"AI员工能力缺口调研清单\"#13/#14/#15/#16/#18定性为🟠(现在就该做)后的正式设计，面向租户管理员的产品体验层，绝大部分是F-AIEMP-001/F-COST-001/F-OBS-001/F-SUPERVISOR-001/F-ORCHESTRATOR-001已有能力的自助聚合投影，不复制存储，拆出CONSOLE-F001~F005。"
-      ],
-      "断头": false,
-      "to名字": "雇佣中心（Hiring Center）"
-    },
-    {
-      "from": "F-CONSOLE-001",
       "to": "F-APPROVAL-001",
       "from模块": "F-CONSOLE-001",
       "to模块": "F-APPROVAL-001",
@@ -2504,51 +1754,6 @@
       ],
       "断头": false,
       "to名字": "混合路由（Classifier）"
-    },
-    {
-      "from": "F-CONSOLE-001",
-      "to": "CONSOLE-F003",
-      "from模块": "F-CONSOLE-001",
-      "to模块": "F-CONSOLE-001",
-      "粒度": "子功能",
-      "怎么接": "",
-      "解决什么问题": "",
-      "出处": "Feature Register · F-CONSOLE-001 那一行的「依赖」列",
-      "依据全部": [
-        "CONSOLE-F003补充默认评分标准+企业可调整机制、训练前后对比视图；"
-      ],
-      "断头": false,
-      "to名字": "质检/评分中心（QC & Scoring Center）"
-    },
-    {
-      "from": "F-CONSOLE-001",
-      "to": "CONSOLE-F002",
-      "from模块": "F-CONSOLE-001",
-      "to模块": "F-CONSOLE-001",
-      "粒度": "子功能",
-      "怎么接": "",
-      "解决什么问题": "",
-      "出处": "Feature Register · F-CONSOLE-001 那一行的「依赖」列",
-      "依据全部": [
-        "CONSOLE-F002补充简单场景自助+复杂场景付费顾问介入两档"
-      ],
-      "断头": false,
-      "to名字": "训练中心（Training Center）"
-    },
-    {
-      "from": "F-PAGE-001",
-      "to": "PAGE-F001",
-      "from模块": "F-PAGE-001",
-      "to模块": "F-PAGE-001",
-      "粒度": "子功能",
-      "怎么接": "",
-      "解决什么问题": "",
-      "出处": "Feature Register · F-PAGE-001 那一行的「依赖」列",
-      "依据全部": [
-        "正式开发文档：\u0001（纯业务schema，框架无关），拆出 PAGE-F001~F004。"
-      ],
-      "断头": false,
-      "to名字": "Page/Block Schema"
     },
     {
       "from": "F-PAGE-001",
@@ -2581,36 +1786,6 @@
       "to名字": "多端渲染 + Client Capability Registry"
     },
     {
-      "from": "F-MOBILE-001",
-      "to": "MOBILE-F001",
-      "from模块": "F-MOBILE-001",
-      "to模块": "F-MOBILE-001",
-      "粒度": "子功能",
-      "怎么接": "正式开发文档：\u0001（复用已验证的yudao-ui-admin-uniapp）",
-      "解决什么问题": "",
-      "出处": "Feature Register · F-MOBILE-001 那一行的「依赖」列",
-      "依据全部": [
-        "正式开发文档：\u0001（复用已验证的yudao-ui-admin-uniapp），拆出 MOBILE-F001~F004。"
-      ],
-      "断头": false,
-      "to名字": "鉴权加固"
-    },
-    {
-      "from": "F-MULTIEND-001",
-      "to": "MULTIEND-F001",
-      "from模块": "F-MULTIEND-001",
-      "to模块": "F-MULTIEND-001",
-      "粒度": "子功能",
-      "怎么接": "",
-      "解决什么问题": "",
-      "出处": "Feature Register · F-MULTIEND-001 那一行的「依赖」列",
-      "依据全部": [
-        "正式开发文档：\u0001（Next.js Web端SSR/SEO + uni-app移动端），拆出 MULTIEND-F001~F004。"
-      ],
-      "断头": false,
-      "to名字": "Web端Renderer"
-    },
-    {
       "from": "F-MULTIEND-001",
       "to": "F-PAGE-001",
       "from模块": "F-MULTIEND-001",
@@ -2624,21 +1799,6 @@
       ],
       "断头": false,
       "to名字": "页面内容 Schema"
-    },
-    {
-      "from": "F-HANDOFF-001",
-      "to": "HANDOFF-F001",
-      "from模块": "F-HANDOFF-001",
-      "to模块": "F-HANDOFF-001",
-      "粒度": "子功能",
-      "怎么接": "",
-      "解决什么问题": "",
-      "出处": "Feature Register · F-HANDOFF-001 那一行的「依赖」列",
-      "依据全部": [
-        "正式开发文档：\u0001（一次性opaque code，纯安全模式设计），拆出 HANDOFF-F001~F004。"
-      ],
-      "断头": false,
-      "to名字": "Opaque Code生成与Claim"
     },
     {
       "from": "F-HANDOFF-001",
@@ -2702,21 +1862,6 @@
     },
     {
       "from": "F-CHANNEL-001",
-      "to": "CHANNEL-F001",
-      "from模块": "F-CHANNEL-001",
-      "to模块": "F-CHANNEL-001",
-      "粒度": "子功能",
-      "怎么接": "正式开发文档：\u0001（复用F-CRED-001/F-RELEASE-001/F-TENANT-001）",
-      "解决什么问题": "",
-      "出处": "Feature Register · F-CHANNEL-001 那一行的「依赖」列",
-      "依据全部": [
-        "正式开发文档：\u0001（复用F-CRED-001/F-RELEASE-001/F-TENANT-001），拆出 CHANNEL-F001~F004。"
-      ],
-      "断头": false,
-      "to名字": "ChannelInstance管理"
-    },
-    {
-      "from": "F-CHANNEL-001",
       "to": "F-PAGE-001",
       "from模块": "F-CHANNEL-001",
       "to模块": "F-PAGE-001",
@@ -2744,21 +1889,6 @@
       ],
       "断头": false,
       "to名字": "多端渲染 + Client Capability Registry"
-    },
-    {
-      "from": "F-CHANNEL-001",
-      "to": "CHANNEL-F002",
-      "from模块": "F-CHANNEL-001",
-      "to模块": "F-CHANNEL-001",
-      "粒度": "子功能",
-      "怎么接": "",
-      "解决什么问题": "属F-CONSOLE-001范畴登记于此避免与客户端白标能力混淆）",
-      "出处": "Feature Register · F-CHANNEL-001 那一行的「依赖」列",
-      "依据全部": [
-        "2026-09-02回填架构原则第42条#22：新增4.2.1节明确区分客户端渠道品牌定制（CHANNEL-F002，完整白标）与管理控制台品牌定制（新增，仅登录页/导航栏Logo配色，非完整白标，属F-CONSOLE-001范畴登记于此避免与客户端白标能力混淆）"
-      ],
-      "断头": false,
-      "to名字": "Brand/Theme/Template绑定"
     },
     {
       "from": "F-CHANNEL-001",
