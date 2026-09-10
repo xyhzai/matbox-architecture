@@ -376,6 +376,96 @@ def check_module_page_content():
         fails.append("C15 一个模块页面都没查到 —— 「跳过」不等于「通过」")
 
 
+# ══ C17：依赖关系那两张卡 —— 结构、条数、方向，逐条对 ═══════════════════
+#
+# 2026-09-10 用户喊停：「你现在文件包规范还没有把依赖关系放进去呢」。
+# 对：§8 的位置表原来只有 A/B/B2/C/D/E，依赖关系那一段整段不在规范里。
+# 那就意味着 —— **批量生成后面 22 个模块时，缺了也没有任何程序会说话**。
+#
+# 这条检查按标准 §8.2a 判四件事：
+#   ① 两张卡都在，编号 1/2、标题「谁在用我」「我用了谁」、顺序不许颠倒
+#   ② 六列表头齐全（怎么接 / 解决什么问题 / 依据原文 一个不少）
+#   ③ 徽章条数 == 表里实际行数 == dep_graph.json 算出来的扇入/扇出（三个数）
+#   ④ ①「谁在用我」里不许出现本包自己的功能
+#
+# ④ 是这里最要紧的一条，也是最不显眼的一条：2026-09-10 第三方复算发现
+# DQ 页面「谁在用我」8 行里 5 行是 DQ 自己的功能冒充外部消费方，
+# 同时 5 个真外部消费方一个都没显示 —— **两边数字都是 8**。
+# 只比数字的检查（③）对这种错完全无感，必须连来源一起比。
+DEP_CARD = re.compile(
+    r'<h3><span class="n">(\d)</span>([^<]+)<span class="dep-n">共 (\d+) 条</span></h3>'
+    r'.*?<tbody>(.*?)</tbody>', re.S)
+
+
+def check_dep_panel():
+    mp = os.path.join(DOCS, "modules.json")
+    gp = os.path.join(DOCS, "dep_graph.json")
+    if not os.path.exists(mp) or not os.path.exists(gp):
+        fails.append("C17 缺 modules.json 或 dep_graph.json —— 无法判依赖关系段")
+        return
+    mods = json.load(io.open(mp, encoding="utf-8"))["modules"]
+    graph = json.load(io.open(gp, encoding="utf-8"))
+    edges = graph["edges"]
+    ran = 0
+    for key, cfg in sorted(mods.items()):
+        flow = cfg.get("flow") or ("%s_gate_flow.html" % key.lower())
+        fp = os.path.join(DOCS, flow)
+        fid = cfg.get("feature_id")
+        if not os.path.exists(fp):
+            fails.append("C17 %s 没有页面 %s" % (key, flow))
+            continue
+        if not fid:
+            # 哨兵这类登记表里本来就没有的模块：显式说明，不静默跳过。
+            notes.append("C17 %s 在 modules.json 里没有 feature_id，"
+                         "依赖关系段走「登记表里没有这个模块」的兜底 —— 不参与判定" % key)
+            continue
+        ran += 1
+        body = read(fp)
+        cards = DEP_CARD.findall(body)
+        if len(cards) != 2:
+            fails.append("C17 %s 的依赖关系段有 %d 张方向卡，标准 §8.2a 要求**正好 2 张**"
+                         "（① 谁在用我 / ② 我用了谁）—— 少一张就是一个方向没人看得见"
+                         % (flow, len(cards)))
+            continue
+        want = [("1", "谁在用我"), ("2", "我用了谁")]
+        got = [(n, t.strip()) for n, t, _c, _b in cards]
+        if got != want:
+            fails.append("C17 %s 的两张方向卡是 %s，标准 §8.2a 要求 %s（顺序也不许变）"
+                         % (flow, got, want))
+            continue
+        exp_in = len([e for e in edges
+                      if e.get("to模块") == fid and not e["断头"]])
+        exp_out = len([e for e in edges if e.get("from模块") == fid])
+        ok = True
+        for (num, title, cnt, tbody), exp in zip(cards, (exp_in, exp_out)):
+            n_rows = len(re.findall(r"<tr>", tbody)) - tbody.count('class="dep-empty"')
+            for col in ("怎么接", "解决什么问题", "依据原文"):
+                if col not in tbody and col not in body:
+                    fails.append("C17 %s 的「%s」卡缺「%s」这一列" % (flow, title, col))
+                    ok = False
+            if not (int(cnt) == n_rows == exp):
+                fails.append("C17 %s 的「%s」三个数对不上：徽章 %s · 表里 %d 行 · "
+                             "dep_graph 算出 %d —— 任意两个不等就是页面和数据分叉了"
+                             % (flow, title, cnt, n_rows, exp))
+                ok = False
+        # ④ 「谁在用我」里不许有本包自己的功能
+        selfies = [e for e in edges if e.get("to模块") == fid
+                   and not e["断头"] and e.get("from模块") == fid]
+        if selfies:
+            fails.append("C17 %s 的「谁在用我」里混进了 %d 条本包自己的功能"
+                         "（%s）—— 同包互相引用不是依赖，它既造出假的外部消费方，"
+                         "又把真的挤掉（标准 §8.2a 第 3 条）"
+                         % (flow, len(selfies),
+                            "、".join(e["from"] for e in selfies[:4])))
+            ok = False
+        if ok:
+            notes.append("C17 %s 依赖关系两张卡齐全：谁在用我 %d 条 · 我用了谁 %d 条，"
+                         "徽章/行数/数据三者一致，且无同包自引用"
+                         % (flow, exp_in, exp_out))
+    if not ran:
+        fails.append("C17 一个模块页面都没查到 —— 「跳过」不等于「通过」")
+
+
 # ══ C16：脚本里取的元素，页面上必须真的有 ═══════════════════════════════
 # 2026-09-10 用户要我「自己点击测试 2 遍」。点开密钥管理那张卡，控制台里躺着：
 #
@@ -1033,7 +1123,7 @@ def main():
                check_page_matches_state, check_workpackages_buildable,
                check_workflows, check_module_page_order, check_module_page_content,
                check_diagram_selfcontained, check_module_has_entry,
-               check_dom_refs_exist):
+               check_dom_refs_exist, check_dep_panel):
         fn()
 
     print("=" * 72)
