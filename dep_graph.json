@@ -22,7 +22,8 @@
       "name": "Dev Quality Run Orchestrator",
       "status": "✅ READY_FOR_STAGE10_BINDING",
       "layer": "平台层",
-      "section": "Platform Core Quality / DevCodeQuality（代码持续质检与安全自检）"
+      "section": "Platform Core Quality / DevCodeQuality（代码持续质检与安全自检）",
+      "包名": "代码持续质检与安全自检 Gate"
     },
     "F-DQ-002": {
       "id": "F-DQ-002",
@@ -211,7 +212,8 @@
       "name": "Secret / Credential 管理系统",
       "status": "🟢 DRAFT_RESEARCH_COMPLETE",
       "layer": "地基层",
-      "section": "地基模块（被大量依赖）"
+      "section": "地基模块（被大量依赖）",
+      "包名": "密钥与凭据管理"
     },
     "F-SUPERVISOR-001": {
       "id": "F-SUPERVISOR-001",
@@ -239,7 +241,8 @@
       "name": "全球多语言 / Global Localization",
       "status": "🟢 DRAFT_RESEARCH_COMPLETE",
       "layer": "地基层",
-      "section": "地基模块（被大量依赖）"
+      "section": "地基模块（被大量依赖）",
+      "包名": "全球多语言"
     },
     "F-EGRESS-001": {
       "id": "F-EGRESS-001",
@@ -622,7 +625,7 @@
     {
       "from": "F-DQ-002",
       "to": "F-OBS-001",
-      "from模块": "F-DQ-002",
+      "from模块": "F-DQ-001",
       "to模块": "F-OBS-001",
       "粒度": "整个包",
       "怎么接": "",
@@ -636,23 +639,8 @@
     },
     {
       "from": "F-DQ-003",
-      "to": "F-DQ-001",
-      "from模块": "F-DQ-003",
-      "to模块": "F-DQ-001",
-      "粒度": "整个包",
-      "怎么接": "",
-      "解决什么问题": "",
-      "出处": "Feature Register · F-DQ-003 那一行的「依赖」列",
-      "依据全部": [
-        "F-DQ-001/002, F-CRED-001"
-      ],
-      "断头": false,
-      "to名字": "Dev Quality Run Orchestrator"
-    },
-    {
-      "from": "F-DQ-003",
       "to": "F-CRED-001",
-      "from模块": "F-DQ-003",
+      "from模块": "F-DQ-001",
       "to模块": "F-CRED-001",
       "粒度": "整个包",
       "怎么接": "",
@@ -665,39 +653,9 @@
       "to名字": "Secret / Credential 管理系统"
     },
     {
-      "from": "F-DQ-004",
-      "to": "F-DQ-001",
-      "from模块": "F-DQ-004",
-      "to模块": "F-DQ-001",
-      "粒度": "整个包",
-      "怎么接": "",
-      "解决什么问题": "",
-      "出处": "Feature Register · F-DQ-004 那一行的「依赖」列",
-      "依据全部": [
-        "F-DQ-001/002"
-      ],
-      "断头": false,
-      "to名字": "Dev Quality Run Orchestrator"
-    },
-    {
-      "from": "F-DQ-005",
-      "to": "F-DQ-001",
-      "from模块": "F-DQ-005",
-      "to模块": "F-DQ-001",
-      "粒度": "整个包",
-      "怎么接": "",
-      "解决什么问题": "",
-      "出处": "Feature Register · F-DQ-005 那一行的「依赖」列",
-      "依据全部": [
-        "F-DQ-001/002, F-CRED-001"
-      ],
-      "断头": false,
-      "to名字": "Dev Quality Run Orchestrator"
-    },
-    {
       "from": "F-DQ-005",
       "to": "F-CRED-001",
-      "from模块": "F-DQ-005",
+      "from模块": "F-DQ-001",
       "to模块": "F-CRED-001",
       "粒度": "整个包",
       "怎么接": "",
@@ -712,7 +670,7 @@
     {
       "from": "F-DQ-006",
       "to": "F-RELEASE-001",
-      "from模块": "F-DQ-006",
+      "from模块": "F-DQ-001",
       "to模块": "F-RELEASE-001",
       "粒度": "整个包",
       "怎么接": "",
@@ -725,39 +683,9 @@
       "to名字": "ReleaseArtifact / Baseline / SBOM 系统"
     },
     {
-      "from": "F-DQ-008",
-      "to": "F-DQ-001",
-      "from模块": "F-DQ-008",
-      "to模块": "F-DQ-001",
-      "粒度": "整个包",
-      "怎么接": "F-DQ-001~007（2026-09-04用户直接要求解决\"DQ自己判断逻辑没有独立核查\"存疑事项：本模块早就定义了PolicyChallengeSet这个Contract但从未接上规则",
-      "解决什么问题": "F-DQ-001~007（2026-09-04用户直接要求解决\"DQ自己判断逻辑没有独立核查\"存疑事项：本模块早就定义了PolicyChallengeSet这个Contract但从未接上规则",
-      "出处": "Feature Register · F-DQ-008 那一行的「依赖」列",
-      "依据全部": [
-        "F-DQ-001~007（2026-09-04用户直接要求解决\"DQ自己判断逻辑没有独立核查\"存疑事项：本模块早就定义了PolicyChallengeSet这个Contract但从未接上规则，已补上opa test强制跑通才能合并+新增用例必须经非本次Implementer的人过一遍+复用第15节Technology Watch季度节奏定期重跑防漂移，详见架构原则第69条）"
-      ],
-      "断头": false,
-      "to名字": "Dev Quality Run Orchestrator"
-    },
-    {
-      "from": "F-DQ-009",
-      "to": "F-DQ-001",
-      "from模块": "F-DQ-009",
-      "to模块": "F-DQ-001",
-      "粒度": "整个包",
-      "怎么接": "",
-      "解决什么问题": "",
-      "出处": "Feature Register · F-DQ-009 那一行的「依赖」列",
-      "依据全部": [
-        "F-DQ-001~008"
-      ],
-      "断头": false,
-      "to名字": "Dev Quality Run Orchestrator"
-    },
-    {
       "from": "F-DQ-010",
       "to": "F-OBS-001",
-      "from模块": "F-DQ-010",
+      "from模块": "F-DQ-001",
       "to模块": "F-OBS-001",
       "粒度": "整个包",
       "怎么接": "",
@@ -772,7 +700,7 @@
     {
       "from": "F-DQ-011",
       "to": "F-RELEASE-001",
-      "from模块": "F-DQ-011",
+      "from模块": "F-DQ-001",
       "to模块": "F-RELEASE-001",
       "粒度": "整个包",
       "怎么接": "",
@@ -787,7 +715,7 @@
     {
       "from": "F-DQ-012",
       "to": "F-CRED-001",
-      "from模块": "F-DQ-012",
+      "from模块": "F-DQ-001",
       "to模块": "F-CRED-001",
       "粒度": "整个包",
       "怎么接": "",
@@ -802,7 +730,7 @@
     {
       "from": "F-DQ-013",
       "to": "F-OBS-001",
-      "from模块": "F-DQ-013",
+      "from模块": "F-DQ-001",
       "to模块": "F-OBS-001",
       "粒度": "整个包",
       "怎么接": "F-OBS-001（2026-09-04场景模拟发现：本模块\"人工审核通过率趋势\"指标是缓慢漂移型",
@@ -817,7 +745,7 @@
     {
       "from": "F-DQ-013",
       "to": "OBS-F004",
-      "from模块": "F-DQ-013",
+      "from模块": "F-DQ-001",
       "to模块": "F-OBS-001",
       "粒度": "子功能",
       "怎么接": "F-OBS-001（2026-09-04场景模拟发现：本模块\"人工审核通过率趋势\"指标是缓慢漂移型",
@@ -832,7 +760,7 @@
     {
       "from": "F-DQ-013",
       "to": "OBS-F007",
-      "from模块": "F-DQ-013",
+      "from模块": "F-DQ-001",
       "to模块": "F-OBS-001",
       "粒度": "子功能",
       "怎么接": "F-OBS-001（2026-09-04场景模拟发现：本模块\"人工审核通过率趋势\"指标是缓慢漂移型",
@@ -848,7 +776,7 @@
       "from": "F-VIZ-002",
       "to": "F-DQ-002",
       "from模块": "F-VIZ-002",
-      "to模块": "F-DQ-002",
+      "to模块": "F-DQ-001",
       "粒度": "整个包",
       "怎么接": "复用F-DQ-002/F-OBS-001/F-TENANT-001权限与证据",
       "解决什么问题": "",
@@ -893,7 +821,7 @@
       "from": "F-VIZ-005",
       "to": "F-DQ-009",
       "from模块": "F-VIZ-005",
-      "to模块": "F-DQ-009",
+      "to模块": "F-DQ-001",
       "粒度": "整个包",
       "怎么接": "提交新commit创建QualityRun这一步复用F-DQ-001（见\u0001）",
       "解决什么问题": "",
@@ -1013,7 +941,7 @@
       "from": "F-RELEASE-001",
       "to": "F-DQ-006",
       "from模块": "F-RELEASE-001",
-      "to模块": "F-DQ-006",
+      "to模块": "F-DQ-001",
       "粒度": "整个包",
       "怎么接": "正式开发文档已完成：\u0001（Harbor仓库 + 复用F-DQ-006的SBOM + SLSA签名",
       "解决什么问题": "",
@@ -1178,7 +1106,7 @@
       "from": "F-COST-001",
       "to": "F-DQ-012",
       "from模块": "F-COST-001",
-      "to模块": "F-DQ-012",
+      "to模块": "F-DQ-001",
       "粒度": "整个包",
       "怎么接": "",
       "解决什么问题": "",
@@ -1283,7 +1211,7 @@
       "from": "F-CRED-001",
       "to": "F-DQ-003",
       "from模块": "F-CRED-001",
-      "to模块": "F-DQ-003",
+      "to模块": "F-DQ-001",
       "粒度": "整个包",
       "怎么接": "",
       "解决什么问题": "",
