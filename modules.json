@@ -1,0 +1,213 @@
+{
+  "_why": [
+    "模块登记表 —— 每个模块的材料在哪。2026-09-09 建立。",
+    "",
+    "为什么要有这个文件：《Matbox 开发包标准 V1.0》要对每个模块判 24 条开发前硬项，",
+    "而判之前得先知道「这个模块的材料是哪几份」。这份映射是数据，不写进代码里。",
+    "",
+    "⚠️ 一条关键设计：判据是「这项材料在不在」，**不是「在第几节」**。",
+    "DQ 的材料是专项报告（§13 端点 / §20 DDL），语言包的材料是交接包",
+    "（MANIFEST + features.json + DEV.docx）——两种源格式完全不同。",
+    "如果判据写死成「§20 存在」，换一种源格式就全判不了。",
+    "所以检查器在**该模块的全部材料里**找内容，不认章节号。",
+    "",
+    "新增模块只改这个文件，不改检查器。",
+    "",
+    "⚠️ 2026-09-09 补：sources 必须列**全部材料**，不只是源文档。",
+    "第一次跑 DQ 只得 21/24，缺 P19(路径)/P22(真跑过)/P23(指派)——",
+    "因为那三样的答案在 dq_protected_scope.yml 和工作包里，登记表没列。",
+    "**是登记表漏了材料，不是 DQ 不合格。**",
+    "",
+    "但 <mod>_ready_state.json **故意不列**：那是「我声称满足」的断言，",
+    "不是证据。拿它当材料就是自己证明自己，标准会变成一句空话。"
+  ],
+  "modules": {
+    "DQ": {
+      "name": "代码持续质检与安全自检 Gate",
+      "feature_prefix": "F-DQ-",
+      "test_prefix": "DQ-T",
+      "sources": [
+        "Matbox_代码持续质检与安全自检_开发文档_FINAL.md",
+        "技术选型报告/Matbox_专项01_*.md",
+        "dq_protected_scope.yml",
+        "dq_test_ownership.json",
+        "工作包/DQ/*.md"
+      ],
+      "source_kind": "专项报告",
+      "note": "样板模块。本标准就是从它身上抽出来的，所以它是标尺——它要是不满分，说明检查器写错了。",
+      "java_package": "com.matbox.devquality",
+      "module_dir": "backend/modules/dev-quality",
+      "branch_prefix": "wp/",
+      "wp_dir": "工作包/DQ",
+      "features_from": "builtin",
+      "ledger": [
+        "Matbox_代码持续质检与安全自检_开发文档_FINAL.md"
+      ],
+      "build_steps": [
+        [
+          "_build_ready_summary.py",
+          "把 dq_ready_state.json 渲染进样板的 12 块摘要"
+        ],
+        [
+          "_build_workpackages.py",
+          "从源头按功能切出 13 份工作包，并导出归属表"
+        ],
+        [
+          "_plan_holdout.py",
+          "按行为类别算出留一手的 7 条（读上一步的归属表）"
+        ],
+        [
+          "_build_dq_final_doc.py",
+          "从 .docx + 专项01 生成 FINAL 开发文档"
+        ]
+      ],
+      "public": true,
+      "flow": "quality_gate_flow.html",
+      "implementer": "opencode",
+      "scope": "dq_protected_scope.yml",
+      "ready_state": "dq_ready_state.json",
+      "feature_id": "F-DQ-001",
+      "test_ownership": "dq_test_ownership.json"
+    },
+    "LOC": {
+      "name": "全球多语言",
+      "feature_prefix": "LOC-F",
+      "test_prefix": "AC-LOC-",
+      "sources": [
+        "Matbox_全球多语言_正式开发文档_V1.0-RC.md",
+        "全球多语言/Matbox_全球多语言_交接包_V1.0/*",
+        "全球多语言/Matbox_全球多语言_开发交接补全_V1.0.md",
+        "loc_protected_scope.yml"
+      ],
+      "source_kind": "交接包",
+      "note": "第二种源格式：不是专项报告，是带 MANIFEST SHA-256 的交接包 + 可跑 POC。拿它试，就是试标准和检查器扛不扛得住换格式。",
+      "java_package": "com.matbox.localization",
+      "module_dir": "backend/modules/localization",
+      "branch_prefix": "wp/",
+      "wp_dir": "工作包/LOC",
+      "features_from": "全球多语言/Matbox_全球多语言_交接包_V1.0/features.json",
+      "supplement": "全球多语言/Matbox_全球多语言_开发交接补全_V1.0.md",
+      "ac_prefix": "AC-LOC-",
+      "ledger": [
+        "全球多语言/Matbox_全球多语言_交接包_V1.0/DEV.docx",
+        "全球多语言/Matbox_全球多语言_开发交接补全_V1.0.md"
+      ],
+      "build_steps": [
+        [
+          "_extract_loc_surfaces.py",
+          "从 DEV.docx §6 抽出 7 个施工面 × 5 个字段"
+        ],
+        [
+          "_build_loc_workpackages.py",
+          "生成 20 份工作包，并导出 AC-LOC 归属表"
+        ],
+        [
+          "_build_loc_blocks.py",
+          "生成页面要用的施工面区块与 12 张卡"
+        ]
+      ],
+      "public": true,
+      "flow": "loc_gate_flow.html",
+      "implementer": "opencode",
+      "scope": "loc_protected_scope.yml",
+      "ready_state": "loc_ready_state.json",
+      "feature_id": "F-LOC-001",
+      "test_ownership": "loc_test_ownership.json"
+    },
+    "ZZ": {
+      "name": "写死检测哨兵（不是真模块）",
+      "feature_prefix": "ZZ-F",
+      "test_prefix": "ZZ-T",
+      "sources": [
+        "工作包/ZZ/*.md"
+      ],
+      "source_kind": "哨兵",
+      "java_package": "com.matbox.sentinel",
+      "module_dir": "backend/modules/sentinel",
+      "branch_prefix": "wp/",
+      "wp_dir": "工作包/ZZ",
+      "ledger": [],
+      "public": false,
+      "sentinel": true,
+      "note": "假模块，专门用来撞出「只认 DQ/LOC」的写死。留常驻，不删。",
+      "build_steps": [
+        [
+          "_build_sentinel_ownership.py",
+          "从工作包正文导出哨兵模块的归属表"
+        ]
+      ],
+      "flow": "zz_gate_flow.html",
+      "implementer": "opencode",
+      "scope": "zz_protected_scope.yml",
+      "ready_state": "zz_ready_state.json",
+      "feature_id": null,
+      "test_ownership": "zz_test_ownership.json"
+    },
+    "CRED": {
+      "name": "密钥与凭据管理",
+      "feature_prefix": "CRED-F",
+      "test_prefix": "CRED-T",
+      "sources": [
+        "Matbox_密钥管理_正式开发文档_V1.0-RC.md",
+        "技术选型报告/Matbox_专项10_密钥管理_技术选型与开发交接报告_2026-08-30.md",
+        "cred_protected_scope.yml",
+        "cred_test_ownership.json",
+        "工作包/CRED/*.md"
+      ],
+      "source_kind": "正式开发文档 + 专项报告",
+      "note": "第三个真模块。用它验《开发包标准 V2.0》能不能只靠登记表接一个新包。",
+      "java_package": "com.matbox.credential",
+      "module_dir": "backend/modules/credential",
+      "branch_prefix": "wp/",
+      "wp_dir": "工作包/CRED",
+      "ledger": [
+        "Matbox_密钥管理_正式开发文档_V1.0-RC.md"
+      ],
+      "build_steps": [
+        [
+          "_build_module_pack.py",
+          "[CRED] 从正式文档+专项报告切出工作包与归属表"
+        ]
+      ],
+      "public": true,
+      "sentinel": false,
+      "flow": "cred_gate_flow.html",
+      "scope": "cred_protected_scope.yml",
+      "ready_state": "cred_ready_state.json",
+      "implementer": "opencode",
+      "pack": {
+        "formal": "Matbox_密钥管理_正式开发文档_V1.0-RC.md",
+        "report": "技术选型报告/Matbox_专项10_密钥管理_技术选型与开发交接报告_2026-08-30.md"
+      },
+      "demo_flow": "cred_tenant_auth_lifecycle_flow.html",
+      "feature_id": "F-CRED-001",
+      "test_ownership": "cred_test_ownership.json"
+    }
+  },
+  "_build_why": [
+    "2026-09-09 补：生成工作包需要的字段。此前只有「材料在哪」，",
+    "没有「代码写到哪个包、哪个目录、切什么分支」——那是工作包必须写清的四样，",
+    "C10 判的就是它们。缺了，生成出来的工作包过不了 C10。"
+  ],
+  "_ledger_why": [
+    "2026-09-09 补：ledger = 该模块的**完整开发文档（总账）**，必须摆在存放处最前，",
+    "跟工作包并列可下载。用户对比 DQ 截图后问「开发文档下载去哪了」——",
+    "DQ 存放处第一行就是 147 KB 的 FINAL 总账，而全球多语言那页只有工作包，",
+    "总账整行没有。我的检查查了「存放处在不在、下载按钮几个」，",
+    "**没查「总账在不在」**——因为那些检查是照我自己的清单写的，",
+    "不是照 DQ 那一块实际长什么样写的。同一个病：拿自己的理解替代标准。"
+  ],
+  "_sentinel_why": [
+    "2026-09-10 用户选 B：造一个假的第三个模块，**留着当常驻哨兵**。",
+    "",
+    "为什么要它：全球多语言那一轮，6 处「代码里只认 DQ」全靠用户一个个撞出来。",
+    "只有两个模块时写死几乎不露馅——可以给第二个也单独加一行，凑合就跑通。",
+    "第三个模块没人给它开小灶，**写死的地方会一次性全炸出来**。",
+    "",
+    "它的内容全是占位的，唯一价值是「存在」。任何生成器/检查器只要还认死",
+    "模块名，跑到它这里就会报错——这正是我们要的。",
+    "",
+    "public=false：它不上公开站点。这是**数据驱动的属性**，不是给它开小灶——",
+    "任何模块都可以设这个标志，哨兵只是第一个用到的。"
+  ]
+}
