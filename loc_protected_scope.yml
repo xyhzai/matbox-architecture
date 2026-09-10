@@ -1,0 +1,81 @@
+# ══════════════════════════════════════════════════════════════════════
+# LOC-F001~F020 的「允许 / 禁止修改范围」—— 机器可读版
+#
+# 2026-09-09 建立。对应《Matbox 开发包标准 V1.0》P19。
+#
+# ⚠️ 路径是怎么来的，必须说清楚，否则「越界」的定义就成了随口说的：
+#
+#   · 模块目录名 global-localization、Java 包名 com.matbox.localization
+#     —— 套的是**全项目一次性的命名约定**（与 DQ 的
+#     backend/modules/dev-quality/src/main/java/com/matbox/devquality 同构）。
+#     这是"算的"，不是"判的"：概念目录 + 一条全局约定 = 真实路径。
+#
+#   · 子目录名全部来自交接包已有的结构：
+#     20 个 Feature（features.json）与 DEV.docx §4 的实体/契约命名。
+#     **没有一个是这里现编的。**
+#
+#   · physical_paths 在 readiness.json 里目前是 []，因为 Stage 10 还没绑真实仓库。
+#     绑定完成后必须回来核对本文件与 features.json 的 physical_paths 一致。
+#
+# 谁来消费：
+#   · docs/_check_scope.py —— M5 改动越界检查
+#   · docs/_check_standard.py —— P19 判据
+#   · 派工时抽出该 Feature 自己那一段随材料交给 Implementer
+#
+# ⚠️ 与 DQ 同一条边界：本文件只定义**路径**。
+# 「import 了不该 import 的模块」不在这里判，那是 Architecture Guard 的活。
+# ══════════════════════════════════════════════════════════════════════
+
+version: 1
+module: LOC-F001~F020
+source:
+  - "features.json（20 个 Feature 的 id 与 name）"
+  - "DEV.docx §4 核心 Context / Data Contract（实体与契约命名）"
+  - "DEV.docx §7 页面 / Route / 入口（前端入口）"
+  - "全项目命名约定：backend/modules/<module>/src/main/java/com/matbox/<pkg>"
+
+module_wide:
+  allowed_root: "backend/modules/global-localization/src/main/java/com/matbox/localization/**"
+  frontend_root: "frontend/apps/*/features/localization/**"
+
+  dependency_rules:
+    - id: LOC-DEP-1
+      rule: "localization/* 只允许依赖 shared-clients/* 和自己内部子模块"
+      forbid_import_from:
+        - "backend/modules/!(global-localization)/**"
+    - id: LOC-DEP-2
+      rule: "adapters/* 之间禁止互相依赖——移除任一 Provider 只影响可用 Provider 集合"
+      forbid_cross_import_within:
+        - "adapters/*"
+    - id: LOC-DEP-3
+      rule: "禁止复制 Product/Page/User 主事实。只引用 object_id，不落 Source 副本"
+      note: "AC-LOC-005 / AC-LOC-006 就是考这条；违反即验收不过"
+
+# 子目录 → Feature（供派工时切分，也是 _check_scope.py 的范围来源）
+per_feature:
+  context/:        LOC-F001    # Effective Locale Resolution
+  preference/:     LOC-F002    # User/Tenant Preferences
+  catalog/:        LOC-F003    # Catalog & Key Governance
+  adapters/web/:   LOC-F004    # next-intl
+  adapters/uniapp/: LOC-F005   # vue-i18n
+  adapters/tms/:   LOC-F006    # Tolgee
+  site/:           LOC-F007    # Site/Page Locale
+  translation/:    LOC-F008    # Business Content Translation Store
+  gateway/:        LOC-F009    # Translation Gateway & Router
+  adapters/qwen/:  LOC-F010    # ⚠️ POC_ONLY，不可并行派工
+  adapters/google/: LOC-F011   # ⚠️ POC_ONLY，不可并行派工
+  terminology/:    LOC-F012    # Glossary / Placeholder Integrity
+  format/:         LOC-F013    # ICU-CLDR
+  ai/:             LOC-F014    # Conversation Locale Bridge
+  release/:        LOC-F015    # Catalog Release / Fallback
+  ops/:            LOC-F016    # Observability / Cost / Audit
+  regression/:     LOC-F017    # Regression & Acceptance Gate
+  policy/:         LOC-F018    # AI Language Intelligence Policy
+  quality/:        LOC-F019    # AI Language Quality Gate
+  realtime/:       LOC-F020    # ⚠️ 被 G-LOC-MATBOX-002 阻塞，不排期
+
+# 本模块**不许**建的表（DEV.docx §4.2 原文：Owner 是 Platform Core）
+must_not_create:
+  - "UserPreference 表（归 Platform Core Identity/Profile）"
+  - "Tenant 表（只新增列，由 Core Migration 负责）"
+  - "Product / Page / ContentBinding 的任何语言副本"

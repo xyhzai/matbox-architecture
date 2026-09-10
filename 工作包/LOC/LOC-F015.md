@@ -38,6 +38,37 @@ Java 包名固定为 `com.matbox.localization`；代码写在 `backend/modules/l
 - ✅ 可以改：`backend/modules/localization/src/test/**`（测试是必须写的）
 - ❌ 不许碰：其它模块目录、公共契约、别人的测试
 
+### 0.6 · 你的工作区（确定的，不要自己找）
+
+| | |
+|---|---|
+| 仓库 | `xyhzai/matbox` |
+| 落脚目录 | `backend/modules/localization/` —— **只在这里面改**，越界会被 `_check_scope.py` 逐个文件列出来 |
+| 分支 | `wp/loc-f015`，从下面那个基线切 |
+| 并行 | 一个功能一个分支、各自一份克隆，几十个 AI 同时开工互不干扰 |
+
+### 0.7 · 源码基线（照着核对，不等于就先对齐再动手）
+
+```
+base_commit: 0fb8f1dac5e776b0dea315927eeaef0bb68e23e5
+分支：      main
+```
+
+clone 之后先跑 `git rev-parse HEAD`，**必须等于上面这个 SHA**。
+不等于说明你不是在这一版上改的，事后没法复现，也没法说清改动是相对什么的。
+
+### 0.8 · 测试报告交到哪（判你做完没做完就读这个）
+
+```bash
+cd backend/modules/localization && mvn -B verify
+# 报告产生在：backend/modules/localization/target/surefire-reports/TEST-*.xml
+```
+
+判据是 `docs/_check_delivery.py --reports <那个目录> --wp LOC-F015`：
+认领的每条编号都要有测试且**通过**——失败、跳过(skipped)、**没有报告**，三种都不算通过。
+
+整套包登记与代码地图（谁在哪、做到哪一步）在 [`code_map.json`](../../code_map.json)，机器可读，一次读全。
+
 机器可读的完整边界见 `docs/loc_protected_scope.yml`，CI 用 `_check_scope.py` 逐个文件判，越界会被逐条点名。
 
 ## 3 · 七类施工面（RC5 硬条件，少一个不能派发）
@@ -180,6 +211,10 @@ void locT008_describeWhatThisCriterionVerifies() {   // ← 后半段换成「�
 > 路由是**逻辑入口**，物理 URL 在 Stage 10 绑真实仓库时确定——这是 DEV.docx 原文的约束。
 
 ### 5.2 你要建的表
+
+> ⚠️ **这些表已经在 `V1__loc_core_tables.sql` 里建好了，不要再写一份重复的迁移**——Flyway 会直接失败。这里印出来是给你**对照字段**用的：契约类必须跟它逐列一致，`ContractMatchesSchemaTest` 双向比对，多一列少一列都红。
+>
+> 确实要新增就写 `V2__…` 递增，**不许改已发布的 V1**（改了校验和对不上，别人的库会 Validate failed）。
 
 ## 20｜数据库及Migration设计
 
@@ -367,6 +402,20 @@ Java 17 / Spring Boot 3.3.5（RuoYi-Vue-Pro 基座）/ **PostgreSQL** / Flyway�
 **「做完了」不由你说了算**：`_check_delivery.py` 读 CI 的 surefire XML，认领的每条 AC 都要有测试且通过；失败、跳过、没有报告，都不算通过。
 
 ## 8 · 怎么起本地环境
+
+**先装两样**（缺一样编不了）：JDK **17**、Maven **3.9+**（`mvn -v` 要指向 JDK 17）。
+
+**再起 PostgreSQL 16**：
+
+```bash
+docker run -d --name matbox-pg -p 5432:5432 \
+  -e POSTGRES_USER=matbox -e POSTGRES_PASSWORD=matbox \
+  -e POSTGRES_DB=matbox postgres:16
+```
+
+**装不了也能干活**：只推分支让 CI 跑，`.github/workflows/backend-build.yml` 起真 postgres:16、跑迁移、跑全部测试。**判定以 CI 为准。**
+
+**当前事实**：`backend/modules/localization/` 骨架已建好、CI 绿；已有 pom、应用入口、3 个契约类、V1 迁移与两个测试。你不是从零开始。
 
 ## 28｜交给未来AI开发人员的完整执行说明
 

@@ -1,0 +1,9 @@
+# CRED（密钥与凭据管理）能改哪、不能碰哪 —— 机器可判版
+# 由 _build_module_pack.py 生成，不要手改。
+module: CRED
+allow:
+  - backend/modules/credential/*
+deny:
+  - backend/modules/dev-quality/*
+  - backend/modules/localization/*
+  - backend/modules/sentinel/*

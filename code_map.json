@@ -1,0 +1,439 @@
+{
+  "_why": [
+    "给 opencode 读的包登记 + 代码地图 + 状态闭环。",
+    "由 docs/_build_code_map.py 生成，**不要手改**。",
+    "",
+    "起因：opencode 第一次拿开发包时回来说缺四样——工作区、源码基线、",
+    "测试报告、状态闭环。按《开发包标准 V2.0》§0.5，它每卡一次就是",
+    "代理指标漏了一条，所以补上并注明是被哪次实跑逼出来的。",
+    "",
+    "状态字段是**算出来的**（看仓库里真有什么），不是人填的。"
+  ],
+  "生成自": {
+    "文档仓库提交": "33a8493df31123676a7755f53ca98b81613f1ccc",
+    "生成时刻": "2026-09-09T21:11:20Z"
+  },
+  "源码基线": {
+    "仓库": "xyhzai/matbox",
+    "分支": "main",
+    "base_commit": "0fb8f1dac5e776b0dea315927eeaef0bb68e23e5",
+    "提交时间": "2026-09-09T21:11:20Z",
+    "怎么核对": "git rev-parse HEAD 必须等于上面这个 SHA；不等于说明你不是在这一版上改的，先对齐再动手"
+  },
+  "测试报告": {
+    "怎么产生": "在模块目录下跑 mvn -B verify",
+    "报告路径": "<落脚目录>/target/surefire-reports/TEST-*.xml",
+    "谁来读": "docs/_check_delivery.py --reports <那个目录> --wp <FeatureID>",
+    "判据": "认领的每条验收标准都要有测试且通过；失败、跳过(skipped)、没有报告，都不算通过"
+  },
+  "模块": {
+    "CRED": {
+      "name": "密钥与凭据管理",
+      "public": true,
+      "sentinel": false,
+      "工作区": {
+        "仓库": "xyhzai/matbox",
+        "克隆地址": "https://github.com/xyhzai/matbox.git",
+        "落脚目录": "backend/modules/credential",
+        "java_package": "com.matbox.credential",
+        "分支": "wp/<小写FeatureID>",
+        "说明": "一个功能一个分支，从基线切；不同 AI 各自一份克隆，互不干扰"
+      },
+      "工作包": [
+        "CRED-F001",
+        "CRED-F002",
+        "CRED-F003",
+        "CRED-F004",
+        "CRED-F005",
+        "CRED-F006",
+        "CRED-F007",
+        "CRED-F008",
+        "CRED-F009"
+      ],
+      "验收标准": {
+        "CRED-F001": [
+          "CRED-T511",
+          "CRED-T512",
+          "CRED-T007",
+          "CRED-T008",
+          "CRED-T009"
+        ],
+        "CRED-F002": [
+          "CRED-T521",
+          "CRED-T004"
+        ],
+        "CRED-F003": [
+          "CRED-T531",
+          "CRED-T532"
+        ],
+        "CRED-F004": [
+          "CRED-T541",
+          "CRED-T001"
+        ],
+        "CRED-F005": [
+          "CRED-T551",
+          "CRED-T002"
+        ],
+        "CRED-F006": [
+          "CRED-T561"
+        ],
+        "CRED-F007": [
+          "CRED-T571",
+          "CRED-T572",
+          "CRED-T573",
+          "CRED-T574",
+          "CRED-T575",
+          "CRED-T576"
+        ],
+        "CRED-F008": [
+          "CRED-T581",
+          "CRED-T582",
+          "CRED-T003"
+        ],
+        "CRED-F009": [
+          "CRED-T591",
+          "CRED-T592",
+          "CRED-T593",
+          "CRED-T005",
+          "CRED-T006"
+        ]
+      },
+      "仓库里现有文件": [
+        "backend/modules/credential/pom.xml",
+        "backend/modules/credential/src/main/java/com/matbox/credential/CredentialApplication.java",
+        "backend/modules/credential/src/main/java/com/matbox/credential/adapters/package-info.java",
+        "backend/modules/credential/src/main/resources/application.yml",
+        "backend/modules/credential/src/main/resources/db/migration/README.md",
+        "backend/modules/credential/src/test/java/com/matbox/credential/SkeletonSmokeTest.java"
+      ],
+      "状态": "工程骨架已就位，业务实现 0 个源文件 —— 可以开工"
+    },
+    "DQ": {
+      "name": "代码持续质检与安全自检 Gate",
+      "public": true,
+      "sentinel": false,
+      "工作区": {
+        "仓库": "xyhzai/matbox",
+        "克隆地址": "https://github.com/xyhzai/matbox.git",
+        "落脚目录": "backend/modules/dev-quality",
+        "java_package": "com.matbox.devquality",
+        "分支": "wp/<小写FeatureID>",
+        "说明": "一个功能一个分支，从基线切；不同 AI 各自一份克隆，互不干扰"
+      },
+      "工作包": [
+        "F-DQ-001",
+        "F-DQ-002",
+        "F-DQ-003",
+        "F-DQ-004",
+        "F-DQ-005",
+        "F-DQ-006",
+        "F-DQ-007",
+        "F-DQ-008",
+        "F-DQ-009",
+        "F-DQ-010",
+        "F-DQ-011",
+        "F-DQ-012",
+        "F-DQ-013"
+      ],
+      "验收标准": {
+        "F-DQ-001": [
+          "DQ-T001",
+          "DQ-T011",
+          "DQ-T014",
+          "DQ-T023"
+        ],
+        "F-DQ-002": [
+          "DQ-T014",
+          "DQ-T017",
+          "DQ-T018"
+        ],
+        "F-DQ-003": [
+          "DQ-T007",
+          "DQ-T021"
+        ],
+        "F-DQ-004": [
+          "DQ-T002",
+          "DQ-T022"
+        ],
+        "F-DQ-005": [
+          "DQ-T003",
+          "DQ-T008",
+          "DQ-T022"
+        ],
+        "F-DQ-006": [
+          "DQ-T004",
+          "DQ-T010",
+          "DQ-T019",
+          "DQ-T022"
+        ],
+        "F-DQ-007": [
+          "DQ-T022"
+        ],
+        "F-DQ-008": [
+          "DQ-T001",
+          "DQ-T005",
+          "DQ-T006",
+          "DQ-T015",
+          "DQ-T021",
+          "DQ-T023"
+        ],
+        "F-DQ-009": [
+          "DQ-T009",
+          "DQ-T010"
+        ],
+        "F-DQ-010": [
+          "DQ-T013"
+        ],
+        "F-DQ-011": [
+          "DQ-T012",
+          "DQ-T016",
+          "DQ-T019",
+          "DQ-T024"
+        ],
+        "F-DQ-012": [
+          "DQ-T015"
+        ],
+        "F-DQ-013": [
+          "DQ-T018",
+          "DQ-T020"
+        ]
+      },
+      "仓库里现有文件": [
+        "backend/modules/dev-quality/pom.xml",
+        "backend/modules/dev-quality/src/main/java/com/matbox/devquality/DevQualityApplication.java",
+        "backend/modules/dev-quality/src/main/java/com/matbox/devquality/adapters/package-info.java",
+        "backend/modules/dev-quality/src/main/java/com/matbox/devquality/shared/contracts/ChallengeRun.java",
+        "backend/modules/dev-quality/src/main/java/com/matbox/devquality/shared/contracts/GateDecision.java",
+        "backend/modules/dev-quality/src/main/java/com/matbox/devquality/shared/contracts/NormalizedFinding.java",
+        "backend/modules/dev-quality/src/main/java/com/matbox/devquality/shared/contracts/QualityRun.java",
+        "backend/modules/dev-quality/src/main/java/com/matbox/devquality/shared/contracts/RepairAttempt.java",
+        "backend/modules/dev-quality/src/main/java/com/matbox/devquality/shared/contracts/ScannerRun.java",
+        "backend/modules/dev-quality/src/main/java/com/matbox/devquality/shared/contracts/SuppressionRef.java",
+        "backend/modules/dev-quality/src/main/java/com/matbox/devquality/shared/contracts/ToolHealthCheck.java",
+        "backend/modules/dev-quality/src/main/resources/application.yml",
+        "backend/modules/dev-quality/src/main/resources/db/migration/V1__dq_core_tables.sql",
+        "backend/modules/dev-quality/src/test/java/com/matbox/devquality/ContractMatchesSchemaTest.java",
+        "backend/modules/dev-quality/src/test/java/com/matbox/devquality/SchemaMigrationTest.java"
+      ],
+      "状态": "业务实现进行中：src/main 下已有 8 个源文件"
+    },
+    "LOC": {
+      "name": "全球多语言",
+      "public": true,
+      "sentinel": false,
+      "工作区": {
+        "仓库": "xyhzai/matbox",
+        "克隆地址": "https://github.com/xyhzai/matbox.git",
+        "落脚目录": "backend/modules/localization",
+        "java_package": "com.matbox.localization",
+        "分支": "wp/<小写FeatureID>",
+        "说明": "一个功能一个分支，从基线切；不同 AI 各自一份克隆，互不干扰"
+      },
+      "工作包": [
+        "LOC-F001",
+        "LOC-F002",
+        "LOC-F003",
+        "LOC-F004",
+        "LOC-F005",
+        "LOC-F006",
+        "LOC-F007",
+        "LOC-F008",
+        "LOC-F009",
+        "LOC-F010",
+        "LOC-F011",
+        "LOC-F012",
+        "LOC-F013",
+        "LOC-F014",
+        "LOC-F015",
+        "LOC-F016",
+        "LOC-F017",
+        "LOC-F018",
+        "LOC-F019",
+        "LOC-F020"
+      ],
+      "验收标准": {
+        "LOC-F001": [
+          "AC-LOC-001",
+          "AC-LOC-003",
+          "AC-LOC-025",
+          "AC-LOC-026",
+          "AC-LOC-034"
+        ],
+        "LOC-F002": [
+          "AC-LOC-001",
+          "AC-LOC-002",
+          "AC-LOC-003"
+        ],
+        "LOC-F003": [
+          "AC-LOC-004",
+          "AC-LOC-008",
+          "AC-LOC-011",
+          "AC-LOC-012",
+          "AC-LOC-018",
+          "AC-LOC-020",
+          "AC-LOC-021",
+          "AC-LOC-022",
+          "AC-LOC-024",
+          "AC-LOC-032",
+          "AC-LOC-035",
+          "AC-LOC-037"
+        ],
+        "LOC-F004": [
+          "AC-LOC-004",
+          "AC-LOC-010",
+          "AC-LOC-012",
+          "AC-LOC-034"
+        ],
+        "LOC-F005": [
+          "AC-LOC-004",
+          "AC-LOC-010",
+          "AC-LOC-012",
+          "AC-LOC-034"
+        ],
+        "LOC-F006": [
+          "AC-LOC-012",
+          "AC-LOC-016",
+          "AC-LOC-029",
+          "AC-LOC-038"
+        ],
+        "LOC-F007": [],
+        "LOC-F008": [
+          "AC-LOC-005",
+          "AC-LOC-006",
+          "AC-LOC-007",
+          "AC-LOC-015",
+          "AC-LOC-017",
+          "AC-LOC-031",
+          "AC-LOC-038",
+          "AC-LOC-039"
+        ],
+        "LOC-F009": [
+          "AC-LOC-019"
+        ],
+        "LOC-F010": [
+          "AC-LOC-019"
+        ],
+        "LOC-F011": [
+          "AC-LOC-019"
+        ],
+        "LOC-F012": [
+          "AC-LOC-014",
+          "AC-LOC-023",
+          "AC-LOC-028",
+          "AC-LOC-029",
+          "AC-LOC-032"
+        ],
+        "LOC-F013": [
+          "AC-LOC-008",
+          "AC-LOC-014",
+          "AC-LOC-022"
+        ],
+        "LOC-F014": [
+          "AC-LOC-008",
+          "AC-LOC-009",
+          "AC-LOC-011",
+          "AC-LOC-022",
+          "AC-LOC-024",
+          "AC-LOC-025",
+          "AC-LOC-027",
+          "AC-LOC-029",
+          "AC-LOC-034",
+          "AC-LOC-035",
+          "AC-LOC-040"
+        ],
+        "LOC-F015": [
+          "AC-LOC-008",
+          "AC-LOC-011",
+          "AC-LOC-012",
+          "AC-LOC-017",
+          "AC-LOC-018",
+          "AC-LOC-020",
+          "AC-LOC-021",
+          "AC-LOC-022",
+          "AC-LOC-023",
+          "AC-LOC-024",
+          "AC-LOC-025",
+          "AC-LOC-029",
+          "AC-LOC-032",
+          "AC-LOC-035"
+        ],
+        "LOC-F016": [
+          "AC-LOC-013",
+          "AC-LOC-016",
+          "AC-LOC-017",
+          "AC-LOC-030"
+        ],
+        "LOC-F017": [
+          "AC-LOC-032"
+        ],
+        "LOC-F018": [
+          "AC-LOC-008",
+          "AC-LOC-009",
+          "AC-LOC-011",
+          "AC-LOC-022",
+          "AC-LOC-024",
+          "AC-LOC-027",
+          "AC-LOC-028",
+          "AC-LOC-029",
+          "AC-LOC-031",
+          "AC-LOC-034",
+          "AC-LOC-035"
+        ],
+        "LOC-F019": [
+          "AC-LOC-027",
+          "AC-LOC-032"
+        ],
+        "LOC-F020": [
+          "AC-LOC-033",
+          "AC-LOC-034",
+          "AC-LOC-035",
+          "AC-LOC-036",
+          "AC-LOC-037",
+          "AC-LOC-038",
+          "AC-LOC-039",
+          "AC-LOC-040"
+        ]
+      },
+      "仓库里现有文件": [
+        "backend/modules/localization/pom.xml",
+        "backend/modules/localization/src/main/java/com/matbox/localization/LocalizationApplication.java",
+        "backend/modules/localization/src/main/java/com/matbox/localization/adapters/package-info.java",
+        "backend/modules/localization/src/main/java/com/matbox/localization/shared/contracts/BusinessContentTranslation.java",
+        "backend/modules/localization/src/main/java/com/matbox/localization/shared/contracts/CatalogRelease.java",
+        "backend/modules/localization/src/main/java/com/matbox/localization/shared/contracts/LanguagePolicyProfile.java",
+        "backend/modules/localization/src/main/resources/application.yml",
+        "backend/modules/localization/src/main/resources/db/migration/V1__loc_core_tables.sql",
+        "backend/modules/localization/src/test/java/com/matbox/localization/ContractMatchesSchemaTest.java",
+        "backend/modules/localization/src/test/java/com/matbox/localization/SchemaMigrationTest.java"
+      ],
+      "状态": "业务实现进行中：src/main 下已有 3 个源文件"
+    },
+    "ZZ": {
+      "name": "写死检测哨兵（不是真模块）",
+      "public": false,
+      "sentinel": true,
+      "工作区": {
+        "仓库": "xyhzai/matbox",
+        "克隆地址": "https://github.com/xyhzai/matbox.git",
+        "落脚目录": "backend/modules/sentinel",
+        "java_package": "com.matbox.sentinel",
+        "分支": "wp/<小写FeatureID>",
+        "说明": "一个功能一个分支，从基线切；不同 AI 各自一份克隆，互不干扰"
+      },
+      "工作包": [
+        "ZZ-F001",
+        "ZZ-F002"
+      ],
+      "验收标准": {
+        "ZZ-F001": [
+          "ZZ-T001"
+        ],
+        "ZZ-F002": [
+          "ZZ-T002"
+        ]
+      },
+      "仓库里现有文件": [],
+      "状态": "落脚目录不存在 —— 还不能开工（R8 会红）"
+    }
+  }
+}

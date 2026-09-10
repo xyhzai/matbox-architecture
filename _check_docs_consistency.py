@@ -338,6 +338,44 @@ def check_diagram_selfcontained():
                      % (len(seg.encode("utf-8")) / 1048576))
 
 
+# ══ C15：B2 与 C 区不许是空壳 ═══════════════════════════════════════════
+# 2026-09-10 用户翻到 CRED 页面底部：「下面就没有了啊」。
+# 对：B2（施工面检查展开）和 C（12 张卡）确实是空的 —— extra_blocks() 遇到
+# 没有 <key>_blocks.json 的模块就静默返回空字符串。
+#
+# 而 C12 只查「块在不在、顺序对不对」，**不查里面有没有东西**，所以一路绿。
+# 这正是标准 §8.3 第 4 条：**不许出现只有表头的空表**（假绿 F6）。
+# 我把 B/C 标成 ⚪ 记在案上，然后照样把空页面交了出去 ——
+# 标了 ⚪ 不等于可以交空的。
+def check_module_page_content():
+    mp = os.path.join(DOCS, "modules.json")
+    mods = json.load(io.open(mp, encoding="utf-8"))["modules"] if os.path.exists(mp) else {}
+    ran = 0
+    for key, cfg in sorted(mods.items()):
+        flow = cfg.get("flow") or ("%s_gate_flow.html" % key.lower())
+        fp = os.path.join(DOCS, flow)
+        if not os.path.exists(fp) or flow == "quality_gate_flow.html":
+            continue
+        ran += 1
+        body = read(fp)
+        n_surf = len(re.findall(r'class="if-full"', body))
+        n_card = len(re.findall(r'class="dr-card"', body))
+        wps = len([f for f in os.listdir(os.path.join(DOCS, "工作包", key))
+                   if re.match(r"^%s\d{3}\.md$" % re.escape(cfg.get("feature_prefix", key)), f)])             if os.path.isdir(os.path.join(DOCS, "工作包", key)) else 0
+        if n_surf < wps:
+            fails.append("C15 %s 的 ⑥ 施工面检查展开只列了 %d 个功能，工作包有 %d 份 —— "
+                         "**该列几条就得列几条，0 条当故障不当空**（标准 §8.3 第 4 条）"
+                         % (flow, n_surf, wps))
+        if n_card != 12:
+            fails.append("C15 %s 的 C 区有 %d 张卡，标准 §8.2 要求 **12 张** —— "
+                         "少一张就是丢内容" % (flow, n_card))
+        if n_surf >= wps and n_card == 12:
+            notes.append("C15 %s 内容完整：施工面 %d 个功能逐条展开 + C 区 12 张卡"
+                         % (flow, n_surf))
+    if not ran:
+        fails.append("C15 一个模块页面都没查到 —— 「跳过」不等于「通过」")
+
+
 # ══ C12：模块页面的块顺序必须符合《开发包标准》§3.7.1 ═══════════════════
 # 2026-09-09。用户对比 DQ 与全球多语言两张截图后问：
 #   「我的开发交接包是放什么位置！！为什么这么提醒你还是出错。」
@@ -786,8 +824,13 @@ def check_page_matches_state():
         # `<div class="wp-file wp-file-ledger">.*?</div>\s*</div>`，看着是非贪婪，
         # 实际因为多了一个 </div> 而一路吃到容器结尾，把 14 行工作包全删了，
         # 于是报"存放处列出 0 个"。前缀匹配简单，也不会因为 HTML 结构微调就碎掉。
+        # 📘 是本模块的总账，⚖️ 是全局文档（开发包标准）——两种都不是工作包，
+        # 不该跟工作包目录去比数量。
+        # 2026-09-10 加 ⚖️：把标准挂进存放处之后，C9 立刻报「目录 14 个、
+        # 存放处 15 个」。**它报得对**——判据是"存放处列的应该正好是工作包"，
+        # 我加了一行非工作包的东西，就该由我来说清楚它算哪一类。
         listed = [x for x in re.findall(r'class="wp-fname"[^>]*>([^<]+)</a>', page)
-                  if not x.startswith("📘")]
+                  if not x.startswith(("📘", "⚖️"))]
         if sorted(listed) != on_disk:
             fails.append("C9 工作包目录里有 %d 个文件 %s，但存放处列出的是 %d 个 %s"
                          "——跑：python docs/_build_workpackage_index.py（或 _build_all.py）"
@@ -841,6 +884,15 @@ WP_MUST_HAVE = [
     ("架构禁令随包附带", r"架构原则第58条"),
     ("交付清单", r"AcceptanceRunID"),
     ("本地环境指引", r"§4\.18|怎么起本地环境"),
+    # ══ 下面四条是 opencode 2026-09-10 第一次拿包时回来说缺的 ══════════
+    # 原话：缺「一个确定的正式开发工作区 / 一个确定的源码基线 /
+    # 当前专项可读取的真实测试报告 / 完整的包登记和代码地图状态闭环」。
+    # 按标准 §0.5：**它每卡一次，就说明代理指标漏了一条**。
+    # 四条逐一核过，全是真缺 —— 不写进检查，下一个模块会原样再漏一次。
+    ("确定的工作区（§0.6）", r"### 0\.6 · 你的工作区"),
+    ("源码基线写死成真实 SHA（§0.7）", r"base_commit:\s*[0-9a-f]{40}"),
+    ("测试报告交到哪（§0.8）", r"surefire-reports"),
+    ("包登记与代码地图（状态闭环）", r"code_map\.json"),
 ]
 # 适配器没有自己的端点和表（由 F-DQ-001 调度、F-DQ-002 归一化），
 # 它们要照着实现的是 Provider Adapter 接口规范——这一条对它们才是硬要求。
@@ -933,7 +985,7 @@ def main():
                check_module_names, check_gate_ids, check_feature_ids,
                check_handoff_packages, check_generated_docs,
                check_page_matches_state, check_workpackages_buildable,
-               check_workflows, check_module_page_order,
+               check_workflows, check_module_page_order, check_module_page_content,
                check_diagram_selfcontained, check_module_has_entry):
         fn()
 
